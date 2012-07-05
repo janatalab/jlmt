@@ -525,14 +525,16 @@ for ifile = 1:nfiles
       % get parameters for this calc step
       nprocparam = length(params.(proc));
       if nprocparam > 1
+        
         %%% if there is more than one parameter structure provided for this
         %%% step, we will attempt to find the parameter structure for this
         %%% step that has a matching cell array of strings in the
         %%% 'prev_steps' field indicating the previous jobs used in this
         %%% series
-        pmatch = cellfun(@ismember,{params.(proc).prev_steps},...
-            repmat(series(1:istep),1,nprocparam),'UniformOutput',false);
-        pidx = find(cellfun(@all,pmatch,1,'first'));
+        pmatch_idxs = find(~cellfun(@isempty,{params.(proc).prev_steps}));
+        pmatch = cellfun(@ismember,{params.(proc)(pmatch_idxs).prev_steps},...
+            repmat(series(1:istep),1,length(pmatch_idxs)),'UniformOutput',false);
+        pidx = find(cellfun(@all,pmatch),1,'first');
         if isempty(pidx)
           wstr = sprintf(['multiple param structs specified for %s, '...
               'however none matched the previous jobs for the current '...
@@ -542,14 +544,8 @@ for ifile = 1:nfiles
           fprintf(lfid,wstr);
           lparams = proc_fh('getDefaultParams');
         else
-          if length(pidx) > 1
-            warning('multiple parameter structs matched for %s, using first',...
-                proc);
-            pidx = pidx(1);
-          end
-          
-          fprintf(lid,'using params index %d for %s\n',pidx,proc);
-          lparams = params.(proc)(pidx);
+          fprintf(lid,'using params index %d for %s\n',pmatch_idxs(pidx),proc);
+          lparams = params.(proc)(pmatch_idxs(pidx));
         end
       else
         % use the only set of parameters available for this step

@@ -36,7 +36,7 @@ function toract = calc_toract(inData,params)
 % added getDefaultParams
 
 toract = [];
-if ischar(indata) && ~isempty(strmatch(indata,'getDefaultParams'))
+if ischar(inData) && ~isempty(strmatch(inData,'getDefaultParams'))
     if ~exist('params','var'), params = ''; end
     toract = getDefaultParams(params);
     return

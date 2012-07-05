@@ -1,15 +1,15 @@
-function pp = ipem_preproc_params(project_name)
-%  pp = ipem_preproc_params;
+function pp = jlmt_preproc_params(project_name)
+%  pp = jlmt_preproc_params;
 %
-%  Initializes various pre-processing parameters for the IPEM Toolbox
+%  Initializes various pre-processing parameters for the JLMT
 %
-% Copyright (c) 2007 The Regents of the University of California
+% Copyright (c) 2007-2012 The Regents of the University of California
 % All Rights Reserved.
 %
-% Author: Petr Janata
+% Authors: Petr Janata, Stefan Tomic, Fred Barrett
 
 if ~exist('project_name','var')
-  project_name = ''; 
+  project_name = '';
 end
 
 switch project_name

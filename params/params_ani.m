@@ -22,6 +22,10 @@ function params = params_ani(varargin)
 %              FirstCBU: frequency of first channel (in critical
 %                        band units, see IPEMCalcANI)
 %               CBUStep: frequency difference between channels (in CBU)
+%            inDataType: specify the type of input for calc_ani (optional)
+%            prev_steps: specify the analysis steps previous to calc_li
+%                        that should be encountered when using the given
+%                        parameters (optional)
 %
 % Initialization values must be passed in as parameter/value pairs
 %
@@ -36,18 +40,10 @@ function params = params_ani(varargin)
 %if you need to add more parameters, add them here
 fields = {'start_time_sec','dur_sec','normalize_wav','normalize_maxVal',...
 	  'aniPath','PlotFlag','DownSampleFactor',...
-	  'NumOfChannels','FirstCBU','CBUStep'};
+	  'NumOfChannels','FirstCBU','CBUStep','prev_steps','inDataType'};
 
 params = mkstruct(fields,varargin);
    
-% If no path is specified in which to perform the ANI calculation, we have to
-% add a unique path.  Otherwise, the calculations will occur in the default
-% temp directory and run the risk of being clobbered if multiple jobs are
-% running with default values
-if isempty(params.aniPath)
-  params.aniPath = create_ipem_tmpdir;
-end
-
 % set defaults if not otherwise specified
 def.PlotFlag = 0;
 def.DownSampleFactor = 4;
@@ -56,9 +52,11 @@ def.FirstCBU = 2.0;
 def.CBUStep =0.5;
 def.start_time_sec = [];
 def.dur_sec = [];
-def.aniPath = create_ipem_tmpdir;  % '/tmp/IPEM'
+def.aniPath = create_jlmt_tmpdir;  % '/tmp/jlmt'
 def.normalize_wav = 1;
 def.normalize_maxVal = 0.95;
+def.prev_steps = [];
+def.inDataType = [];
 
 for ifld = 1:length(fields)
   if isempty(params.(fields{ifld}))

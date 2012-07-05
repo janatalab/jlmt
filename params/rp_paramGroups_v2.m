@@ -7,6 +7,10 @@ function rp = rp_paramGroups_v2(varargin)
 %
 % INPUTS
 % Accepts tag/value pairs, where possible tags are:
+%   'prev_steps':   (optional)   a cell array of strings specifying the
+%                                analysis steps previous to calc_rp that
+%                                should be encountered when using the given
+%                                parameters
 %   'input_type':                'ani','aud',or 'mat'. 'aud' and 'mat' set the
 %                                appropriate parameters to bypass ANI calculation
 % 
@@ -60,7 +64,7 @@ function rp = rp_paramGroups_v2(varargin)
 %                                    constant half-energy time.
 %
 %
-% Copyright (c) 2007 The Regents of the University of California
+% Copyright (c) 2007-2012 The Regents of the University of California
 % All Rights Reserved.
 %
 % Author: Stefan Tomic 10/18/2007
@@ -83,6 +87,8 @@ for iarg = 1:2:nargin
    case 'perform'
     rp.perform = varargin{iarg+1};
     
+   case 'prev_steps'
+    rp.prev_steps = varargin{iarg+1};
   end
   
 end

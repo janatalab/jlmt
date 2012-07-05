@@ -5,21 +5,24 @@ function params = params_toract(varargin)
 % 
 % Input parameters for torus projection within jlmt_proc_series.m
 %
-% 	                  li_siglist = [];
-% 	              HalfDecayTimes = [];
-% 	             calc_spher_harm = 1;
-%     	  spher_harm.nharm_theta = 3;
-%       	spher_harm.nharm_phi = 4;
-% 	         spher_harm.min_rsqr = 0.95;
-% 	                        norm = [];
-% 	                   som.fname = [];
-% 	                          Fs = [];
+% 	            li_siglist = [];
+% 	        HalfDecayTimes = [];
+% 	       calc_spher_harm = 1;
+%   spher_harm.nharm_theta = 3;
+%     spher_harm.nharm_phi = 4;
+% 	   spher_harm.min_rsqr = 0.95;
+% 	                  norm = 'x./repmat(sum(x),size(x,1),1)';
+% 	             som.fname = [];
+% 	                    Fs = [];
+%               inDataType = [];
+%               prev_steps = [];
 %
-% Copyright (c) 2006 The Regents of the University of California
+% Copyright (c) 2006-2012 The Regents of the University of California
 % All Rights Reserved.
 %
 % 2011.01.10 FB - adapted from params_ci.m
-% 2012.07.03 FB - move from ci_siglist to li_siglist
+% 2012.07.03 FB - move from ci_siglist to li_siglist, add inDataType and
+%   prev_steps
 
 fields = {...
     'li_siglist',...
@@ -29,7 +32,9 @@ fields = {...
     'spher_harm',...
     'norm',...
     'som',...
-    'Fs'};
+    'Fs', ...
+    'inDataType', ...
+    'prev_steps'};
 params = mkstruct(fields,varargin);
 
 if ~isempty(params.ci_siglist)
@@ -45,8 +50,3 @@ end
 if isempty(params.norm)
   params.norm = 'x./repmat(sum(x),size(x,1),1)';
 end
-%   params.metrics = struct('toract_corr',struct('tc_pair',[]));
-%   params.metrics = struct('toract_kldist',struct('tc_pair',[]));
-% note: if we stick with verifying sub-structs of main analysis params in
-% ipem_proc_series.getDefaultParameters, we will have to add a default
-% definition for every toract metric function that we use
