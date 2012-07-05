@@ -26,6 +26,14 @@ function [regval,regnames] = calc_tonreg_fmri(toract,params)
 % init vars
 regval = [];
 regnames = {};
+
+%see if toract was a 'get_default_params' tag
+if(ischar(toract) && strcmp(toract,'getDefaultParams'))
+  if ~exist('params','var'), params = ''; end
+  regval = getDefaultParams(params);
+  return
+end
+
 ensemble_globals;
 sdefs = params.scanner;
 toract_cols = set_var_col_const(toract.vars);
@@ -54,3 +62,28 @@ if ~isempty(dc_col) && abs(mean(regval(:,dc_col))) < 1E-09
   regval(:,dc_col) = [];
   regnames(dc_col) = [];
 end
+
+return
+
+%makes sure that all necessary param fields are populated and
+%non-empty. Sets empty or non-existent values to default values
+function params = getDefaultParams(params)
+
+def = params_tonreg_fmri;
+
+fnames = fieldnames(def);
+
+if(~exist('params','var'))
+  params = def;
+  return
+else
+
+  for ifld = 1:length(fnames)
+    if (~isfield(params,fnames{ifld}) || isempty(params.(fnames{ifld})))
+      params.(fnames{ifld}) = def.(fnames{ifld});
+    end
+  end
+
+end
+
+return

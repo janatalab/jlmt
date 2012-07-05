@@ -141,17 +141,6 @@ elseif isfield(par,'HalfDecayTimes')
   end
 end
 
-if isfield(par,'metrics')
-  metfuncs = fieldnames(par.metrics);
-  nmetfunc = length(metfuncs);
-  for k=1:nmetfunc
-    fh = parse_fh(metfuncs{k});
-    li.vars = [li.vars metfuncs{k}];
-    l = length(li.vars);
-    li.data{l} = fh(li,par.metrics.(metfuncs{k}));
-  end % for k=1:nmetfunc
-end % if isfield(params,'metrics
-
 function names = HalfDecayNameGen(times)
   ntime = length(times);
   names = cell(1,ntime);

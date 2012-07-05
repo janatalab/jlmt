@@ -3,8 +3,7 @@ function toract = calc_toract(inData,params)
 % 
 %   toract = calc_toract(inData,params);
 %
-% Also calculates spherical harmonics, as well as additional tonality
-% tracking metrics, if desired.
+% Also calculates spherical harmonics, if desired.
 %
 % REQUIRES
 %   inData - output from calc_li
@@ -18,13 +17,6 @@ function toract = calc_toract(inData,params)
 %       .nharm_theta
 %       .nharm_phi
 %       .min_rsqr
-%   params.metrics - this is a struct whose fieldnames will be taken as
-%       functions to be executed in order to calculate metrics on toract
-%       data. The first argument to the metric function will be 'toract'
-%       (the output of this function), and the second arguent to the metric
-%       function will be params.metrics.(fieldname). Output from each
-%       metric function will be stored in a column of the 'toract' data
-%       structure with the column name set to the metric function name
 % 
 % RETURNS
 %   toract - an ensemble data struct with the following variables:

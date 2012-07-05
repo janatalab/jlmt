@@ -14,7 +14,6 @@ function params = params_toract(varargin)
 % 	                        norm = [];
 % 	                   som.fname = [];
 % 	                          Fs = [];
-%    metrics.toract_corr.tc_pair = [];
 %
 % Copyright (c) 2006 The Regents of the University of California
 % All Rights Reserved.
@@ -30,8 +29,7 @@ fields = {...
     'spher_harm',...
     'norm',...
     'som',...
-    'Fs',...
-    'metrics'};
+    'Fs'};
 params = mkstruct(fields,varargin);
 
 if ~isempty(params.ci_siglist)
@@ -43,9 +41,6 @@ if isempty(params.som)
 end
 if isempty(params.spher_harm)
   params.spher_harm = struct('nharm_theta',[],'nharm_phi',[],'min_rsqr',[]);
-end
-if isempty(params.metrics)
-  params.metrics = struct();
 end
 if isempty(params.norm)
   params.norm = 'x./repmat(sum(x),size(x,1),1)';

@@ -39,9 +39,13 @@ def.glob.process = {{'ani','pp','li','toract'},...
     {'ani','pp','pc','li','toract'}};
 def.glob.outputType = 'data';
 
+if ~iscell(calc_names)
+  calc_names = {calc_names};
+end % if ~iscell(calc_names
+
 for k=1:length(calc_names)
-  fh = parse_fh(calc_names{k});
-  if nargin && isstruct(params) && isfield(params,calc_names{k})
+  fh = parse_fh(['params_' calc_names{k}]);
+  if isstruct(params) && isfield(params,calc_names{k})
     def.(calc_names{k}) = fh('getDefaultParams',params.(calc_names{k}));
   else
     def.(calc_names{k}) = fh('getDefaultParams');

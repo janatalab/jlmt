@@ -12,7 +12,6 @@ function params = params_pc(varargin)
 %   HalfDecayTimes: []
 %       ci_siglist: []
 %             norm: []
-%          metrics: []
 %
 % Copyright (c) 2011 The Regents of the University of California
 % All Rights Reserved.
@@ -25,15 +24,11 @@ fields = {...
     'nnet',...
     'HalfDecayTimes',...
     'ci_siglist',...
-    'norm',...
-    'metrics'};
+    'norm'};
 params = mkstruct(fields,varargin);
 
 if isempty(params.nnet)
   params.nnet = struct('fname',[]);
-end
-if isempty(params.metrics)
-  params.metrics = struct();
 end
 
 end % params_pc

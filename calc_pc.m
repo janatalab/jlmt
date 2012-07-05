@@ -10,7 +10,7 @@ function pc = calc_pc(indata,params)
 % Toolbox.
 % 
 % This script will accept both context images and periodicity pitch
-% images. It also calculates pitch class metrics, if desired.
+% images.
 %
 % IF you want to project context images to pitch class space, you MUST
 % specify 'params.li_siglist', since the output from calc_context.m can
@@ -39,13 +39,6 @@ function pc = calc_pc(indata,params)
 %       class space, and it will send PP data rather than LI data to this
 %       function.
 %   params.norm - equation (using @inline) used to normalize the input
-%   params.metrics - this is a struct whose fieldnames will be taken as
-%       functions to be executed in order to calculate metrics on
-%       pitchclass data. The first argument to the metric function will be
-%       'pc' (the output of this function), and the second arguent to the
-%       metric function will be params.metrics.(fieldname). Output from
-%       each metric function will be stored in a column of the 'pc' data
-%       structure with the column name set to the metric function name
 % 
 % RETURNS
 %   pc - an ensemble data struct with the following variables:

@@ -459,7 +459,7 @@ function defParams = getDefaultParams(params)
 % this can be called from external functions by passing 
 % 'getDefaultParams' to rhythm_profiler
 
-if(exist('params','var') & isfield(params,'inDataType'))
+if(exist('params','var') && isfield(params,'inDataType'))
   switch(params.inDataType)
     
    case 'ani'
