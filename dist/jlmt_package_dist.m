@@ -1,4 +1,4 @@
-% script to package up TTt files for distribution
+% script to package up jlmt files for distribution
 % 
 % FB 2012.05.21 - adapted from private/matlab/projects/rhythm_profiler/dist/rp_package_dist.m
 
@@ -14,17 +14,17 @@ EDIT_FILES = 0;
 DISTRIBUTE_TO_ATONAL = 0;
 
 home_path = fullfile('/home',user);
-log_file = fullfile(home_path,'data/TTtfiles.log');
-priv_path = fullfile(home_path,'svn/private/matlab');
-pub_path = fullfile(home_path,'svn/public/matlab');
-readme_file = fullfile(priv_path,'jlmt/dist/README.txt');
-relative_dist_path = 'TTt/';
-dist_path = fullfile(relative_dist_path);
+priv_path = fullfile(home_path,'svn','private','matlab');
+pub_path = fullfile(home_path,'svn','public','matlab');
+
+relative_dist_path = 'jlmt_dist/';
+dist_path = fullfile(home_path,relative_dist_path);
 www_path = '/var/www/html/resources/software/';
-dist_file = 'TTt_v1.0.tar.gz';
+dist_file = 'jlmt_v1.0.tar.gz';
+log_file = fullfile(home_path,'data','jlmt_files.log');
+readme_file = fullfile(priv_path,'jlmt','dist','README.txt');
 
-colormap_list = {fullfile(pub_path,'colormaps/new_seismic')};
-
+colormap_list = {fullfile(pub_path,'colormaps','new_seismic')};
 
 data_list = {...
     '/data2/tontraj/orig_maps/map_10-Dec-2006_16:18.mat',...
@@ -125,9 +125,9 @@ pathRep = {fullfile(pub_path,'database'),'utils';...
 	   fullfile(pub_path,'utils'),'utils';...
 	   fullfile(priv_path,'data_types/event_objects'),'event_objects';...
        fullfile(priv_path,'database_private'),'utils';...
-	   fullfile(priv_path,'ipem/rp_modules'),'rp_modules';...
-       fullfile(priv_path,'ipem/test'),'test';...
-	   fullfile(priv_path,'ipem'),'proc';...
+	   fullfile(priv_path,'jlmt/rp_modules'),'rp_modules';...
+       fullfile(priv_path,'jlmt/test'),'test';...
+	   fullfile(priv_path,'jlmt'),'proc';...
 	   fullfile(priv_path,'projects/rhythm_profiler/params'),'proc/params';...
 	   fullfile(priv_path,'projects/rhythm_profiler'),'.';...
        fullfile(priv_path,'projects/tonmodcomp'),'utils';...
@@ -189,15 +189,18 @@ else
   end
   
   %copy the readme file
+  fprintf(1,'copying readme\n');
   eval(['!cp ' readme_file ' ' dist_path]);
 
   %copy colormaps
+  fprintf(1,'copying colormaps\n');
   eval(['!cp ' cell2str(colormap_list,' ') ' ' fullfile(dist_path,'utils')]);
   
   %set permissions on all files to be the same
   eval(['!chmod -R 755 ' dist_path]);
   
   %tarball everything
+  fprintf(1,'making tarball\n');
   eval(['!tar -C ' home_path ' -cf ' fullfile(home_path,dist_file) ' ' relative_dist_path ' --gzip']);
   
   if(DISTRIBUTE_TO_ATONAL)
