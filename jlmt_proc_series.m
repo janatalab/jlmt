@@ -200,7 +200,7 @@ function outData = jlmt_proc_series(inData,params)
 % parameters, including a prev_steps field, that were used to generate the
 % given data.
 %
-% Copyright (c) 2006-2011 The Regents of the University of California
+% Copyright (c) 2006-2012 The Regents of the University of California
 % All Rights Reserved.
 %
 % Authors:
@@ -267,17 +267,12 @@ if(~isfield(params,'glob') || ~isfield(params.glob,'ignore'))
 end
 
 % If Ensemble is installed and available in the path, ensemble_globals will
-% set the variables stimulus_root and stimulus_jlmt_analysis_root. These
+% set the variables stimulus_root and stimulus_ipem_analysis_root. These
 % variables are used when processing stimuli from the Ensemble stimulus
 % database. If Ensemble is not installed, these variables will not be used.
-try
-  ensemble_globals;
-catch
-  stimulus_root = '';
-  stimulus_jlmt_analysis_root = '';
+if exist('ensemble_globals','file')
+  ensemble_globals
 end
-
-% % % % FIXME: change ipem -> jlmt
 
 % initialize the output data structure
 outData = ensemble_init_data_struct;
@@ -391,7 +386,6 @@ elseif isstruct(inData) && all(isfield(inData{1},{'vars','type','data'}))
 				  stimIDList,'extract_vars',{'location'},'conn_id',params.ensemble.conn_id);
     stimLocs = stimLocs{1};
     destStimLocs = check_stim_dirs(stimLocs,'srcroot',stimulus_root,'destroot',stimulus_ipem_analysis_root,'verbose',false);
-    
   end
   
 elseif(isnumeric(inData)) || (iscell(inData) && isnumeric(inData{1}))
@@ -644,23 +638,21 @@ for ifile = 1:nfiles
         eval(sprintf('outData.data{outDataCols.%s}{ifile,1} = %s',proc,proc));
       end
     end % for istep = 1:length(series
+
+%%% FIXME: plot code from previous versions for rhythm profiler: must
+%%% confirm that it integrates well with the new coding scheme
+    if(ismember('rp',series))
+      rpPlotParams = params.plot.rp;
+      rpPlotParams.fig.title = sig_st.data{sig_st_cols.tag};
+      if(isfield(params.plot,'addInputFname') && params.plot.addInputFname == 1)
+    	[dummyvar,plotFstub] = fileparts(params.plot.rp.plotFname);
+        [dummyvar,sigFstub] = fileparts(sig_st.data{sig_st_cols.filename});
+	rpPlotParams.plotFname = [plotFstub '_' sigFstub];
+      end
+      plot_rhythmProfile({rp,sig_st},rpPlotParams);
+    end
+
   end % for iseries = 1:nproc
-
-%%%% plot code from previous versions for rhythm profiler: must confirm
-%%%% that it integrates well with the new coding scheme
-%     if(ismember('rp',params.plot.process))
-%       plotRPInput{1} = rp;
-%       plotRPInput{2} = sig_st;
-%       rpPlotParams = params.plot.rp;
-%       rpPlotParams.fig.title = sig_st.data{sig_st_cols.tag};
-%       if(isfield(params.plot,'addInputFname') && params.plot.addInputFname == 1)
-% 	[dummyvar,plotFstub] = fileparts(params.plot.rp.plotFname);
-% 	[dummyvar,sigFstub] = fileparts(sig_st.data{sig_st_cols.filename});
-% 	rpPlotParams.plotFname = [plotFstub '_' sigFstub];
-%       end
-%       plot_rhythmProfile(plotRPInput,rpPlotParams);
-%     end
-
 end % for ifile=
 
 if(exist('tmp_conn_id','var'))
@@ -720,7 +712,7 @@ if (nargin)
     % function we create, we update the defaults for params.metrics in
     % params_toract.m to include the defaults for the given metric. If we
     % do not want to do this, we will have to either not descend into
-    % parameters for each ipem_proc_series function, or we will have to
+    % parameters for each jlmt_proc_series function, or we will have to
     % find another solution to checking the defaults. - FB 01/10/2011
 %     [validParams,badFields,reason] = compare_structs(params.(type),def.(type),'values',0,'substruct',0,'types',0);
     [validParams,badFields,~] = compare_structs(params.(type),def.(type),'values',0,'substruct',1,'types',0);

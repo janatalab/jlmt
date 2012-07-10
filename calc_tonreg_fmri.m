@@ -1,5 +1,5 @@
 function [regval,regnames] = calc_tonreg_fmri(toract,params)
-% generates fmri tonality tracking regressors for a given stimulus
+% generates fmri tonality tracking regressors for a given timulus
 % 
 %   [regval,regnames] = calc_tonreg_fmri(indata,params);
 %
@@ -21,10 +21,13 @@ function [regval,regnames] = calc_tonreg_fmri(toract,params)
 %   regnames - a cell array of strings identifying each spherical harmonic
 %       timecourse in the 'regval' matrix
 % 
+% Copyright (c) 2012 The Regents of the University of California
+% All Rights Reserved.
+%
 % 2012.05.22 FB - adapted from fmri_generate_tonreg.m
 
 % init vars
-regval = [];
+regval = []; %#ok<NASGU>
 regnames = {};
 
 %see if toract was a 'get_default_params' tag
@@ -34,12 +37,15 @@ if(ischar(toract) && strcmp(toract,'getDefaultParams'))
   return
 end
 
-ensemble_globals;
 sdefs = params.scanner;
 toract_cols = set_var_col_const(toract.vars);
 
 % get the spline data
-try use_sig = params.use_sig; catch use_sig = 'tc_2'; end
+try
+    use_sig = params.use_sig;
+catch %#ok<CTCH>
+    use_sig = 'tc_2';
+end
 sidx = strmatch(use_sig,toract.data{toract_cols.labels});
 sphm_st = toract.data{toract_cols.spherharm}{sidx};
 regnames = sphm_st.spher_names;

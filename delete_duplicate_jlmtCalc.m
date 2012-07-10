@@ -26,7 +26,7 @@
 %    calculations will not be checked.
 % 6) Run the script. This should take a little while.
 %
-% Copyright (c) 2008 The Regents of the University of California
+% Copyright (c) 2008-2012 The Regents of the University of California
 % All Rights Reserved
 %
 % Author(s):

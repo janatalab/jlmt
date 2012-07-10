@@ -2,6 +2,8 @@ function out_st = metric_readout(data_st, params)
 % Given a list of stimulus paths specified in data_st, this function will
 % extract metrics based on several fields in the params structure.
 % 
+% Copyright (c) 2012 The Regents of the University of California
+% All Rights Reserved.
 %
 
 % 01Nov2011 Petr Janata

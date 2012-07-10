@@ -15,7 +15,7 @@ function [foundFile,firstViolation,violationReason] = check_anal_exist(dirPath, 
 % check, and params.matchParams is the parameter structure
 % containing the parameter values we want to find.
 %
-% Copyright (c) 2007 The Regents of the University of California
+% Copyright (c) 2007-2012 The Regents of the University of California
 % All Rights Reserved.
 %
 % Author(s):

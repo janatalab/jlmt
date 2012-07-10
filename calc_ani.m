@@ -15,7 +15,7 @@ function outData = calc_ani(inData,ap)
 % outData: an ani data structure
 %
 %
-% Copyright (c) 2007 The Regents of the University of California
+% Copyright (c) 2007-2012 The Regents of the University of California
 % All Rights Reserved.
 %
 % Author(s):

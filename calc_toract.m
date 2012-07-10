@@ -22,7 +22,7 @@ function toract = calc_toract(inData,params)
 %   toract - an ensemble data struct with the following variables:
 %       
 %
-% Copyright (c) 2007 The Regents of the University of California
+% Copyright (c) 2007-2012 The Regents of the University of California
 % All Rights Reserved.
 %
 % 12/10/06 Petr Janata

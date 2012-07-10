@@ -11,7 +11,7 @@ function pp = init_pp_struct(varargin)
 %
 % Varargin can be a tag/value list of fieldnames and associated values
 %
-% Copyright (c) 2007 The Regents of the University of California
+% Copyright (c) 2007-2012 The Regents of the University of California
 % All Rights Reserved.
 %
 %

@@ -7,8 +7,7 @@ function defs = CollinsEtAl_globals(defs)
 % This script returns global parameters 
 % 
 % PJ 2011.10.27 
-
-ensemble_globals;
+% FB 2012.07.10 adapted for JLMT release
 
 %% set paths
 defs.paths.install_root = fileparts(which('jlmt_proc_series'));

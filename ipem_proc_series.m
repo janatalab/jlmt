@@ -119,11 +119,8 @@ end
 
 %need to catch an error in case ensemble_globals is not in the path
 %this provides for public use of ipem_proc_series (without Ensemble)
-try
-  ensemble_globals;
-catch
-  stimulus_root = '';
-  stimulus_ipem_analysis_root = '';
+if exist('ensemble_globals','file')
+  ensemble_globals
 end
 
 outData = ensemble_init_data_struct;

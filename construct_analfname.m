@@ -7,7 +7,7 @@ function analfname = construct_analfname(fname,anal_stub)
 % (currently only a .mat file) that will be placed in a sibling directory that
 % has the name in anal_stub. The sibling directory is created if it doesn't exist.
 %
-% Copyright (c) 2006 The Regents of the University of California
+% Copyright (c) 2006-2012 The Regents of the University of California
 % All Rights Reserved.
 %
 % Author:

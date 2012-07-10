@@ -12,7 +12,7 @@ function fh = pp_atten_func(atten_type)
 % 'hanning', etc
 %
 %
-% Copyright (c) 2007 The Regents of the University of California
+% Copyright (c) 2007-2012 The Regents of the University of California
 % All Rights Reserved.
 %
 % 12/10/06 Petr Janata

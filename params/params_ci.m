@@ -15,7 +15,7 @@ function params = params_ci(varargin)
 % % % %         HalfDecayChords: []
 % % % %    HalfDecayToneCenters: []
 %
-% Copyright (c) 2006 The Regents of the University of California
+% Copyright (c) 2006-2012 The Regents of the University of California
 % All Rights Reserved.
 %
 % 12/4/06 Petr Janata

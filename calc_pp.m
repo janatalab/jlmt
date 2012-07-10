@@ -4,7 +4,7 @@ function pp = calc_pp(inData,par)
 % Calculates a periodicity pitch image from an ANI image using IPEM Toolbox
 % routine IPEMPeriodicityPitch()
 %
-% Copyright (c) 2007 The Regents of the University of California
+% Copyright (c) 2007-2012 The Regents of the University of California
 % All Rights Reserved.
 %
 % 12/04/06 Petr Janata
