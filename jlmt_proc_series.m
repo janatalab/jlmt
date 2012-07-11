@@ -250,7 +250,7 @@ calcs = dir(fullfile(rootdir,'calc*m'));
 calcfuncs = cell(1,length(calcs));
 for k=1:length(calcs)
   lname = regexp(calcs(k).name,'^calc_(.*)\.m$','tokens');
-  calcfuncs{k} = lname{1};
+  calcfuncs{k} = lname{1}{1};
 end % for k=1:length(calcs
 
 % get/return default jlmt parameter structure?
@@ -315,6 +315,14 @@ catch
   params.glob.outputType = 'data';
 end
 
+if ~iscell(params.glob.process)
+  params.glob.process = {params.glob.process};
+end
+if ~iscell(params.glob.process{1})
+  params.glob.process = {params.glob.process};
+end
+nproc = length(params.glob.process);
+
 %%  identify input format
 if(ischar(inData)) 
 
@@ -347,7 +355,7 @@ elseif(iscell(inData) && all(isfield(inData{1},{'vars','type','data'})) ...
   inDataType = 'aud_cell_array';
   nfiles = length(inData);
 
-elseif isstruct(inData) && all(isfield(inData{1},{'vars','type','data'}))
+elseif isstruct(inData) && all(isfield(inData,{'vars','type','data'}))
 
   % deal with ensemble data struct types here
   if(ismember('path',inData.vars) && ismember('filename',inData.vars))
@@ -588,7 +596,7 @@ for ifile = 1:nfiles
         eval(sprintf('%s = proc_fh(%s,lparams)',proc,input_data));
      
         % save the output?
-        if ismember(proc,params.glob.save_calc)
+        if ismember(proc,params.glob.save_calc{iseries})
           % if a previous calculation exists and we are recalculating,
           % use previous calculation filename and overwrite it
           if ~isempty(previousCalcFname)
@@ -623,7 +631,7 @@ for ifile = 1:nfiles
       end
       
       % plot function?
-      if isfield(lparmas,'plotfun') && ~isempty(lparams.plotfun)
+      if isfield(lparams,'plotfun') && ~isempty(lparams.plotfun)
         plotfun = parse_fh(lparams.plotfun);
         eval(sprintf('plotfun(%s,lparams)',proc));
         %% FIXME: add functionality to support multiple inputs to plotfun
@@ -678,7 +686,7 @@ def.glob.process = {{'ani','pp','li','toract'},...
 def.glob.outputType = 'data';
 
 for k=1:length(calc_names)
-  fh = parse_fh(calc_names{k});
+  fh = parse_fh(['calc_' calc_names{k}]);
   if nargin && isstruct(params) && isfield(params,calc_names{k})
     def.(calc_names{k}) = fh('getDefaultParams',params.(calc_names{k}));
   else
@@ -702,19 +710,6 @@ if (nargin)
       params.(type) = struct();
     end
     
-    %see if there are any fields in params that are not in
-    %defs. This should be reported since it may have been caused by
-    %a misspelling. All possible fields should also have defaults
-    %(even if the default is simply empty)
-    
-    % should we be checking sub-structs of the main analysis parameters? If
-    % we do this, then we need to make sure that for every toract metric
-    % function we create, we update the defaults for params.metrics in
-    % params_toract.m to include the defaults for the given metric. If we
-    % do not want to do this, we will have to either not descend into
-    % parameters for each jlmt_proc_series function, or we will have to
-    % find another solution to checking the defaults. - FB 01/10/2011
-%     [validParams,badFields,reason] = compare_structs(params.(type),def.(type),'values',0,'substruct',0,'types',0);
     [validParams,badFields,~] = compare_structs(params.(type),def.(type),'values',0,'substruct',1,'types',0);
     if(~validParams)
       if iscell(badFields), badFields = cell2str(badFields,', '); end

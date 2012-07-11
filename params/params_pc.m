@@ -35,7 +35,9 @@ fields = {...
 params = mkstruct(fields,varargin);
 
 if isempty(params.nnet)
-  params.nnet = struct('fname',[]);
+  root_path = fileparts(fileparts(which('jlmt_proc_series')));
+  params.nnet = struct('fname',fullfile(root_path,...
+      'data','pp2pitchclass_nnet_full_20120418T220430.mat'));
 end
 
 end % params_pc

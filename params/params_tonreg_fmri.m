@@ -31,3 +31,14 @@ fields = {'scanner','use_sig','inDataType','prev_steps'};
 
 params = mkstruct(fields,varargin);
 
+% set defaults if not otherwise specified
+def.scanner = struct('TR',2,'dt',16); % Janata Lab defaults: 2s TR, 1/16 dt
+def.use_sig = calc_li('calc_names',[2]); % timescale used in Janata 2009 Cerebral Cortex
+def.inDataType = '';
+def.prev_steps = [];
+
+for ifld = 1:length(fields)
+  if isempty(params.(fields{ifld}))
+    params.(fields{ifld}) = def.(fields{ifld});
+  end
+end

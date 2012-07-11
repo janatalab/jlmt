@@ -16,8 +16,8 @@ function pc = calc_pc(indata,params)
 % specify 'params.li_siglist', since the output from calc_context.m can
 % contain multiple context images (integrated at different timeconstants).
 % 
-% calc_pitchclass is intended to be called by ipem_proc_series.m. If you
-% specify params.li_siglist, ipem_proc_series.m will assume that you want
+% calc_pitchclass is intended to be called by jlmt_proc_series.m. If you
+% specify params.li_siglist, jlmt_proc_series.m will assume that you want
 % to project context image data into pitch class space, and will therefore
 % send LI data to this function. If you do not specify params.li_siglist,
 % it will assume that you want to project periodicity pitch images to pitch
@@ -34,7 +34,7 @@ function pc = calc_pc(indata,params)
 %   params.HalfDecayTimes (used if indata.type = 'li') - Half Decay Times
 %       used by IPEMLeakyIntegration
 %   params.li_siglist (used if indata.type = 'li') - names of images in
-%       indata to use. If this is not specified, ipem_proc_series will
+%       indata to use. If this is not specified, jlmt_proc_series will
 %       assume that you want to project periodicity pitch images to pitch
 %       class space, and it will send PP data rather than LI data to this
 %       function.

@@ -10,7 +10,7 @@ function toract = calc_toract(inData,params)
 %   params.som.fname - path to the self organizing map that transforms
 %       context image data into torus activation data
 %   params.HalfDecayTimes - Half Decay Times used by IPEMLeakyIntegration
-%   params.li_sig_list - names of images in inData to use
+%   params.li_siglist - names of images in inData to use
 %   params.norm - equation (using @inline) used to normalize inData
 %   params.calc_spher_harm - if specified, these parameters will be used to
 %       guide construction of spherical harmonics

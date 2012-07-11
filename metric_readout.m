@@ -107,10 +107,10 @@ for istim = 1:nstims
 					varName = currSpace;
 			end
 			matchParams.varName = varName;
-			matchParams.paramFind.ani = params.ipem.ani;
-			matchParams.paramFind.pp = params.ipem.pp;
+			matchParams.paramFind.ani = params.jlmt.ani;
+			matchParams.paramFind.pp = params.jlmt.pp;
             if ~strcmp(currSpace, 'pc_ci')
-                matchParams.paramFind.(currSpace) = params.ipem.(currSpace);
+                matchParams.paramFind.(currSpace) = params.jlmt.(currSpace);
                 matchParams.paramFind.(currSpace).(tcName) = currTCPair;
             end
 			matchParams.ignore = {'ani.aniPath','ci','Fs','pc'};
@@ -122,7 +122,7 @@ for istim = 1:nstims
 				error(['Could not locate MAT-file with matching parameters in %s\n' ...
 				'Violation reason: %s'], spaceDir, violationReason)
 					% This is where we can add calculation of the analysis via
-					% IPEMProcSeries
+					% jlmt_proc_series
 			else
 				calcInfo = load(fullfile(spaceDir,previousCalcFname{1}));
 			end

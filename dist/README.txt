@@ -104,8 +104,14 @@ following line to your startup.m file:
 
     path(path,genpath(<path_to_JLMT>));
 
-where <path_to_JLMT> is the absolute path to the JLMT directory. It
-may also be accomplished in the MATLAB user interface, by choosing:
+where <path_to_JLMT> is the absolute path to the JLMT directory. An 
+example of lines to add to your startup.m file can be found in:
+
+    jlmt/jlmt_startup.m
+
+Make sure to replace '/home/fbarrett/matlab/jlmt_dist' in that file
+with the path to your particular jlmt directory. You may also use the
+MATLAB user interface to add JLMT paths by choosing:
 
     File -> Set Path
 

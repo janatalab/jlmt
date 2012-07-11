@@ -5,14 +5,14 @@ function params = params_toract(varargin)
 % 
 % Input parameters for torus projection within jlmt_proc_series.m
 %
-% 	            li_siglist = [];
-% 	        HalfDecayTimes = [];
+% 	            li_siglist = []; % tc_2 if not specified
+% 	        HalfDecayTimes = []; % 2 if not specified
 % 	       calc_spher_harm = 1;
 %   spher_harm.nharm_theta = 3;
 %     spher_harm.nharm_phi = 4;
 % 	   spher_harm.min_rsqr = 0.95;
 % 	                  norm = 'x./repmat(sum(x),size(x,1),1)';
-% 	             som.fname = [];
+% 	             som.fname = []; % modulating-melody-trained som if not specified
 % 	                    Fs = [];
 %               inDataType = [];
 %               prev_steps = [];
@@ -37,16 +37,33 @@ fields = {...
     'prev_steps'};
 params = mkstruct(fields,varargin);
 
+root_path = fileparts(fileparts(which('jlmt_proc_series')));
+
+def.li_siglist = [];
+def.ci_siglist = [];
+def.HalfDecayTimes = [];
+def.calc_spher_harm = 1;
+def.spher_harm = struct('nharm_theta',3,'nharm_phi',4,'min_rsqr',0.95);
+def.norm = 'x./repmat(sum(x),size(x,1),1)';
+def.som = struct('fname',fullfile(root_path,'data',...
+    'map_10-Dec-2006_16:18.mat'));
+def.Fs = [];
+def.inDataType = '';
+def.prev_steps = [];
+
+for ifld = 1:length(fields)
+  if isempty(params.(fields{ifld}))
+    params.(fields{ifld}) = def.(fields{ifld});
+  end
+end
+
 if ~isempty(params.ci_siglist)
   % for backwards compatibility; ci_siglist is deprecated
   params.li_siglist = params.ci_siglist;
 end
-if isempty(params.som)
-  params.som = struct('fname',[]);
+if isempty(params.HalfDecayTimes) && isempty(params.li_siglist)
+  params.HalfDecayTimes = [2];
 end
-if isempty(params.spher_harm)
-  params.spher_harm = struct('nharm_theta',[],'nharm_phi',[],'min_rsqr',[]);
-end
-if isempty(params.norm)
-  params.norm = 'x./repmat(sum(x),size(x,1),1)';
+if isempty(params.li_siglist)
+  params.li_siglist = calc_li('calc_names',params.HalfDecayTimes);
 end

@@ -11,10 +11,10 @@ function params = params_pp(varargin)
 %           Matrix: []
 %       SampleFreq: []
 %     LowFrequency: []
-%       FrameWidth: []
-%    FrameStepSize: []
-%         PlotFlag: []
-%            Atten: [] - handle to weighting function to apply over periodicity dimension
+%       FrameWidth: 0.0381
+%    FrameStepSize: 0.0381
+%         PlotFlag: 0
+%            Atten: 'ipem_squash_hf' - handle to weighting function to apply over periodicity dimension
 %       inDataType: specify the type of input for calc_pp (optional)
 %       prev_steps: specify the analysis steps previous to calc_pp that
 %                   should be encountered when using the given
@@ -38,4 +38,16 @@ fields = {...
 
 params = mkstruct(fields,varargin);
 
-end % params_pp
+def.LowFrequency = [];
+def.FrameWidth = 0.0381;
+def.FrameStepSize = 0.0381;
+def.PlotFlag = 0;
+def.Atten = 'ipem_squash_hf';
+def.prev_steps = [];
+def.inDataType = '';
+
+for ifld = 1:length(fields)
+  if isempty(params.(fields{ifld}))
+    params.(fields{ifld}) = def.(fields{ifld});
+  end
+end

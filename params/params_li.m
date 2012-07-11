@@ -11,7 +11,7 @@ function params = params_li(varargin)
 %                SnapShot: []
 %             Enlargement: []
 %                PlotFlag: []
-%          HalfDecayTimes: []
+%          HalfDecayTimes: 2
 % % % %         HalfDecayChords: []
 % % % %    HalfDecayToneCenters: []
 %              inDataType: specify the type of input for calc_li (optional)
@@ -38,4 +38,17 @@ fields = {...
 
 params = mkstruct(fields,varargin);
 
-end % params_li
+% set defaults if not otherwise specified
+def.PeriodicityPitch = [];
+def.SnapShot = [];
+def.HalfDecayTimes = [2];
+def.Enlargement = [];
+def.PlotFlag = [];
+def.prev_steps = [];
+def.inDataType = [];
+
+for ifld = 1:length(fields)
+  if isempty(params.(fields{ifld}))
+    params.(fields{ifld}) = def.(fields{ifld});
+  end
+end
