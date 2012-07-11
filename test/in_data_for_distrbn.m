@@ -1,4 +1,4 @@
-% concise header
+% Analysis of example files from Collins et all 2012
 % 
 % 
 
