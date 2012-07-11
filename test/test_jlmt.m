@@ -12,14 +12,8 @@
 % Collect test file paths
 test_data_dir = fullfile(fileparts(fileparts(which('jlmt_proc_series'))),...
     'data','test_jlmt');
-input_file_pattern = {'*.wav','*.mp3'};
-
-fnames = {};
-for k=1:length(input_file_pattern)
-  dirStruct = dir(fullfile(test_data_dir,input_file_pattern{k}));
-  fnames = [fnames dirStruct.name];
-end % for k=1:length(input_file_pattern
-flist = check_stim_dirs(fnames,'srcroot',test_data_dir,'destroot',test_data_dir);
+flist = listFilesOfType(test_data_dir, {'wav','mp3'});
+flist = check_stim_dirs(flist,'srcroot',test_data_dir,'destroot',test_data_dir);
 
 % Specify minimum parameters for torus projections. Defaults will be used
 % for each step.

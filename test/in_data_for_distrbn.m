@@ -1,5 +1,9 @@
+% concise header
+% 
+% 
 
-audio_root = fullfile('/data2', 'tonmodcomp', 'temp');
+audio_root = fullfile(fileparts(fileparts(which('jlmt_proc_series'))),...
+    'data');
 
 expmt_names = {'bigand_etal_jep_2003' 'bigand_etal_jep_2003' ...
     'marmel_and_tillmann_mp_2009' 'marmel_and_tillmann_mp_2009'};
