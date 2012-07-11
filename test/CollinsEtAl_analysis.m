@@ -30,7 +30,7 @@ for istim = 1:nstim
         error('Found %d files in %s\n', length(file_list), curr_path);
     end
     in_data.data{ic.path}{istim} = curr_path;
-    in_data.data{ic.filename}{istim} = file_list;
+    in_data.data{ic.filename}{istim} = file_list{1};
     [path_no_ext, ~, ~] = fileparts(curr_path);
     in_data.data{ic.path_no_ext}{istim} = path_no_ext;
     in_data.data{ic.name_no_ext}{istim} = audio_names{istim};
@@ -38,4 +38,4 @@ end
 
 params = CollinsEtAl_globals;
 
-jlmt_out = jlmt_proc_series(in_data, params);
+jlmt_out = jlmt_proc_series(in_data, params.jlmt);

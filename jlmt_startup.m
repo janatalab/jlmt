@@ -22,10 +22,3 @@ path(path,genpath('/path/to/jlmt_dist'));
 % % PATH TO IPEM Toolbox : replace '/path/to/IPEMToolbox' with the path to
 % % your IPEM Toolbox installation
 path(path,genpath('/path/to/IPEMToolbox'));
-
-% % PATH TO MP3READ : if you wish to process MP3 files, you need to
-% % download 'mp3read' from the LabROSA web site:
-% %     http://labrosa.ee.columbia.edu/matlab/mp3read.html
-% % Then, uncomment the following line and change the path to add the
-% % directory that holds your copy of mp3read:
-% addpath('/path/to/directory/holding/mp3/read/');

@@ -271,7 +271,7 @@ end
 % variables are used when processing stimuli from the Ensemble stimulus
 % database. If Ensemble is not installed, these variables will not be used.
 if exist('ensemble_globals','file')
-  ensemble_globals
+  ensemble_globals;
 end
 
 % initialize the output data structure
@@ -509,45 +509,41 @@ for ifile = 1:nfiles
 
   % iterate over job series
   for iseries = 1:nproc
-    series = params.glob.process{iseries};
-    if isempty(series), continue, end
-    if length(unique(series)) < length(series)
-      error('duplicate steps in a series are not permitted');
-    end
+    pseries = params.glob.process{iseries};
+    if isempty(pseries), continue, end
     series_params = struct();
+    nseries = length(pseries);
 
     fprintf(lfid,'jlmt_proc_series: running job series %d/%d (%s)\n',...
-        iseries,nproc,cell2str(series,'-'));
+        iseries,nproc,cell2str(pseries,'-'));
     
     % iterate over steps in this series
-    for istep = 1:length(series)
-      proc = series{istep};
+    for istep = 1:nseries
+      proc = pseries{istep};
       proc_fh = parse_fh(sprintf('calc_%s',proc));
       
       % get parameters for this calc step
       nprocparam = length(params.(proc));
       if nprocparam > 1
-        
-        %%% if there is more than one parameter structure provided for this
-        %%% step, we will attempt to find the parameter structure for this
-        %%% step that has a matching cell array of strings in the
-        %%% 'prev_steps' field indicating the previous jobs used in this
-        %%% series
-        pmatch_idxs = find(~cellfun(@isempty,{params.(proc).prev_steps}));
-        pmatch = cellfun(@ismember,{params.(proc)(pmatch_idxs).prev_steps},...
-            repmat(series(1:istep),1,length(pmatch_idxs)),'UniformOutput',false);
-        pidx = find(cellfun(@all,pmatch),1,'first');
-        if isempty(pidx)
+
+        lparams = '';
+        for iproc = 1:nprocparam
+          if (istep == 1 && isempty(params.(proc)(iproc).prev_steps)) || ...
+                  compare_cells(pseries(1:istep-1),params.(proc)(iproc).prev_steps)
+            fprintf(lfid,'using params index %d for %s\n',iproc,proc);
+            lparams = params.(proc)(iproc);
+            break
+          end
+        end % for iproc = 1:nprocparam
+
+        if isempty(lparams)
           wstr = sprintf(['multiple param structs specified for %s, '...
               'however none matched the previous jobs for the current '...
               'series (%s). Default parameters are being used\n'],proc,...
-              cell2str(series(1:istep-1),','));
+              cell2str(pseries(1:istep-1),','));
           warning(wstr);
           fprintf(lfid,wstr);
           lparams = proc_fh('getDefaultParams');
-        else
-          fprintf(lid,'using params index %d for %s\n',pmatch_idxs(pidx),proc);
-          lparams = params.(proc)(pmatch_idxs(pidx));
         end
       else
         % use the only set of parameters available for this step
@@ -555,10 +551,14 @@ for ifile = 1:nfiles
       end % if isfield(params,proc
       
       % save the previous steps in this proc series
-      if istep > 1, lparams.prev_steps = series(1:istep); end
+      if istep > 1, lparams.prev_steps = pseries(1:istep); end
       
       % save this step's parameters to the series params
-      series_params.(proc) = lparams;
+      if isfield(series_params,proc)
+        series_params.(proc)(end+1) = lparams;
+      else
+        series_params.(proc) = lparams;
+      end
 
       % do the parameters specify an input data type?
       if istep == 1
@@ -568,7 +568,7 @@ for ifile = 1:nfiles
       elseif isfield(lparams,'inDataType') && ~isempty(lparams.inDataType)
         input_data = lparams.inDataType;
       else
-        input_data = series{istep-1};
+        input_data = pseries{istep-1};
       end % if isfield(lparams,'inDataType
       
       % look for previously run jobs that match this parameter set
@@ -593,7 +593,7 @@ for ifile = 1:nfiles
       else
         % run this step!
         fprintf(lfid,'jlmt_proc_series: Calculating %s ...\n\n',proc);
-        eval(sprintf('%s = proc_fh(%s,lparams)',proc,input_data));
+        eval(sprintf('%s = proc_fh(%s,lparams);',proc,input_data));
      
         % save the output?
         if ismember(proc,params.glob.save_calc{iseries})
@@ -623,7 +623,7 @@ for ifile = 1:nfiles
           lmetparam = lparams.metrics.(currmet);
           
           % calculate metrics
-          eval(sprintf('metric_output = metric_readout(%s,lmetparam)',proc));
+          eval(sprintf('metric_output = metric_readout(%s,lmetparam);',proc));
           
           % FIXME: update 'meta' variable for current analysis output, to
           % reflect metrics that have been calculated
@@ -633,7 +633,7 @@ for ifile = 1:nfiles
       % plot function?
       if isfield(lparams,'plotfun') && ~isempty(lparams.plotfun)
         plotfun = parse_fh(lparams.plotfun);
-        eval(sprintf('plotfun(%s,lparams)',proc));
+        eval(sprintf('plotfun(%s,lparams);',proc));
         %% FIXME: add functionality to support multiple inputs to plotfun
       end % if isfield(lparams,'plotfun...
       
@@ -643,13 +643,13 @@ for ifile = 1:nfiles
               exist(lfname,'file')
         outData.data{outDataCols.(proc)}{ifile,1} = lfname;
       else
-        eval(sprintf('outData.data{outDataCols.%s}{ifile,1} = %s',proc,proc));
+        eval(sprintf('outData.data{outDataCols.%s}{ifile,1} = %s;',proc,proc));
       end
-    end % for istep = 1:length(series
+    end % for istep = 1:nseries
 
 %%% FIXME: plot code from previous versions for rhythm profiler: must
 %%% confirm that it integrates well with the new coding scheme
-    if(ismember('rp',series)) && isfield(params.rp,'plot')
+    if(ismember('rp',pseries)) && isfield(params.rp,'plot')
       rpPlotParams = params.rp.plot;
       rpPlotParams.fig.title = sig_st.data{sig_st_cols.tag};
       if(isfield(params.rp.plot,'addInputFname') && params.rp.plot.addInputFname == 1)
@@ -688,7 +688,10 @@ def.glob.outputType = 'data';
 for k=1:length(calc_names)
   fh = parse_fh(['calc_' calc_names{k}]);
   if nargin && isstruct(params) && isfield(params,calc_names{k})
-    def.(calc_names{k}) = fh('getDefaultParams',params.(calc_names{k}));
+    nparam = length(params.(calc_names{k}));
+    for l=1:nparam
+      def.(calc_names{k})(l) = fh('getDefaultParams',params.(calc_names{k})(l));
+    end % for l=1:nparam
   else
     def.(calc_names{k}) = fh('getDefaultParams');
   end
@@ -719,8 +722,15 @@ if (nargin)
     end
     
     %populate missing param fields with defaults
-    params.(type) = struct_union(params.(type),def.(type));
-
+    nparam = length(def.(type));
+    for l=1:nparam
+      if l == 1
+        tmpstruct = struct_union(params.(type)(l),def.(type)(l));
+      else
+        tmpstruct(l) = struct_union(params.(type)(l),def.(type)(l));
+      end
+    end % for l=1:nparam
+    params.(type) = tmpstruct;
   end
   
 else
