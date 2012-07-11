@@ -18,6 +18,7 @@ function [Y,FS,NBITS,OPTS] = mp3read(FILE,N,MONO,DOWNSAMP)
 %            passing N = [];
 % 2011-07-01 PJ - mpg123 would sometimes return insufficient data when only
 %            a partial read was requested, so a bit extra is being requested now
+% 2012-07-11 FB - updating paths for JLMT-relative installation
 % $Header: /homes/dpwe/matlab/columbiafns/RCS/mp3read.m,v 1.7 2005/04/11 20:55:16 dpwe Exp $
 
 if nargin < 2
@@ -51,8 +52,9 @@ end
 %forcemono = 1;
 
 %%%%%% Location of the binaries
-mpg123 = '/usr/local/bin/mpg123';
-mp3info = '/usr/local/bin/mp3info';
+jlmt_root = fileparts(fileparts(which('jlmt_proc_series')));
+mpg123 = fullfile(jlmt_root,'utils','mpg123');
+mp3info = fullfile(jlmt_root,'utils','mp3info');
 
 %%%%%% Constants
 NBITS=16;
