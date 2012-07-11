@@ -104,8 +104,5 @@ defs.jlmt.rp.onsetInfo.thresh = 0.2;
 % signal where there probably shouldn't have been one.
 defs.jlmt.rp.onsetInfo.throwOutFirstOnset = 0;
 
-% Attach dataset info
-defs.datasets = tonmodcomp_datasets;
-
 return
 

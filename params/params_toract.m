@@ -12,10 +12,15 @@ function params = params_toract(varargin)
 %     spher_harm.nharm_phi = 4;
 % 	   spher_harm.min_rsqr = 0.95;
 % 	                  norm = 'x./repmat(sum(x),size(x,1),1)';
-% 	             som.fname = []; % modulating-melody-trained som if not specified
 % 	                    Fs = [];
 %               inDataType = [];
 %               prev_steps = [];
+% 
+% 	             som.fname = []; % mus specify either:
+%                   the pp->li->toract at:
+%                       jlmt/data/maps/map_10-Dec-2006_16:18.mat
+%                   OR the pp->pc->li->toract map at:
+%                       jlmt/data/maps/pc_ci2toract_map_12-Jun-2012_15:47.mat
 %
 % Copyright (c) 2006-2012 The Regents of the University of California
 % All Rights Reserved.
@@ -37,16 +42,13 @@ fields = {...
     'prev_steps'};
 params = mkstruct(fields,varargin);
 
-root_path = fileparts(fileparts(which('jlmt_proc_series')));
-
 def.li_siglist = [];
 def.ci_siglist = [];
 def.HalfDecayTimes = [];
 def.calc_spher_harm = 1;
 def.spher_harm = struct('nharm_theta',3,'nharm_phi',4,'min_rsqr',0.95);
 def.norm = 'x./repmat(sum(x),size(x,1),1)';
-def.som = struct('fname',fullfile(root_path,'data',...
-    'map_10-Dec-2006_16:18.mat'));
+def.som = [];
 def.Fs = [];
 def.inDataType = '';
 def.prev_steps = [];

@@ -1,4 +1,4 @@
-% Analysis of example files from Collins et all 2012
+% Analysis of example files from Collins et al 201X tonality model comparisons
 % 
 % 
 
@@ -36,8 +36,6 @@ for istim = 1:nstim
     in_data.data{ic.name_no_ext}{istim} = audio_names{istim};
 end
 
-params = tonmodcomp_globals;
+params = CollinsEtAl_globals;
+
 jlmt_out = jlmt_proc_series(in_data, params);
-
-
-
