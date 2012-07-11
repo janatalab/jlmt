@@ -2,6 +2,16 @@ function out_st = metric_readout(data_st, params)
 % Given a list of stimulus paths specified in data_st, this function will
 % extract metrics based on several fields in the params structure.
 % 
+% REQUIRES
+%   params
+%       .useSpace
+%       .timeConstantList
+%       .readoutWindows
+%       .calcMetrics
+%       .load_wav
+%       .jlmt.(params_to_match_spaces_and_data_you_want_to_use)
+%       .verbose
+% 
 % Copyright (c) 2012 The Regents of the University of California
 % All Rights Reserved.
 %
@@ -12,7 +22,7 @@ function out_st = metric_readout(data_st, params)
 
 try 
 	verbose = params.verbose;
-catch ME
+catch
 	verbose = 0;
 end
 
