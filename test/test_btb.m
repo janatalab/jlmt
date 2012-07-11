@@ -17,7 +17,7 @@
 
 rp_proc_dir = fullfile(fileparts(fileparts(which('jlmt_proc_series'))),...
     'data','test_jlmt');
-input_file_pattern = {'*;.wav','*.mp3'};
+input_file_pattern = {'*.wav','*.mp3'};
 
 % Remove the comment marks on the following line if you are running btb on
 % midi files instead of wav files
@@ -30,7 +30,7 @@ for k=1:length(input_file_pattern)
   fnames = {dirStruct.name};
   mapped_audioFileList = check_stim_dirs(fnames,'srcroot',rp_proc_dir,'destroot',rp_proc_dir);
 
-  params.jlmt.ani  = ani_paramGroupsz;
+  params.jlmt.ani  = ani_paramGroups;
 
   switch lower(ext)
     case {'.wav','.mp3'}

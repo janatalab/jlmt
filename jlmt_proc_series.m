@@ -358,21 +358,7 @@ elseif(iscell(inData) && all(isfield(inData{1},{'vars','type','data'})) ...
 elseif isstruct(inData) && all(isfield(inData,{'vars','type','data'}))
 
   % deal with ensemble data struct types here
-  if(ismember('path',inData.vars) && ismember('filename',inData.vars))
-    
-    % ensemble structure with path info
-    inDataType = 'file_data_struct';
-    cols = set_var_col_const(inData.vars);
-    nfiles = length(inData.data{cols.filename});
-
-  elseif(strcmp(inData.type,'aud'))
-    
-    % ensemble structure with aud info
-    inDataType = 'aud';
-    cols = set_var_col_const(inData.vars);
-    nfiles = length(inData);
-    
-  elseif(ismember('stimulus_id',inData.vars))
+  if(ismember('stimulus_id',inData.vars))
     
     % ensemble structure with stimulus ids : must consult Ensemble database
     inDataType = 'stimulus_id';
@@ -394,6 +380,20 @@ elseif isstruct(inData) && all(isfield(inData,{'vars','type','data'}))
 				  stimIDList,'extract_vars',{'location'},'conn_id',params.ensemble.conn_id);
     stimLocs = stimLocs{1};
     destStimLocs = check_stim_dirs(stimLocs,'srcroot',stimulus_root,'destroot',stimulus_ipem_analysis_root,'verbose',false);
+  elseif(strcmp(inData.type,'aud'))
+    
+    % ensemble structure with aud info
+    inDataType = 'aud';
+    cols = set_var_col_const(inData.vars);
+    nfiles = length(inData);
+    
+  elseif(ismember('path',inData.vars) && ismember('filename',inData.vars))
+    
+    % ensemble structure with path info
+    inDataType = 'file_data_struct';
+    cols = set_var_col_const(inData.vars);
+    nfiles = length(inData.data{cols.filename});
+
   end
   
 elseif(isnumeric(inData)) || (iscell(inData) && isnumeric(inData{1}))
@@ -649,13 +649,13 @@ for ifile = 1:nfiles
 
 %%% FIXME: plot code from previous versions for rhythm profiler: must
 %%% confirm that it integrates well with the new coding scheme
-    if(ismember('rp',series))
-      rpPlotParams = params.plot.rp;
+    if(ismember('rp',series)) && isfield(params.rp,'plot')
+      rpPlotParams = params.rp.plot;
       rpPlotParams.fig.title = sig_st.data{sig_st_cols.tag};
-      if(isfield(params.plot,'addInputFname') && params.plot.addInputFname == 1)
-    	[dummyvar,plotFstub] = fileparts(params.plot.rp.plotFname);
+      if(isfield(params.rp.plot,'addInputFname') && params.rp.plot.addInputFname == 1)
+    	[dummyvar,plotFstub] = fileparts(params.rp.plot.plotFname);
         [dummyvar,sigFstub] = fileparts(sig_st.data{sig_st_cols.filename});
-	rpPlotParams.plotFname = [plotFstub '_' sigFstub];
+    	rpPlotParams.plotFname = [plotFstub '_' sigFstub];
       end
       plot_rhythmProfile({rp,sig_st},rpPlotParams);
     end
