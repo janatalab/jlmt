@@ -1,0 +1,116 @@
+Copyright (c) 2012 The Regents of the University of California
+All Rights Reserved
+
+
+Janata Lab Music Toolbox (JLMT)
+
+
+PREREQUISITES
+
+JLMT requires installation of the IPEM Toolbox. It can be obtained at:
+     - http://www.ipem.ugent.be/Toolbox. 
+
+If processing mp3 files, "mp3read" scripts are required. These were
+acquired from:
+     -  http://labrosa.ee.columbia.edu/matlab/mp3read.html
+and included in the JLMT in the 'jlmt/utils' directory, however they are
+compiled for use on Linux machines. If you are running Windows, you may
+have to update the mp3read scripts. Visit the LabROSA web site for more
+information on mp3read.
+
+JLMT also requires installation of the following Matlab Toolboxes:
+     - Neural Net
+     - Signal Processing
+     - Statistics
+
+The MIDI Toolbox is an optional toolbox that can be used by the
+JLMT. For more information on using the MIDI Toolbox with the JLMT,
+please read the section below titled 'MIDI FILES and BTB'. The MIDI
+Toolbox may be found at:
+     - http://www.jyu.fi/hum/laitokset/musiikki/en/research/coe/materials/miditoolbox/
+
+
+INSTALLATION
+
+1) Install all prerequisites for the JLMT.
+
+2) Unpackage the JLMT distribution file. This will create a directory
+named 'jlmt_dist'. Copy the JLMT directory to an appropriate location
+for your matlab installation. Add this directory, and all subdirectories 
+to your Matlab path. This can be easily accomplished by adding the
+following line to your startup.m file:
+
+    path(path,genpath(<path_to_JLMT>));
+
+where <path_to_JLMT> is the absolute path to the JLMT directory. An 
+example of lines to add to your startup.m file can be found in:
+
+    jlmt/jlmt_startup.m
+
+Make sure to replace '/home/fbarrett/matlab/jlmt_dist' in that file
+with the path to your particular jlmt directory. You may also use the
+MATLAB user interface to add JLMT paths by choosing:
+
+    File -> Set Path
+
+then clicking "Add with Subfolders" and selecting your JLMT
+directory.
+
+3) Restart Matlab and check your paths with the following command:
+
+    which jlmt_proc_series
+
+If Matlab returns the path to your JLMT installation, then you have
+properly set the JLMT path.
+
+4) Run the 'test_jlmt.m' script in the 'test/' subdirectory of your
+JLMT installation. If this script runs without error, then your JLMT
+installation is complete.
+
+
+MIDI FILES and BTB
+
+A MIDI file reader written in Java, "Midi2tr.java", and a second
+java class, "TrackInfo.java", located in the midi subdirectory must
+be compiled and configured for Matlab in order to use BTB with MIDI
+files. If you don't have a Java compiler installed on your system,
+it can be obtained by downloading the Java Standard Edition (Java SE)
+at java.sun.com. The current version at the time of this writing is
+JSE 7 Update 4. To compile Midi2tr.java and TrackInfo.java, simply go
+to the midi directory and type the following at a command line
+(assuming that javac is in your path):
+
+    javac Midi2tr.java TrackInfo.java
+
+This should create files "Midi2tr.class" and "TrackInfo.class" in the
+midi directory. In order to use the Java classes in Matlab, the path
+of the midi directory (e.g. /home/username/JLMT/midi) must be added
+to Matlab's classpath.txt, which typically resides in:
+
+    <path to Matlab application>/toolbox/local
+
+The MIDI reader was written in java to speed up the process of reading
+very large MIDI files.  Alternately, you may install the MIDI Toolbox
+and replace the line in plot_dir_rhythm_profile.m:
+
+    tr = javamidi2tr(thisLocation);
+
+with the following:
+
+    tr.nmat = readmidi(thisLocation);
+
+The MIDI Toolbox may be obtained from:
+    - http://www.jyu.fi/hum/laitokset/musiikki/en/research/coe/materials/miditoolbox/
+
+
+CONTACT
+
+If you have any questions regarding the code, please feel free to email
+Petr Janata at pjanata@ucdavis.edu.
+
+
+Janata Lab
+Center for Mind and Brain
+University of California, Davis
+http://atonal.ucdavis.edu
+07/09/2012

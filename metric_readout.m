@@ -100,31 +100,15 @@ for istim = 1:nstims
 			
 			% Find existing analysis
 			clear matchParams;
-			switch currSpace
-				case 'ci'
-					varName = 'cntxt_img';
-					tcName = 'HalfDecayTimes';
-					
-				case 'pc_ci'
-					varName = 'pc_cntxt_img';
-					tcName = 'HalfDecayTimes';
-
-                case 'toract'
-					varName = 'toract';
-					tcName = 'HalfDecayTimes';
-					
-				otherwise
-					varName = currSpace;
-			end
-			matchParams.varName = varName;
+			matchParams.varName = currSpace;
 			matchParams.paramFind.ani = params.jlmt.ani;
 			matchParams.paramFind.pp = params.jlmt.pp;
             if ~strcmp(currSpace, 'pc_ci')
                 matchParams.paramFind.(currSpace) = params.jlmt.(currSpace);
-                matchParams.paramFind.(currSpace).(tcName) = currTCPair;
+                matchParams.paramFind.(currSpace).HalfDecayTimes = currTCPair;
             end
 			matchParams.ignore = {'ani.aniPath','ci','Fs','pc'};
-			matchParams.subsetIsOK = {tcName};
+			matchParams.subsetIsOK = {'HalfDecayTimes'};
 			
 			[previousCalcFname, violation, violationReason] = check_anal_exist(spaceDir,matchParams);
 			
@@ -143,13 +127,13 @@ for istim = 1:nstims
             else
                 currSpaceLabel = currSpace;
             end
-			idx = ensemble_find_analysis_struct(calcInfo.(varName), struct('type',currSpaceLabel));
+			idx = ensemble_find_analysis_struct(calcInfo.(currSpace), struct('type',currSpaceLabel));
 			if isempty(idx)
 				error('Could not find analysis of type: %s', currSpace)
 			end
 			
 			% Extract the data
-			an_st = calcInfo.(varName);
+			an_st = calcInfo.(currSpace);
 			anCols = set_var_col_const(an_st.vars);
 			
 			% Get appropriate time-constant indices

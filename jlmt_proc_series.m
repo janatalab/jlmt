@@ -126,37 +126,12 @@ function outData = jlmt_proc_series(inData,params)
 %           series (pc) as the input to li, the output from the step
 %           specified in 'params.li.inDataType' (pp) would be used.
 % 
-%       .metrics - if you want to calculate metrics based upon the output
-%           of a particular analysis step, specify those in
-%           params.(analysis_step).metrics. For each metric you would like
-%           to calculate for a given analysis step, add a fieldname to
-%           params.(analysis_step).metrics that matches the name of the
-%           metric [calculated by metric_readout()] that you want to
-%           generate. The value of that fieldname will be used as the
-%           parameter input to the 'metric_readout()' function for that
-%           metric calculation. See metric_readout() for more information.
-% 
-%           The output of metrics steps are saved to the output files
-%           created after an analysis step, and they are not checked when
-%           comparing current proposed analysis steps to previously run
-%           analyses. Therefore, if you've run a previous analysis, haven't
-%           changed the parameters of that analysis, and you want to
-%           calculate new metrics based on that previously saved
-%           calculation, you can enter those metrics into
-%           params.(analysis_step).metrics and re-run jlmt_proc_series, and
-%           your new metrics (as well as any previously calculated metrics)
-%           will be returned, without having to re-run the original
-%           analysis step.
-% 
 %       .plotfun - if you have a custom function that you want to use to
-%           generate plots based on the output of an analysis step and/or
-%           the output of metric calculations, you can pass in a string
-%           reference to that function here. The function will be called in
-%           the following manner:
+%           generate plots based on the output of an analysis step, you can
+%           pass in a string reference to that function here. The function
+%           will be called in the following manner:
 % 
 %           plotfun({analysis_output},params.(analysis_step))
-%               - or, if metrics have been calculated -
-%           plotfun({analysis_output,metric_output},params.(analysis_step))
 % 
 %       example:
 % 
@@ -223,15 +198,11 @@ function outData = jlmt_proc_series(inData,params)
 % November 2, 2009 Stefan Tomic - Added support for ignoring parameters when
 %                                param matching through params.glob.ignore
 % May 6, 2011 Fred Barrett - added calc_pitchclass.m to the proc series,
-%                            also cleaned up deprecated functionality
-%                            handling "correlation" ... this has been moved
-%                            into metrics calculated in calc_toract and
-%                            calc_pitchclass, added comments, did a little
-%                            bit of cleaning
+%                            added comments, did a little bit of cleaning
 % March 29, 2012 FB - added pc_ci handling (leaky integrate pc vectors)
 % May 24, 2012 FB - cleaned up code, expanded to allow separate processing
 % series, abstracted each job block so they can be run in the order
-% specified by the processing series
+% specified by the processing series, calc_ci/pc_ci is now calc_li
 
 %%
 % Make sure IPEM setup has been run
@@ -278,9 +249,9 @@ end
 outData = ensemble_init_data_struct;
 outData.type = 'jlmt_proc_series';
 outData.name = 'jlmt_proc_series';
-outData.vars = calcfuncs;
+outData.vars = ['stimulus_path' 'proc_series' calcfuncs];
 outDataCols = set_var_col_const(outData.vars);
-outData.data = repmat({{[]}},size(outData.vars));
+outData.data = repmat({{}},size(outData.vars));
 
 % if params were passed in, fill in any missing parameters with
 % defaults. Otherwise, if no params passed in, just set them all to defaults.
@@ -517,6 +488,10 @@ for ifile = 1:nfiles
     fprintf(lfid,'jlmt_proc_series: running job series %d/%d (%s)\n',...
         iseries,nproc,cell2str(pseries,'-'));
     
+    sidx = length(outData.data{1}) + 1;
+    outData.data{outDataCols.stimulus_path}{sidx,1} = fullfile(path,filename);
+    outData.data{outDataCols.proc_series}{sidx,1} = cell2str(pseries,'->');
+    
     % iterate over steps in this series
     for istep = 1:nseries
       proc = pseries{istep};
@@ -529,7 +504,10 @@ for ifile = 1:nfiles
         lparams = '';
         for iproc = 1:nprocparam
           if (istep == 1 && isempty(params.(proc)(iproc).prev_steps)) || ...
-                  compare_cells(pseries(1:istep-1),params.(proc)(iproc).prev_steps)
+                  compare_cells(pseries(1:istep-1),params.(proc)(iproc).prev_steps) || ...
+                  (isfield(params.(proc)(iproc),'future_steps') && ...
+                  ~isempty(params.(proc)(iproc),'future_steps') && ...
+                  compare_cells(pseries(istep+1:nseries),params.(proc)(iproc).future_steps))
             fprintf(lfid,'using params index %d for %s\n',iproc,proc);
             lparams = params.(proc)(iproc);
             break
@@ -579,7 +557,7 @@ for ifile = 1:nfiles
       clear matchParams;
       matchParams.varName = proc;
       matchParams.paramFind = series_params;
-      matchParams.ignore = [params.glob.ignore 'metrics' 'ani.aniPath'];
+      matchParams.ignore = [params.glob.ignore 'ani.aniPath'];
       previousCalcFname = check_anal_exist(lPath,matchParams);
     
       % run this step?
@@ -609,26 +587,6 @@ for ifile = 1:nfiles
           save(lfname,proc);
         end % if ismember(proc,params.glob.save_calc
       end % if ~ismember(proc,params.glob.force_recalc) && ~isempty(...
-    
-      % calculate metrics?
-      if isfield(lparams,'metrics')
-        mets_to_calc = fieldnames(lparams.metrics);
-        nmet_to_calc = length(mets_to_calc);
-        for imet=1:nmet_to_calc
-          currmet = mets_to_calc{imet};
-          
-          %FIXME: check if requested metrics have already been calculated
-          
-          % get current metric parameters
-          lmetparam = lparams.metrics.(currmet);
-          
-          % calculate metrics
-          eval(sprintf('metric_output = metric_readout(%s,lmetparam);',proc));
-          
-          % FIXME: update 'meta' variable for current analysis output, to
-          % reflect metrics that have been calculated
-        end % for imet=1:nmet_to_calc
-      end
       
       % plot function?
       if isfield(lparams,'plotfun') && ~isempty(lparams.plotfun)
@@ -641,9 +599,9 @@ for ifile = 1:nfiles
       if strcmp(params.glob.outputType,'filepath') && ...
               ismember(proc,params.glob.save_calc) && ...
               exist(lfname,'file')
-        outData.data{outDataCols.(proc)}{ifile,1} = lfname;
+        outData.data{outDataCols.(proc)}{sidx,1} = lfname;
       else
-        eval(sprintf('outData.data{outDataCols.%s}{ifile,1} = %s;',proc,proc));
+        eval(sprintf('outData.data{outDataCols.%s}{sidx,1} = %s;',proc,proc));
       end
     end % for istep = 1:nseries
 
@@ -662,6 +620,13 @@ for ifile = 1:nfiles
 
   end % for iseries = 1:nproc
 end % for ifile=
+
+% fill out short columns
+for k=1:length(outData.vars)
+  if length(outData.data{k}) < sidx
+    outData.data{k}{sidx,1} = [];
+  end
+end
 
 if(exist('tmp_conn_id','var'))
   mysql(params.ensemble.conn_id,'close');

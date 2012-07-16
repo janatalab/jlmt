@@ -11,21 +11,12 @@ function defs = CollinsEtAl_globals(defs)
 %% set paths
 defs.paths.install_root = fileparts(fileparts(which('jlmt_proc_series')));
 defs.paths.data_root = fullfile(defs.paths.install_root,'data');
-defs.paths.project_root = fullfile(defs.paths.install_root,'test','CollinsEtAl2012');
+defs.paths.project_root = fullfile(defs.paths.install_root,'test');
 defs.paths.analysis_path = fullfile(defs.paths.project_root, 'analyses');
 defs.paths.log_path = fullfile(defs.paths.project_root, 'logs');
 defs.paths.fig_path = fullfile(defs.paths.project_root, 'figs');
 defs.paths.matpath = fullfile(defs.paths.project_root,'matfiles');
 defs.paths.tablepath = fullfile(defs.paths.project_root,'tables');
-
-%% Closure parameters
-defs.paths.closure_matrices.theoretical = fullfile(defs.paths.data_root,...
-    'maps','closure_struct-20120703T111311.mat');
-defs.paths.closure_matrices.empirical = fullfile(defs.paths.data_root,...
-    'maps','closure_struct-20120710T153125.mat');
-% Time window over which penultimate and final event correlations are
-% calculated.
-defs.closure_matrix.win = [100 300];
 
 %% JLMT parameters
 pparams = jlmt_preproc_params('modulation');
@@ -47,7 +38,9 @@ defs.jlmt.paths.pc_to_torus_fname = fullfile(defs.paths.data_root,'maps',...
     'pc_ci2toract_map_12-Jun-2012_15:47.mat');
 
 % Steps to execute and save
-defs.jlmt.glob.process = {'ani','pp','li','toract','pc','li','toract','ani','rp'};
+defs.jlmt.glob.process = {{'ani','pp','li','toract'},...
+    {'ani','pp','pc','li','toract'},...
+    {'ani','rp'}};
 defs.jlmt.glob.save_calc = defs.jlmt.glob.process;
 
 % Parameters for individual steps
@@ -58,7 +51,7 @@ defs.jlmt.ani(2) = params_ani('PlotFlag',0, ...
     'DownSampleFactor', 5, ...
     'NumOfChannels', pparams.nchan_ani,...
     'inDataType','sig_st',...
-    'prev_steps',{'ani','pp','li','toract','pc','li','toract'});
+    'future_steps',{'rp'});
 
 defs.jlmt.pp = params_pp('PlotFlag', 0, ...
     'LowFrequency', [], ...
@@ -82,7 +75,7 @@ defs.jlmt.toract(2) = params_toract('li_siglist',names,...
     'HalfDecayTimes',pparams.inHalfDecayTimes,'calc_spher_harm',1,...
     'som',struct('fname',defs.jlmt.paths.pc_to_torus_fname),...
     'spher_harm',struct('nharm_theta',3,'nharm_phi',4,'min_rsqr',0.95),...
-    'prev_steps',{'ani','pp','li','toract','pc','li'});
+    'prev_steps',{'ani','pp','pc','li'});
 
 % set rhythm profiler parameters
 defs.jlmt.rp = rp_paramGroups_v2('input_type','ani',...
@@ -104,5 +97,5 @@ defs.jlmt.rp.onsetInfo.thresh = 0.2;
 % signal where there probably shouldn't have been one.
 defs.jlmt.rp.onsetInfo.throwOutFirstOnset = 0;
 
-return
-
+% Attach dataset info
+defs.datasets = CollinsEtAl_datasets;
