@@ -19,15 +19,15 @@ projections. It also integrates functionality from the BTB (Beyond the
 Beat) algorithm developed by Tomic and Janata for performing rhythm based
 analyses of musical audio signals and MIDI recordings of tapping responses.
 
-Further information on the IPEM Toolbox can be found at:
-    - http://www.ipem.ugent.be/Toolbox
-
 Further information on the JLMT can be found at:
-    - http://atonal.ucdavis.edu/projects/jlmt
+    - http://atonal.ucdavis.edu/resources/software/jlmt
 
 Further information on the BTB algorithm and on how to interpret the
 model's output can be found at:
-    - http://atonal.ucdavis.edu/projects/btb
+    - http://atonal.ucdavis.edu/projects/musical_spaces/rhythm/btb/index.shtml
+
+Further information on the IPEM Toolbox can be found at:
+    - http://www.ipem.ugent.be/Toolbox
 
 This README primarily serves to list the prerequisites, describe the
 organization of the matlab code, and provide instructions on how to install
