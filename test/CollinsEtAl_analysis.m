@@ -74,4 +74,4 @@ jlmt_out = jlmt_proc_series(in_data, params.jlmt);
 
 %% calculate metrics
 % There are parameters within this script that you may want to experiment with.
-CollinsEtAl_metric_compile; 
+CollinsEtAl_metric_compile(in_data, params.jlmt, jlmt_out); 
