@@ -15,14 +15,15 @@ pre_target_window = [-100 0];
 params.closure_post_event_window = [100 300];
 closure_distributions = {'hypo' 'empr' 'smth'};
 
-% Load closure distributions.
-if ismember('CL', representational_space)
-    ndb = size(closure_distributions, 2);
-    db = struct;
-    for idb = 1:ndb
-        db(idb) = load(params.paths.clos.(closure_distributions(iclos)));
-    end
-end
+% Load closure distributions. UNNECESSARY - JUST PASS THE ABOVE STRING TO
+% CLOSURE PROBABILITY FUNCTION.
+% if ismember('CL', representational_space)
+%     ndb = size(closure_distributions, 2);
+%     db = struct;
+%     for idb = 1:ndb
+%         db(idb) = load(params.paths.clos.(closure_distributions(iclos)));
+%     end
+% end
 
 % Make sure integration constants are in ascending order.
 integration_constants = sort(integration_constants, 'ascend');
@@ -32,7 +33,7 @@ nspace = size(representational_space, 2);
 ntype = size(calculation_type, 2);
 ncomparison = size(window_comparison, 2);
 nwindow = size(post_target_window, 2);
-% There will be fewer results due to some combinations being undefined.
+% There will be fewer results due to some combinations not being defined.
 nrow = nstim*nconstant*nspace*ntype*ncomparison*nwindow +...
     nstim*ndb*nconstant*(nconstant-1)/2;
 results = cell(nrow, 8);
@@ -130,10 +131,6 @@ for istim = 1:nstim
                             svar_glo(:, isamp) = sarr_temp(:);
                         end
                         nsamp = size(svar_loc, 2); % Samples.
-                        % ??
-                        % Also need onsets from rhthm profile.
-                        % rvar = jlmt_out{istim}.data{jc.rp};
-                        
                 end
                 %% Iterate over calculation type.
                 for itype = 1:ntype
@@ -153,21 +150,24 @@ for istim = 1:nstim
                         case 'CL'
                             % Closure probabilities only calculated for TS.
                             if strcmp(representational_space{ispace}, 'TS')
-                                % Need to rewrite this function.
-                                ecm = closure_event_corr_mean(jlmt_out,...
-                                    in_data, params);
+                                % Need to check this function.
+                                ecm = closure_event_corr_mean(...
+                                    jlmt_out.data{istim}, in_data,...
+                                    params, 0);
                                 for idb = 1:ndb
-                                    % Need to rewrite this function.
-                                    p = closure_probability(ecm, db(idb),...
-                                        params);
-                                    results{jres, 1} =...
-                                        in_data.data{ic.path_no_ext}{istim};
-                                    results{jres, 2} =...
-                                        in_data.data{ic.name_no_ext}{istim};
+                                    % Need to check this function.
+                                    p = closure_probability(ecm,...
+                                     [integration_constants(iconstant) ...
+                                      integration_constants(jconstant)],...
+                                        db(idb), params);
+                                    results{jres, 1} = in_data.data{...
+                                        ic.path_no_ext}{istim};
+                                    results{jres, 2} = in_data.data{...
+                                        ic.name_no_ext}{istim};
                                     results{jres, 3} =...
                                         representational_space{ispace};
                                     results{jres, 4} =...
-                                        [integration_constants(iconstant)...
+                                       [integration_constants(iconstant)...
                                         integration_constants(jconstant)];
                                     results{jres, 5} =...
                                         {calculation_type{itype},...
@@ -186,7 +186,7 @@ for istim = 1:nstim
                         for iwindow = 1:nwindow
                             % Calculate the post-target attribute value.
                             post_start_idx = find(tpts >= targ_on +...
-                                post_target_window{iwindow}(1), 1, 'first' );
+                               post_target_window{iwindow}(1), 1, 'first');
                             post_end_idx = find(tpts <= targ_on +...
                                 post_target_window{iwindow}(2), 1, 'last');
                             switch calculation_type
@@ -209,7 +209,8 @@ for istim = 1:nstim
                                 results{jres, 3} =...
                                     representational_space{ispace};
                                 results{jres, 5} = calculation_type{itype};
-                                results{jres, 7} = post_target_window{iwindow};
+                                results{jres, 7} =...
+                                    post_target_window{iwindow};
                                 switch window_comparison{icomparison}
                                     case 'abs'
                                         results{jres, 6} = 'abs';
@@ -217,10 +218,11 @@ for istim = 1:nstim
                                     case 'rel'
                                         % The pre-target attribute value.
                                         pre_start_idx = find(tpts >=...
-                                            targ_on + pre_target_window(1),...
+                                         targ_on + pre_target_window(1),...
                                             1, 'first' );
-                                        pre_end_idx = find(tpts <= targ_on +...
-                                            pre_target_window(2), 1, 'last');
+                                        pre_end_idx = find(tpts <=...
+                                         targ_on + pre_target_window(2),...
+                                            1, 'last');
                                         switch calculation_type
                                             case 'MC'
                                                 pre_val = mean(scal(...
@@ -251,7 +253,7 @@ for istim = 1:nstim
 end % for istim
 
 % Tidy up results table and give column titles.
-results = results{1:jres - 1, :};
+results{2:jres, :} = results{1:jres - 1, :};
 results{1, 1} = 'Stimulus Path';
 results{1, 2} = 'Stimulus Name';
 results{1, 3} = 'Represetational Space';
@@ -263,6 +265,7 @@ results{1, 8} = 'Attribute Value';
 
 end
 
+% JUST IN CASE - PROBABLY REMOVE.
 % audio_root = fullfile('/data2', 'tonmodcomp');
 % stim = {{'marmel_and_tillmann_mp_2009' 'Riii0' 0:789.5:5526.5}...
 %     {'marmel_and_tillmann_mp_2009' 'Rvii0' 0:789.5:5526.5}...
@@ -288,4 +291,3 @@ end
 %     {'bigand_etal_jep_2003' 'B_IV_NTC' 0:600:4200}...
 %     {'marmel_etal_pp_2008' 'Gi' 0:789.5:5526.5}...
 %     {'marmel_etal_pp_2008' 'Giv' 0:789.5:5526.5}};
-

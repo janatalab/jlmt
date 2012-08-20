@@ -1,32 +1,40 @@
-function ecm = CollinsEtAl_closure_event_corr_mean(ipem_out, in_data,...
+function ecm = CollinsEtAl_closure_event_corr_mean(jlmt_out, in_data,...
     params, save_ecm)
-% function ipem_out_all = closure_event_corr(ipem_out, in_data, params,...
-%     save_ecm)
+
+% Copyright (c) 2007-2012 The Regents of the University of California
+% All Rights Reserved.
 
 % This function takes a cell argument output by the function
-% closure_run_ipem.m. The cell contains the toract variables of interest
+% jlmt_proc_series. The cell contains the toract variables of interest
 % and the rhythm profiles of each training stimulus. The rhythm profile is
 % accessed to estimate the timepoints of the final two events in a
 % stimulus. The toracts are then retrieved for these timepoints. For
 % stored time-constant pairs, the toract correlations are then calculated
 % at these timepoints, appended to the cell argument, and returned.
 
+% INPUT
+%  jlmt_out is a cell output by the function jlmt_proc_series, containing
+%   toract activations and rhythm profiles, among other variables.
+%  in_data is a cell of paths and filenames for each audio file whose
+%   analysis is contained in jlmt_out.
+%  params is a parameter structure obtained from CollinsEtAl_globals.
+%  save_ecm takes the value 1 if the calculated event correlation matrix
+%   should be saved, and 0 otherwise.
+
 % TC 2012.06.19
 
 % Column names.
-ic = set_var_col_const(ipem_out.vars);
-tc = set_var_col_const(ipem_out.data{ic.toract}{1}.vars);
+ic = set_var_col_const(jlmt_out.vars);
+tc = set_var_col_const(jlmt_out.data{ic.toract}{1}.vars);
 % Cell containing the time constants used in analysis.
-t_const = ipem_out.data{ic.toract}{1}.data{tc.labels};
+t_const = jlmt_out.data{ic.toract}{1}.data{tc.labels};
 % Sampling rates for toract and rp variables (not the same).
-Fs_t = ipem_out.data{ic.toract}{1}.data{tc.params}.toract.Fs;
+Fs_t = jlmt_out.data{ic.toract}{1}.data{tc.params}.toract.Fs;
 % Resonator band for accessing penultimate and final event time samples.
-% (Not sure how to pick a band from which to extract onsets.)
 iband = params.closure_matrix.resonator_band;
-nstim = size(ipem_out.data{1}, 1);
+nstim = size(jlmt_out.data{1}, 1);
 
-% Get a local variable of ordered fNames.
-% if params.closure_matrix.annotated_onsets
+% Get a local variable of ordered fNames. NOT NECESSARY?
 dc = set_var_col_const(in_data.vars);
 fNames = cell(1, nstim);
 fPaths = cell(1, nstim);
@@ -42,7 +50,7 @@ ecm = cell(nstim, 1); % Variable to hold event correlation matrices.
 for istim = 1:nstim
     % Access rhythm profile to estimate the timepoints of the final two
     % events.
-    rp = ipem_out.data{ic.rp}{istim};
+    rp = jlmt_out.data{ic.rp}{istim};
     rc = set_var_col_const(rp.vars);
     Fs_r = rp.data{rc.params}.rp.Fs;
     onsetInfo = rp.data{rc.onsetInfo};
@@ -54,7 +62,7 @@ for istim = 1:nstim
     win = params.closure_matrix.win/1000;
     idx_s = ceil(Fs_t*(event_times + win(1))); % Start indices.
     idx_e = floor(Fs_t*(event_times + win(2))); % End indices.
-    toract = ipem_out.data{ic.toract}{istim};
+    toract = jlmt_out.data{ic.toract}{istim};
     toract_corr = toract.data{tc.toract_corr};
     tcc = set_var_col_const(toract_corr.vars);
     tc_pair = toract_corr.data{tcc.tc_pair};
@@ -121,10 +129,10 @@ for istim = 1:nstim
     end
 end
 
-% Define the output variable.
-ipem_out_all = ipem_out;
-nvars = size(ipem_out_all.data, 2);
-ipem_out_all.vars{nvars+1} = 'ecm';
-ipem_out_all.data{nvars+1} = ecm;
+% Define the output variable. NOT NECESSARY?
+% jlmt_out_all = jlmt_out;
+% nvars = size(jlmt_out_all.data, 2);
+% jlmt_out_all.vars{nvars+1} = 'ecm';
+% jlmt_out_all.data{nvars+1} = ecm;
 
 end
