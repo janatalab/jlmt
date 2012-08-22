@@ -14,7 +14,7 @@
 % Tom Collins, 2012.07.21.
 % Other credits?
 
-%% initialize parameters
+%% Initialize parameters
 params = CollinsEtAl_globals;
 
 % Initialize structure that will be passed to jlmt_proc_series

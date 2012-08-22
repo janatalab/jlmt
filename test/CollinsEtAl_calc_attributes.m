@@ -198,9 +198,8 @@ for Istim = 1:3:Nstim
                     post_start_idx:...
                     post_end_idx));
                 case 'MV'
-                  post_val = max(max(scal(:,...
-                    post_start_idx:...
-                    post_end_idx)));
+                  [post_val, post_val_row] = max(mean(scal(:,...
+                    post_start_idx:post_end_idx), 2));
               end
               %% Iterate over window comparison.
               for icomparison = 1:ncomparison
@@ -231,11 +230,11 @@ for Istim = 1:3:Nstim
                       case 'MC'
                         pre_val = mean(scal(pre_start_idx:pre_end_idx));
                       case 'MV'
-                        pre_val = max(max(...
-                          scal(:,pre_start_idx:pre_end_idx)));
+                        pre_val = mean(...
+                          scal(post_val_row,pre_start_idx:pre_end_idx), 2);
                     end
                     results{jres, 6} = 'rel';
-                    results{jres, 8} = pre_val - post_val;
+                    results{jres, 8} = post_val - pre_val;
                 end
                 jres = jres + 1;
               end % for iwindow
