@@ -3,26 +3,20 @@ function defs = CollinsEtAl_globals(defs)
 % Copyright (c) 2012 The Regents of the University of California
 % All Rights Reserved.
 
-% Return global parameters for Collins et al 201X tonality model
-% comparisons analyses
+% This function sets global parameters for the script CollinsEtAl_analysis.
 
 % INPUT
-%  defs
+%  defs is a structure for holding parameters. It is an optional argument.
 
 % Petr Janata, 2011.10.27. 
-% Tom Collins, 2011-201X.
-% Frederick Barrett, 2012.07.10. (Adapted for JLMT release.)
+% Tom Collins, 2011.10.27.
+% Frederick Barrett, 2012.07.10.
 
 %% set paths
 defs.paths.install_root = fileparts(fileparts(which('jlmt_proc_series')));
 defs.paths.data_root = fullfile(defs.paths.install_root,'data');
-
-%%%%% NB FOR TESTING PURPOSES ONLY %%%%%
-defs.paths.data_root = '/home/tommyc/svn/private/matlab/jlmt/test/CollinsEtAl_data';
-
 defs.paths.project_root = fullfile(defs.paths.install_root,'test');
 defs.paths.analysis_path = fullfile(defs.paths.project_root, 'analyses');
-defs.paths.closure_struct = fullfile(defs.paths.data_root, 'closure_struct');
 defs.paths.log_path = fullfile(defs.paths.project_root, 'logs');
 defs.paths.fig_path = fullfile(defs.paths.project_root, 'figs');
 defs.paths.matpath = fullfile(defs.paths.project_root,'matfiles');
@@ -46,6 +40,10 @@ defs.jlmt.paths.pcmap_fname = fullfile(defs.paths.data_root,'maps',...
 % pitch class to torus weight matrix
 defs.jlmt.paths.pc_to_torus_fname = fullfile(defs.paths.data_root,'maps',...
     'pc_ci2toract_map_12-Jun-2012_15:47.mat');
+  
+% Location of distributions for calculating closure probability.
+defs.paths.closure_struct = fullfile(defs.paths.data_root, 'maps',...
+    'closure_struct');
 
 % Steps to execute and save
 defs.jlmt.glob.process = {{'ani','pp','li','toract'},...
@@ -116,3 +114,5 @@ defs.closure.resonator_band = 2;
 
 % Attach dataset info
 defs.datasets = CollinsEtAl_datasets;
+
+end

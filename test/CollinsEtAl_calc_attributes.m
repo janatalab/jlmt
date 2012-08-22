@@ -3,23 +3,27 @@ function results = CollinsEtAl_calc_attributes(in_data, params, jlmt_out)
 % Copyright (c) 2012 The Regents of the University of California
 % All Rights Reserved.
 
-% This function calculates attributes of audio stimuli, around the region
-% of a target event. The types of audio representation used and attributes
-% calcuated may be altered by the user.
+% This function calculates attributes of audio representations in a
+% temporal region of target events. The types of audio representation used
+% and attributes calcuated may be altered by the user.
 
 % INPUT
+%  in_data is a structure consisting of path and file names of audio that
+%   has been analysed by jlmt_proc_series.
+%  params is a structure containig path names and parameter values for
+%   jlmt_proc_series.
 %  jlmt_out is the result of running jlmt_proc_series. Because there are
 %   three procssing routes for this project, there are three cells per
 %   audio stimulus in the output. We are interested in the first (direct
 %   route to torus), second (via chroma vector), and third (rhythm profile)
-%   of each of these.
+%   of each of these. NB, there is only one cell per audio stimulus in
+%   in_data.
 
 % Tom Collins, 2012.07.21.
 % Petr Janata, 2011.11.08.
 
 % Default parameters.
-integration_constants = [.1 4];
-% integration_constants = [.1 2 4];
+integration_constants = [.1 2 4];
 representational_space = {'PP' 'CV' 'TS'};
 calculation_type = {'MC' 'MV' 'CL'};
 window_comparison = {'abs' 'rel'};
@@ -38,7 +42,8 @@ ntype = size(calculation_type, 2);
 ncomparison = size(window_comparison, 2);
 nwindow = size(post_target_window, 2);
 ndb = size(closure_distributions, 2);
-% There will be fewer results due to some combinations not being defined.
+% Preallocate results. There will be fewer results due to some
+% combinations not being defined.
 nrow = nstim*nconstant*nspace*ntype*ncomparison*nwindow +...
   nstim*ndb*nconstant*(nconstant-1)/2;
 % Define output table.

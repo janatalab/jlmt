@@ -1,18 +1,39 @@
 % Copyright (c) 2012 The Regents of the University of California
 % All Rights Reserved.
 
-% This script... Analysis of example files from Collins et al 201X tonality
-% model comparisons
-
-% INPUT
-%  jlmt_out is the result of running jlmt_proc_series. Because there are
-%   three procssing routes for this project, there are three cells per
-%   audio stimulus in the output. We are interested in the first (direct
-%   route to torus), second (via chroma vector), and third (rhythm profile)
-%   of each of these.
+% This script is intended to accompany:
+%
+%  Tom Collins, Barbara Tillmann, Frederick S. Barrett, Charles Delbé, and
+%   Petr Janata. A combined model of sensory and cognitive representations
+%   underlying tonal expectation: from audio signals to behavior.
+%   Submitted, 2012.
+%
+% Please cite the paper if you use/adapt this code in your own work. This
+% script sets parameters and then iterates over the datasets defined in
+% the function CollinsEtAl_datasets, creating path and variable names of
+% audio files for subsequent analysis. You can place your own audio files
+% in the jlmt data folder and have these analyzed as well/instead.
+% Conforming to our existing folder structure when placing audio will help
+% to avoid errors, and it will also be necessary to extend/modify the
+% function CollinsEtAl_datasets to include your audio files. Event onsets
+% (or at least the time of the target event) need to be specified there in
+% order to run the function CollinsEtAl_calc_attributes. If you do not have
+% this information available, it is possible to modify our code to estimate
+% onsets instead.
+%
+% The function jlmt_proc_series creates the representations of audio that
+% are discussed in the paper (periodicity pitch, chroma vector, and tonal
+% space), as well as some others. The function CollinsEtAl_calc_attributes
+% iterates over the output of jlmt_proc_series, and calculates attributes
+% of the representations in a temporal region of target events. For
+% example, one attribute calculates the correlation between short- and
+% long-term tonal space activations, averaged over a 0-200 ms post-target
+% window. Please see the above paper and the code in
+% CollinsEtAl_calc_attributes for more details. In particular, at the top
+% of this function it is possible to experiment with the default parameter
+% values.
 
 % Tom Collins, 2012.07.21.
-% Other credits?
 
 %% Initialize parameters
 params = CollinsEtAl_globals;
