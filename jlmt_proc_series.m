@@ -503,10 +503,9 @@ for ifile = 1:nfiles
 
         lparams = '';
         for iproc = 1:nprocparam
-          if (istep == 1 && isempty(params.(proc)(iproc).prev_steps)) || ...
-                  compare_cells(pseries(1:istep-1),params.(proc)(iproc).prev_steps) || ...
+          if (istep > 1 && (isfield(params.(proc)(iproc),'prev_steps') && ...
+                  compare_cells(pseries(1:istep-1),params.(proc)(iproc).prev_steps))) || ...
                   (isfield(params.(proc)(iproc),'future_steps') && ...
-                  ~isempty(params.(proc)(iproc),'future_steps') && ...
                   compare_cells(pseries(istep+1:nseries),params.(proc)(iproc).future_steps))
             fprintf(lfid,'using params index %d for %s\n',iproc,proc);
             lparams = params.(proc)(iproc);
@@ -557,7 +556,7 @@ for ifile = 1:nfiles
       clear matchParams;
       matchParams.varName = proc;
       matchParams.paramFind = series_params;
-      matchParams.ignore = [params.glob.ignore 'ani.aniPath'];
+      matchParams.ignore = [params.glob.ignore 'ani.aniPath' 'future_steps'];
       previousCalcFname = check_anal_exist(lPath,matchParams);
     
       % run this step?

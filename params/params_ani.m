@@ -40,7 +40,8 @@ function params = params_ani(varargin)
 %if you need to add more parameters, add them here
 fields = {'start_time_sec','dur_sec','normalize_wav','normalize_maxVal',...
 	  'aniPath','PlotFlag','DownSampleFactor',...
-	  'NumOfChannels','FirstCBU','CBUStep','prev_steps','inDataType'};
+	  'NumOfChannels','FirstCBU','CBUStep',...
+      'prev_steps','future_steps','inDataType'};
 
 params = mkstruct(fields,varargin);
    
@@ -56,6 +57,7 @@ def.aniPath = create_jlmt_tmpdir;  % '/tmp/jlmt'
 def.normalize_wav = 1;
 def.normalize_maxVal = 0.95;
 def.prev_steps = [];
+def.future_steps = [];
 def.inDataType = [];
 
 for ifld = 1:length(fields)
