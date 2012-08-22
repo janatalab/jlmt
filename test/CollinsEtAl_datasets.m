@@ -1,6 +1,18 @@
 function dset = CollinsEtAl_datasets
 
-% Attaches dataset information for tonmodcomp analyses
+% Copyright (c) 2012 The Regents of the University of California
+% All Rights Reserved.
+
+% This function ...
+
+% INPUT
+%  jlmt_out is the result of running jlmt_proc_series. Because there are
+%   three procssing routes for this project, there are three cells per
+%   audio stimulus in the output. We are interested in the first (direct
+%   route to torus), second (via chroma vector), and third (rhythm profile)
+%   of each of these.
+
+% Tom Collins, 2011.10.28.
 
 nd = 0;
 dset = struct();

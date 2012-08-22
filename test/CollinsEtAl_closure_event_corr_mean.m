@@ -1,5 +1,5 @@
-function ecm = CollinsEtAl_closure_event_corr_mean(jlmt_out, in_data,...
-    params, save_ecm)
+function ecm = CollinsEtAl_closure_event_corr_mean(corr_timecourse,...
+    Fs, rp, params)
 
 % Copyright (c) 2007-2012 The Regents of the University of California
 % All Rights Reserved.
@@ -13,126 +13,84 @@ function ecm = CollinsEtAl_closure_event_corr_mean(jlmt_out, in_data,...
 % at these timepoints, appended to the cell argument, and returned.
 
 % INPUT
-%  jlmt_out is a cell output by the function jlmt_proc_series, containing
-%   toract activations and rhythm profiles, among other variables.
-%  in_data is a cell of paths and filenames for each audio file whose
-%   analysis is contained in jlmt_out.
+%  corr_timecourse is .
+%  rp is .
+%  Fs is .
 %  params is a parameter structure obtained from CollinsEtAl_globals.
-%  save_ecm takes the value 1 if the calculated event correlation matrix
-%   should be saved, and 0 otherwise.
 
-% TC 2012.06.19
+% Tom Collins, 2012.06.26.
+
 
 % Column names.
-ic = set_var_col_const(jlmt_out.vars);
-tc = set_var_col_const(jlmt_out.data{ic.toract}{1}.vars);
+% tc = set_var_col_const(jlmt_out.data{ic.toract}{1}.vars);
 % Cell containing the time constants used in analysis.
-t_const = jlmt_out.data{ic.toract}{1}.data{tc.labels};
+% t_const = jlmt_out.data{ic.toract}{1}.data{tc.labels};
 % Sampling rates for toract and rp variables (not the same).
-Fs_t = jlmt_out.data{ic.toract}{1}.data{tc.params}.toract.Fs;
+Fs_t = Fs;
 % Resonator band for accessing penultimate and final event time samples.
-iband = params.closure_matrix.resonator_band;
-nstim = size(jlmt_out.data{1}, 1);
+iband = params.closure.resonator_band;
+% nstim = size(jlmt_out.data{1}, 1);
 
 % Get a local variable of ordered fNames. NOT NECESSARY?
-dc = set_var_col_const(in_data.vars);
-fNames = cell(1, nstim);
-fPaths = cell(1, nstim);
-for istim = 1:nstim
-    [~, stim_name, ~] = fileparts(in_data.data{dc.filename}{istim});
-    fNames{istim} = stim_name;
-    [path_str, ~, ~] = fileparts(in_data.data{dc.path}{istim});
-    fPaths{istim} = path_str;
-end
+% dc = set_var_col_const(in_data.vars);
+% fNames = cell(1, nstim);
+% fPaths = cell(1, nstim);
+% for istim = 1:nstim
+%     [~, stim_name, ~] = fileparts(in_data.data{dc.filename}{istim});
+%     fNames{istim} = stim_name;
+%     [path_str, ~, ~] = fileparts(in_data.data{dc.path}{istim});
+%     fPaths{istim} = path_str;
+% end
 
-% Iterate over stimuli.
-ecm = cell(nstim, 1); % Variable to hold event correlation matrices.
-for istim = 1:nstim
-    % Access rhythm profile to estimate the timepoints of the final two
-    % events.
-    rp = jlmt_out.data{ic.rp}{istim};
-    rc = set_var_col_const(rp.vars);
-    Fs_r = rp.data{rc.params}.rp.Fs;
-    onsetInfo = rp.data{rc.onsetInfo};
-    oc = set_var_col_const(onsetInfo.vars);
-    onSampsBB = onsetInfo.data{oc.onsetTimesSampsByBand};
-    event_times = onSampsBB{iband}(end-1:end)/Fs_r;
-    % event_times = [3.720 4.340];
-    % Retrieve the time windows.
-    win = params.closure_matrix.win/1000;
+% Access rhythm profile to estimate the timepoints of the final two
+% events.
+rc = set_var_col_const(rp.vars);
+Fs_r = rp.data{rc.params}.rp.Fs;
+onsetInfo = rp.data{rc.onsetInfo};
+oc = set_var_col_const(onsetInfo.vars);
+onSampsBB = onsetInfo.data{oc.onsetTimesSampsByBand};
+event_times = onSampsBB{iband}(end-1:end)/Fs_r;
+% Retrieve the time windows.
+win = params.closure.post_event_window/1000;
+idx_s = ceil(Fs_t*(event_times + win(1))); % Start indices.
+idx_e = floor(Fs_t*(event_times + win(2))); % End indices.
+nevents = size(onSampsBB{iband}, 1);
+nsamp = size(corr_timecourse, 1);
+iback = 1;
+% If the analysis window extends beyond the end of the audio, revert to
+% the latest events times such that this is not the case.
+while idx_e(2) > nsamp && iback < nevents + 1
+    % idx_e(2) = nsamp;
+    event_times = onSampsBB{iband}(end-(iback+1):end-iback)/Fs_r;
     idx_s = ceil(Fs_t*(event_times + win(1))); % Start indices.
     idx_e = floor(Fs_t*(event_times + win(2))); % End indices.
-    toract = jlmt_out.data{ic.toract}{istim};
-    toract_corr = toract.data{tc.toract_corr};
-    tcc = set_var_col_const(toract_corr.vars);
-    tc_pair = toract_corr.data{tcc.tc_pair};
-    % This is a p x q matrix, where p is the number of time-constant pairs
-    % and q is the number of samples:
-    toract_corr_data = toract_corr.data{tcc.toract_corr};
-    nsamp = size(toract_corr_data, 2);
-    nevents = size(onSampsBB{iband}, 1);
-    iback = 1;
-    % If the analysis window extends beyond the end of the audio, revert to
-    % the latest events times such that this is not the case.
-    while idx_e(2) > nsamp && iback < nevents + 1
-        % idx_e(2) = nsamp;
-        event_times = onSampsBB{iband}(end-(iback+1):end-iback)/Fs_r;
-        idx_s = ceil(Fs_t*(event_times + win(1))); % Start indices.
-        idx_e = floor(Fs_t*(event_times + win(2))); % End indices.
-        iback = iback + 1;
-    end
-    if iback > 1
-        fprintf('Time window exceeds length of stim %s.\n', fNames{istim})
-        fprintf('Reverted to earlier events.\n')
-    end
-    % Store the penultimate and final correlations in an array, with rows
-    % and columns for time constants, and the third dimension for
-    % penultimate/final.
-    ntc = size(t_const, 2);
-    event_corr_mtx = nan(ntc, ntc, 2);
-    for kev = 1:2 % Indices for penultimate and final events.
-        irow = 1; % Increment over the rows of toract_corr_data.
-        for itc = 1:ntc-1 % Time constant 1.
-            for jtc = itc+1:ntc % Time constant 2.
-                if iback > nevents
-                    fprintf('Could not define a sensible time window.\n')
-                    event_corr_mtx(itc, jtc, kev) = 0;
-                else
-                    event_corr_mtx(itc, jtc, kev) =...
-                        mean(toract_corr_data(irow,...
-                        idx_s(kev):idx_e(kev)));
-                end
-                irow = irow + 1;
-            end
-        end
-    end
-    ecmi = struct;
-    ecmi.type = 'ecm';
-    ecmi.vars = {'params' 'time_constants' 'tc_pair'...
-        'event_corr_mtx'};
-    ecmi.data{1} = params.closure_matrix;
-    ecmi.data{2} = t_const;
-    ecmi.data{3} = tc_pair;
-    ecmi.data{4} = event_corr_mtx;
-    ecmi.report = struct;
-    ecmi.meta = struct;
-    % Save the ecm variable.
-    if save_ecm
-        save_dir = fullfile(fPaths{istim}, 'ecm');
-        if exist(save_dir, 'dir') ~= 7
-            mkdir(save_dir);
-        end
-        f_name = ['ecm_', datestr(now, 30)];
-        ecmi.name = f_name;
-        ecm{istim} = ecmi;
-        save(fullfile(save_dir, [f_name '.mat']), 'ecmi');
+    iback = iback + 1;
+end
+if iback > 1
+    fprintf('Time window exceeds length of stimulus.\n')
+    fprintf('Reverted to earlier events.\n')
+end
+% Store the penultimate and final correlations in an array, with rows
+% and columns for time constants, and the third dimension for
+% penultimate/final.
+event_corr_mtx = nan(2, 2, 2);
+for kev = 1:2 % Indices for penultimate and final events.
+    if iback > nevents
+        fprintf('Could not define a sensible time window.\n')
+        event_corr_mtx(1, 2, kev) = 0;
+    else
+        event_corr_mtx(1, 2, kev) =...
+            mean(corr_timecourse(idx_s(kev):idx_e(kev)));
     end
 end
-
-% Define the output variable. NOT NECESSARY?
-% jlmt_out_all = jlmt_out;
-% nvars = size(jlmt_out_all.data, 2);
-% jlmt_out_all.vars{nvars+1} = 'ecm';
-% jlmt_out_all.data{nvars+1} = ecm;
+ecm = struct;
+ecm.type = 'ecm';
+ecm.vars = {'params' 'event_corr_mtx'};
+ecm.data{1} = params.closure;
+% ecm.data{2} = t_const;
+% ecm.data{3} = tc_pair;
+ecm.data{2} = event_corr_mtx;
+ecm.report = struct;
+ecm.meta = struct;
 
 end

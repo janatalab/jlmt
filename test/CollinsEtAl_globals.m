@@ -1,18 +1,28 @@
 function defs = CollinsEtAl_globals(defs)
 
-% Return global parameters for Collins et al 201X tonality model comparisons analyses
-% 
-%   defs = CollinsEtAl_globals(defs)
-% 
-% PJ 2011.10.27 
-% TC 2011-201X
-% FB 2012.07.10 adapted for JLMT release
+% Copyright (c) 2012 The Regents of the University of California
+% All Rights Reserved.
+
+% Return global parameters for Collins et al 201X tonality model
+% comparisons analyses
+
+% INPUT
+%  defs
+
+% Petr Janata, 2011.10.27. 
+% Tom Collins, 2011-201X.
+% Frederick Barrett, 2012.07.10. (Adapted for JLMT release.)
 
 %% set paths
 defs.paths.install_root = fileparts(fileparts(which('jlmt_proc_series')));
 defs.paths.data_root = fullfile(defs.paths.install_root,'data');
+
+%%%%% NB FOR TESTING PURPOSES ONLY %%%%%
+defs.paths.data_root = '/home/tommyc/svn/private/matlab/jlmt/test/CollinsEtAl_data';
+
 defs.paths.project_root = fullfile(defs.paths.install_root,'test');
 defs.paths.analysis_path = fullfile(defs.paths.project_root, 'analyses');
+defs.paths.closure_struct = fullfile(defs.paths.data_root, 'closure_struct');
 defs.paths.log_path = fullfile(defs.paths.project_root, 'logs');
 defs.paths.fig_path = fullfile(defs.paths.project_root, 'figs');
 defs.paths.matpath = fullfile(defs.paths.project_root,'matfiles');
@@ -46,8 +56,13 @@ defs.jlmt.glob.save_calc = defs.jlmt.glob.process;
 % Parameters for individual steps
 defs.jlmt.ani = params_ani('PlotFlag',0, ...
     'DownSampleFactor', pparams.downsample_factor, ...
-    'NumOfChannels', pparams.nchan_ani,'prev_steps',[]);
+    'NumOfChannels', pparams.nchan_ani,'prev_steps',[],...
+    'future_steps',defs.jlmt.glob.process{1}(2:end));
 defs.jlmt.ani(2) = params_ani('PlotFlag',0, ...
+    'DownSampleFactor', pparams.downsample_factor, ...
+    'NumOfChannels', pparams.nchan_ani,'prev_steps',[],...
+    'future_steps',defs.jlmt.glob.process{2}(2:end));
+defs.jlmt.ani(3) = params_ani('PlotFlag',0, ...
     'DownSampleFactor', 5, ...
     'NumOfChannels', pparams.nchan_ani,...
     'inDataType','sig_st',...
@@ -96,6 +111,8 @@ defs.jlmt.rp.onsetInfo.thresh = 0.2;
 % Some ANI signals have exhibited large spikes at the beginning of the
 % signal where there probably shouldn't have been one.
 defs.jlmt.rp.onsetInfo.throwOutFirstOnset = 0;
+% Which band to select onsets from.
+defs.closure.resonator_band = 2;
 
 % Attach dataset info
 defs.datasets = CollinsEtAl_datasets;
