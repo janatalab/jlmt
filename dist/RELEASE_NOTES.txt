@@ -1,0 +1,21 @@
+Release v1.1 - August 22, 2012
+----------------------------------------------------
+
+- Bug fix in jlmt_proc_series.m, where multiple proc params were not
+being honored for the first step in a proc series.
+
+- Added stimuli, scripts, and closure data for Collins Et Al
+  (submitted)
+
+----------------------------------------------------
+Release v1.0 - July 9, 2012
+----------------------------------------------------
+
+This is the initial release of the jlmt, including:
+
+- jlmt_proc_series.m
+
+- scripts to facilitate generation of tonality tracking matrices and
+  fmri regressors based on those matrices
+
+- the Beyond The Beat (BTB) algorithm developed by Tomic and Janata
