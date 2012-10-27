@@ -53,7 +53,11 @@ inData_cols = set_var_col_const(inData.vars);
 params.Fs = inData.data{inData_cols.Fs};
 
 % Load the weight matrix
-som_fname = params.som.fname;
+if ~isfield(params.som,'fname')
+  som_fname = '';
+else
+  som_fname = params.som.fname;
+end
 if ~exist(som_fname)
   fprintf('SOM file (%s) does not exist\n', som_fname);
   return

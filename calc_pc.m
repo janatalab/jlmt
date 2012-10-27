@@ -46,7 +46,9 @@ function pc = calc_pc(indata,params)
 % Copyright (c) 2011-2012 The Regents of the University of California
 % All Rights Reserved.
 %
+
 % 2011.05.06 FB - adapted from calc_toract.m
+% 2012.10.26 PJ - eliminated unnecessary assignment of empty params field
 
 pc = [];
 if ischar(indata) && ~isempty(strmatch(indata,'getDefaultParams'))
@@ -54,9 +56,6 @@ if ischar(indata) && ~isempty(strmatch(indata,'getDefaultParams'))
     pc = getDefaultParams(params);
     return
 end
-
-% storage for parameter struct
-pc.params = {};
 
 error(nargchk(2,2,nargin))
 

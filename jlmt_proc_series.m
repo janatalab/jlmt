@@ -203,6 +203,9 @@ function outData = jlmt_proc_series(inData,params)
 % May 24, 2012 FB - cleaned up code, expanded to allow separate processing
 % series, abstracted each job block so they can be run in the order
 % specified by the processing series, calc_ci/pc_ci is now calc_li
+% 26Oct2012 PJ - updated to generate default behavior in the event that
+%                only a list of file names is passed in. Also changed path
+%                to fpath.
 
 %%
 % Make sure IPEM setup has been run
@@ -228,6 +231,11 @@ end % for k=1:length(calcs
 if(ischar(inData) && strcmp(inData,'getDefaultParams'))
   outData = getDefaultParams('',calcfuncs);
   return
+end
+
+if ~exist('params','var')
+  fprintf('No param structure specified. Using defaults ...\n')
+  params = getDefaultParams;
 end
 
 % This parameter sets the fieldnames to ignore when comparing the
@@ -405,18 +413,18 @@ for ifile = 1:nfiles
 
   switch inDataType
    case 'aud_file_string'
-    [path,name,ext] = fileparts(inData);
+    [fpath,name,ext] = fileparts(inData);
     filename = [name ext];
-    paramsSig = params_aud('path',path,'filename',filename);
+    paramsSig = params_aud('path',fpath,'filename',filename);
     sig_st = new_aud(paramsSig);
     descript = '(single audio file)';
     
    case 'aud_file_string_cell_array'
-    [path,name,ext] = fileparts(inData{ifile});
+    [fpath,name,ext] = fileparts(inData{ifile});
     filename = [name ext];
-    paramsSig = params_aud('path',path,'filename',filename);
+    paramsSig = params_aud('path',fpath,'filename',filename);
     sig_st = new_aud(paramsSig);
-    descript = fullfile(path,filename);
+    descript = fullfile(fpath,filename);
    
    case {'mat_file_string','mat_file_string_cell_array'}
     % currently, mat input is only supported for rhythm profiles
@@ -424,44 +432,44 @@ for ifile = 1:nfiles
     % doing check_stim_dirs here, since the path needs to be
     % separated from the filenames. Need to extract name and ext first
     if(strcmp(inDataType,'mat_file_string_cell_array'))
-      [path,name,ext] = fileparts(inData{ifile});
+      [fpath,name,ext] = fileparts(inData{ifile});
     else
-      [path,name,ext] = fileparts(inData);
+      [fpath,name,ext] = fileparts(inData);
     end
-    destStimLoc = check_stim_dirs([name ext],'srcroot',path,'destroot',path);
+    destStimLoc = check_stim_dirs([name ext],'srcroot',fpath,'destroot',fpath);
 
     % obtaining the path of destStimLoc
-    [path,name,ext] = fileparts(destStimLoc{1});
+    [fpath,name,ext] = fileparts(destStimLoc{1});
       
     filename = [name ext];
-    paramsSig = params_aud('path',path,'filename',filename,'Fs',params.glob.insigFs,'var_name',params.glob.matVarName);
+    paramsSig = params_aud('path',fpath,'filename',filename,'Fs',params.glob.insigFs,'var_name',params.glob.matVarName);
     sig_st = new_aud(paramsSig);
     descript = '(single mat file)';
     
    case 'aud'
     sig_st = inData;
     descript = 'aud structure';
-    path = inData.data{cols.path};
+    fpath = inData.data{cols.path};
     filename = inData.data{cols.filename};
     
    case 'aud_cell_array'
     sig_st = inData{ifile};
     cols = set_var_col_const(inData{ifile}.vars);
     descript = ['aud_struct ' num2str(ifile)];
-    path = inData{ifile}.data{cols.path};
+    fpath = inData{ifile}.data{cols.path};
     filename = inData{ifile}.data{cols.path};
     
    case 'file_data_struct'
-    path = inData.data{cols.path}{ifile};
+    fpath = inData.data{cols.path}{ifile};
     filename = inData.data{cols.filename}{ifile};
-    paramsSig = params_aud('path',path,'filename',filename);
+    paramsSig = params_aud('path',fpath,'filename',filename);
     sig_st = new_aud(paramsSig);
-    descript = fullfile(path,filename);
+    descript = fullfile(fpath,filename);
     
    case 'stimulus_id'
-    [path,fstub,ext] = fileparts(destStimLocs{ifile});
+    [fpath,fstub,ext] = fileparts(destStimLocs{ifile});
     filename = [fstub ext];
-    paramsSig = params_aud('path',path,'filename',filename);
+    paramsSig = params_aud('path',fpath,'filename',filename);
     sig_st = new_aud(paramsSig);
     descript = sprintf(' Stimulus ID %d ',stimIDList(ifile));
     
@@ -489,7 +497,7 @@ for ifile = 1:nfiles
         iseries,nproc,cell2str(pseries,'-'));
     
     sidx = length(outData.data{1}) + 1;
-    outData.data{outDataCols.stimulus_path}{sidx,1} = fullfile(path,filename);
+    outData.data{outDataCols.stimulus_path}{sidx,1} = fullfile(fpath,filename);
     outData.data{outDataCols.proc_series}{sidx,1} = cell2str(pseries,'->');
     
     % iterate over steps in this series
@@ -549,7 +557,7 @@ for ifile = 1:nfiles
       end % if isfield(lparams,'inDataType
       
       % look for previously run jobs that match this parameter set
-      lfname = construct_analfname(fullfile(path,filename),proc);
+      lfname = construct_analfname(fullfile(fpath,filename),proc);
       lPath = fileparts(lfname);
 
       % find existing analysis
@@ -567,6 +575,9 @@ for ifile = 1:nfiles
             '%s with matching parameters...\n'],proc);
         lfname = fullfile(lPath,previousCalcFname{1});
         load(lfname,proc)
+      elseif eval(sprintf('isempty(%s)',input_data))
+        fprintf('Input data (%s) for %s is empty! Skipping ...\n', input_data, proc);
+        continue
       else
         % run this step!
         fprintf(lfid,'jlmt_proc_series: Calculating %s ...\n\n',proc);
@@ -633,9 +644,9 @@ end
 
 
 
-% % % % % % 
-% % % % % %         subfunctions
-% % % % % % 
+% % 
+%           subfunctions
+
 
 function params = getDefaultParams(params,calc_names)
 
@@ -648,6 +659,10 @@ def.glob.save_calc = {'ani','pp','li','toract'};
 def.glob.process = {{'ani','pp','li','toract'},...
     {'ani','pp','pc','li','toract'}};
 def.glob.outputType = 'data';
+
+if ~exist('calc_names') || isempty(calc_names)
+  calc_names = unique([def.glob.process{:}]);
+end
 
 for k=1:length(calc_names)
   fh = parse_fh(['calc_' calc_names{k}]);
