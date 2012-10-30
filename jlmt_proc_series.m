@@ -206,6 +206,8 @@ function outData = jlmt_proc_series(inData,params)
 % 26Oct2012 PJ - updated to generate default behavior in the event that
 %                only a list of file names is passed in. Also changed path
 %                to fpath.
+% 29Oct2012 PJ - fixed handling of input as directory or single file. Now
+%                calls jlmt_prepare_dirs()
 
 %%
 % Make sure IPEM setup has been run
@@ -303,18 +305,28 @@ end
 nproc = length(params.glob.process);
 
 %%  identify input format
-if(ischar(inData)) 
-
-  % a single file path as a string
-  [~,~,ext] = fileparts(inData);
-  switch ext
-   case {'.wav','.aif','.mp3'}
-    inDataType = 'aud_file_string';
-   case {'.mat'}
-    inDataType = 'mat_file_string';
+if ischar(inData) && exist(inData)
+  % Check to see if this is a directory, in which case we would try to
+  % process all .wav, .aif, .mp3 and .aiff files
+  if isdir(inData)
+    inData = jlmt_prepare_dirs(inData);
+    inDataType = 'aud_file_string_cell_array';
+    nfiles = size(inData,1);
+  else
+    [fpath,fstub,ext] = fileparts(inData);
+    switch ext
+      case {'.wav','.aif','.mp3'}
+        inDataType = 'aud_file_string';
+      case {'.mat'}
+        inDataType = 'mat_file_string';
+    end
+    
+    % a single file path as a string
+    inData = jlmt_prepare_dirs(inData);
+    inData = inData{1};
+    
+    nfiles = 1;
   end
-  nfiles = 1;
-
 elseif(iscell(inData) && ischar(inData{1}))
 
   % cell array of filepaths as strings
@@ -409,6 +421,11 @@ elseif(ischar(inData) && strcmp(inData,'getDefaultParams'))
 end
 
 %% process the list of audio files
+if ~nfiles
+  fprintf('No files found ...\n');
+  return
+end
+
 for ifile = 1:nfiles
 
   switch inDataType
