@@ -49,6 +49,8 @@ function pc = calc_pc(indata,params)
 
 % 2011.05.06 FB - adapted from calc_toract.m
 % 2012.10.26 PJ - eliminated unnecessary assignment of empty params field
+% 2012.11.01 TC - inserted "pc.params = [];" at line 100, to avoid error at
+%                  line 111, where there is a reference to params.
 
 pc = [];
 if ischar(indata) && ~isempty(strmatch(indata,'getDefaultParams'))
@@ -98,6 +100,7 @@ else
 end
 
 pc.Fs = params.Fs;
+pc.params = [];
 pc = ensemble_tree2datastruct(pc);
 pc_dataCols = set_var_col_const(pc.vars);
 pc.type = 'pc';
