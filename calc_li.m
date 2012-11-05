@@ -1,4 +1,4 @@
-function li = calc_li(inData,par)
+function li = calc_li(inData, varargin)
 % JLMT wrapper for IPEMLeakyIntegration()
 % 
 %   li = calc_li(pp,li_params);
@@ -49,13 +49,22 @@ function li = calc_li(inData,par)
 
 li = [];
 
+if nargin > 1
+  if isstruct(varargin{1})
+    par = varargin{1};
+  end
+end
+
 if ischar(inData)
-  if ~isempty(strmatch(inData,'calc_names','exact'))
-    li = HalfDecayNameGen(par);
+  if strcmp(inData,'calc_names')
+    li = HalfDecayNameGen(varargin{1});
     return
-  elseif ~isempty(strmatch(inData,'getDefaultParams'))
-    if ~exist('par','var'), par = ''; end
-    li = getDefaultParams(par);
+  elseif strcmp(inData,'getDefaultParams')
+    if ~exist('par','var')
+      li = getDefaultParams(varargin{:});
+    else
+      li = getDefaultParams('params',par);
+    end
     return
   end % if ~isempty(strmatch(inData,'calc_names...
 end
@@ -157,13 +166,20 @@ function names = HalfDecayNameGen(times)
   
 %makes sure that all necessary param fields are populated and
 %non-empty. Sets empty or non-existent values to default values
-function params = getDefaultParams(params)
+function params = getDefaultParams(varargin)
 
-def = params_li;
+for iarg = 1:2:nargin
+  switch varargin{iarg}
+    case 'params'
+      params = varargin{iarg}+1;
+  end
+end
+
+def = params_li(varargin{:});
 
 fnames = fieldnames(def);
 
-if isempty(params) || ~isstruct(params)
+if ~exist('params','var') || ~isstruct(params)
   params = def;
   return
 else

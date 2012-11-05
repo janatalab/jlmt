@@ -17,8 +17,15 @@
 % FB 2012.07.11
 
 % % PATH TO JLMT : replace '/path/to/jlmt_dist' with the path to the JLMT
-path(path,genpath('/path/to/jlmt_dist'));
+% and uncomment the following line
+% path(path,genpath('/path/to/jlmt_dist'));
+jlmtpath = fileparts(which('jlmt_proc_series'));
+addpath(fullfile(jlmtpath,'maps'));
+addpath(fullfile(jlmtpath,'params'));
+addpath(fullfile(jlmtpath,'includes'));
+addpath(fullfile(jlmtpath,'rp_modules'));
 
 % % PATH TO IPEM Toolbox : replace '/path/to/IPEMToolbox' with the path to
-% % your IPEM Toolbox installation
-path(path,genpath('/path/to/IPEMToolbox'));
+% % your IPEM Toolbox installation and uncomment the following line
+%path(path,genpath('/path/to/IPEMToolbox'));
+

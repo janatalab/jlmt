@@ -177,7 +177,7 @@ function outData = jlmt_proc_series(inData,params)
 %
 % Copyright (c) 2006-2012 The Regents of the University of California
 % All Rights Reserved.
-%
+
 % Authors:
 % December 2006, Petr Janata
 % April 26, 2007, Stefan Tomic - added the ability to input different data
@@ -208,6 +208,10 @@ function outData = jlmt_proc_series(inData,params)
 %                to fpath.
 % 29Oct2012 PJ - fixed handling of input as directory or single file. Now
 %                calls jlmt_prepare_dirs()
+% 30Oct2012 PJ - Cleaned up handling of default parameter specification
+%                with regard to context specificity. Could still use some
+%                cleanup of the logic associated with returning default
+%                parameters.
 
 %%
 % Make sure IPEM setup has been run
@@ -230,8 +234,16 @@ for k=1:length(calcs)
 end % for k=1:length(calcs
 
 % get/return default jlmt parameter structure?
-if(ischar(inData) && strcmp(inData,'getDefaultParams'))
-  outData = getDefaultParams('',calcfuncs);
+if ischar(inData) && strcmp(inData,'getDefaultParams')
+  if exist('params','var')
+    if isfield(params,'glob') && isfield(params.glob,'process') && ~isempty(params.glob.process)
+      outData = getDefaultParams(params);
+    else
+      outData = getDefaultParams(params, calcfuncs);
+    end
+  else
+    outData = getDefaultParams('',calcfuncs);
+  end
   return
 end
 
@@ -266,9 +278,9 @@ outData.data = repmat({{}},size(outData.vars));
 % if params were passed in, fill in any missing parameters with
 % defaults. Otherwise, if no params passed in, just set them all to defaults.
 if(exist('params','var'))
-  params = getDefaultParams(params,calcfuncs);
+  params = getDefaultParams(params);
 else
-  params = getDefaultParams('',calcfuncs);
+  params = getDefaultParams;
 end
 
 %option to set log file ID in params
@@ -535,6 +547,10 @@ for ifile = 1:nfiles
             fprintf(lfid,'using params index %d for %s\n',iproc,proc);
             lparams = params.(proc)(iproc);
             break
+          else
+            % If we are on first step and prev_steps is empty, just use the
+            % first specification
+            
           end
         end % for iproc = 1:nprocparam
 
@@ -666,69 +682,181 @@ end
 
 
 function params = getDefaultParams(params,calc_names)
-
 % getDefaultParams returns default params for each calc step where params
-% were not otherwise specified
+% were not otherwise specified.
+%
+% We need to handle two situations here. One situation is that in which
+% no parameters have been passed in whatsoever and we have to populate
+% everything with default parameters.  The other is the situation in which
+% a partial set of parameters has been passed in and we need to complete
+% the set.
+
+VERBOSE = 0;  % flag for debugging
 
 def.glob.force_recalc = {};
 def.glob.ignore = {};
-def.glob.save_calc = {'ani','pp','li','toract'};
+def.glob.save_calc = {'ani','pp','li','toract','ani'};
 def.glob.process = {{'ani','pp','li','toract'},...
-    {'ani','pp','pc','li','toract'}};
+    {'ani','pp','pc','li','toract'}, ...
+    {'ani','rp'}};
 def.glob.outputType = 'data';
 
-if ~exist('calc_names') || isempty(calc_names)
-  calc_names = unique([def.glob.process{:}]);
+% Check to see whether we have a params struct and initialize any defaults
+% as necessary
+if ~nargin || ~isstruct(params)
+  params = struct;
 end
 
-for k=1:length(calc_names)
-  fh = parse_fh(['calc_' calc_names{k}]);
-  if nargin && isstruct(params) && isfield(params,calc_names{k})
-    nparam = length(params.(calc_names{k}));
-    for l=1:nparam
-      def.(calc_names{k})(l) = fh('getDefaultParams',params.(calc_names{k})(l));
-    end % for l=1:nparam
-  else
-    def.(calc_names{k}) = fh('getDefaultParams');
+% Check to see if we have the various globals fields and if not, copy the
+% default
+checkGlobTypes = {'process','save_calc','outputType','force_recalc','ignore'};
+for iglob = 1:length(checkGlobTypes)
+  currType = checkGlobTypes{iglob};
+  if ~isfield(params,'glob') || ~isfield(params.glob, currType)
+    params.glob.(currType)= def.glob.(currType);
   end
-end % for k=1:length(calc_names
+end
 
-if (nargin)
-  %only assign defaults to the processes that we are performing
-  if(isfield(params,'glob') && isfield(params.glob,'process'))
-    defTypes = [params.glob.process{:} {'glob'}];
+% Clear the defaults
+clear def
+
+if exist('calc_names','var')
+  if iscell(calc_names{1})
+    params.glob.process = calc_names;
   else
-    defTypes = fieldnames(def);    
+    params.glob.process = {calc_names};
   end
-    
-  for iType = 1:length(defTypes)
+end
 
-    type = defTypes{iType};  
+if ~iscell(params.glob.process{1})
+  params.glob.process = {params.glob.process};
+end
 
-    if ~isfield(params,type)
-      params.(type) = struct();
-    end
+numSeries = length(params.glob.process);
+for iseries = 1:numSeries
+  procCalc = params.glob.process{iseries};
+  for k=1:length(procCalc)
+    currCalc = procCalc{k};
+    fh = parse_fh(['calc_' currCalc]);
     
-    [validParams,badFields,~] = compare_structs(params.(type),def.(type),'values',0,'substruct',1,'types',0);
-    if(~validParams)
-      if iscell(badFields), badFields = cell2str(badFields,', '); end
-      warning(['Field(s) %s for ''%s'' calculation is not specified in '...
-			 'default parameters. Check spelling or add'...
-			 ' the field(s) to the list of defaults\n\n'],badFields,type);
-    end
-    
-    %populate missing param fields with defaults
-    nparam = length(def.(type));
-    for l=1:nparam
-      if l == 1
-        tmpstruct = struct_union(params.(type)(l),def.(type)(l));
-      else
-        tmpstruct(l) = struct_union(params.(type)(l),def.(type)(l));
+    % Determine whether any parameters have been specified for this
+    % calculation whatsoever, and if not, get the defaults
+    if ~isfield(params, currCalc)
+      params.(currCalc) = fh('getDefaultParams','prev_steps',procCalc(1:k-1));
+    else
+      % If a field for the current calculation already exists, determine
+      % whether any instances of it match the current context
+
+      nspec = length(params.(currCalc));
+      contextIdx = [];
+      nullContextIdx = [];
+      for ispec=1:nspec
+        % Copy the current spec
+        currSpec = params.(currCalc)(ispec);
+        
+        if ~isfield(currSpec, 'prev_steps') || isempty(currSpec.prev_steps)
+          currSpec.prev_steps = [];
+          params.(currCalc)(ispec).prev_steps = [];
+          nullContextIdx = ispec;
+        end
+        
+        % If the context matches, then assume this is the one we want;
+        % otherwise get a new spec for this context. If the context was
+        % empty, assume that we want to use those parameters throughout
+        if length(currSpec.prev_steps) == length(procCalc(1:k-1)) ...
+            && all(strcmp(currSpec.prev_steps, procCalc(1:k-1)))
+          contextIdx = ispec;
+          break     
+        end
+      end % for l=1:nspec
+      
+      if isempty(contextIdx)
+        if ~isempty(nullContextIdx)
+          % Copy this as a default spec)
+          defSpec = params.(currCalc)(nullContextIdx);
+          defSpec.prev_steps = procCalc(1:k-1);
+          extraParams = [fieldnames(defSpec) struct2cell(defSpec)]';
+        else
+          extraParams = {'prev_steps',procCalc(1:k-1)};
+        end
+          
+        tmpParams = fh('getDefaultParams',extraParams{:});
+        params.(currCalc)(end+1) = tmpParams;
       end
-    end % for l=1:nparam
-    params.(type) = tmpstruct;
+      
+    end % if ~isfield(params, currCalc)
+    
+    if 0
+      tmpdef = fh('getDefaultParams','prev_steps',procCalc(1:k-1));
+      if ~isfield(params, currCalc)
+        params.(currCalc) = tmpdef;
+      else
+        % compare structures and see if we need to append this spec
+        
+        % Set fields to ignore
+        switch currCalc
+          case 'ani'
+            ignoreFlds = 'aniPath';
+          otherwise
+            ignoreFlds = {};
+        end
+        
+        [structsMatch, firstViolation, violationReason] = ...
+          compare_structs(params.(currCalc), tmpdef, 'ignore_fieldnames',ignoreFlds, 'verbose', VERBOSE);
+        if structsMatch
+          % Perform any cleanup necessary due to redundancy
+          switch currCalc
+            case 'ani'
+              if exist(tmpdef.aniPath,'dir'), rmdir(tmpdef.aniPath), end
+          end
+        else
+          
+          % Append this new definition
+          params.(currCalc)(end+1) = tmpdef;
+        end % if compare_structs
+      end % if ~isfield(def, currCalc)
+    end % if 0
+  end % for k=1:length(calc_names
+end % for iseries
+
+
+if 0
+
+%only assign defaults to the processes that we are performing
+if(isfield(params,'glob') && isfield(params.glob,'process'))
+  defTypes = [params.glob.process{:} {'glob'}];
+else
+  defTypes = fieldnames(def);
+end
+
+for iType = 1:length(defTypes)
+  
+  type = defTypes{iType};
+  
+  if ~isfield(params,type)
+    params.(type) = struct();
   end
   
-else
-  params = def;
+  [validParams,badFields,~] = compare_structs(params.(type),def.(type),'values',0,'substruct',1,'types',0);
+  if(~validParams)
+    if iscell(badFields), badFields = cell2str(badFields,', '); end
+    warning(['Field(s) %s for ''%s'' calculation is not specified in '...
+      'default parameters. Check spelling or add'...
+      ' the field(s) to the list of defaults\n\n'],badFields,type);
+  end
+  
+  %populate missing param fields with defaults
+  nspec = length(def.(type));
+  for l=1:nspec
+    if l == 1
+      tmpstruct = struct_union(params.(type)(l),def.(type)(l));
+    else
+      tmpstruct(l) = struct_union(params.(type)(l),def.(type)(l));
+    end
+  end % for l=1:nparam
+  params.(type) = tmpstruct;
 end
+
+end % if 0
+
+return

@@ -28,6 +28,7 @@ function params = params_toract(varargin)
 % 2011.01.10 FB - adapted from params_ci.m
 % 2012.07.03 FB - move from ci_siglist to li_siglist, add inDataType and
 %   prev_steps
+% 2012.10.30 PJ - added context dependent assignment of weight matrices
 
 fields = {...
     'li_siglist',...
@@ -44,11 +45,20 @@ params = mkstruct(fields,varargin);
 
 def.li_siglist = [];
 def.ci_siglist = [];
-def.HalfDecayTimes = [];
+def.HalfDecayTimes = [0.1 2];
 def.calc_spher_harm = 1;
 def.spher_harm = struct('nharm_theta',3,'nharm_phi',4,'min_rsqr',0.95);
 def.norm = 'x./repmat(sum(x),size(x,1),1)';
 def.som = [];
+% Assign the default weight matrix based on context
+switch cell2str(params.prev_steps,'_')
+  case 'ani_pp_li'
+    def.som.fname = 'map_10-Dec-2006_16:18.mat';
+  case 'ani_pp_pc_li'
+    def.som.fname = 'pc_ci2toract_map_12-Jun-2012_15:47.mat';
+  otherwise
+    def.som.fname = '';
+end
 def.Fs = [];
 def.inDataType = '';
 def.prev_steps = [];

@@ -13,6 +13,13 @@ function flist = jlmt_prepare_dirs(fpath,params)
 % directory
 flist = {};
 if isdir(fpath)
+  
+  % If the present directory is specified, get the full path to it so that
+  % we can check for proper nesting
+  if ismember(fpath,{'.',['.' filesep]})
+    fpath = pwd;
+  end
+  
   fprintf('Searching for audio files in %s ...\n', fpath);
   
   % Look for all .wav, .mp3, and .aif or .aiff files

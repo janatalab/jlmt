@@ -1,4 +1,4 @@
-function pc = calc_pc(indata,params)
+function pc = calc_pc(indata,varargin)
 
 % Projects periodicity pitch or context (integrated periodicity pitch) images into pitch class space.
 % 
@@ -48,18 +48,27 @@ function pc = calc_pc(indata,params)
 %
 
 % 2011.05.06 FB - adapted from calc_toract.m
-% 2012.10.26 PJ - eliminated unnecessary assignment of empty params field
+% 2012.10.26 PJ - updated handling of default parameters such that context
+%                 dependent weight matrices can be returned
 % 2012.11.01 TC - inserted "pc.params = [];" at line 100, to avoid error at
 %                  line 111, where there is a reference to params.
 
-pc = [];
-if ischar(indata) && ~isempty(strmatch(indata,'getDefaultParams'))
-    if ~exist('params','var'), params = ''; end
-    pc = getDefaultParams(params);
-    return
+if nargin > 1 && isstruct(varargin{1})
+  params = varargin{1};
 end
 
-error(nargchk(2,2,nargin))
+pc = [];
+if ischar(indata) && strcmp(indata,'getDefaultParams')
+  if exist('params','var')
+    pc = getDefaultParams('params',params);
+  else
+    pc = getDefaultParams(varargin{:});
+  end
+  return
+end
+
+% Storage for parameter struct
+pc.params = {};
 
 indata_cols = set_var_col_const(indata.vars);
 
@@ -112,13 +121,20 @@ pc.data{pc_dataCols.params} = storeParams;
 
 %makes sure that all necessary param fields are populated and
 %non-empty. Sets empty or non-existent values to default values
-function params = getDefaultParams(params)
+function params = getDefaultParams(varargin)
 
-def = params_pc;
+for iarg = 1:2:nargin
+  switch varargin{iarg}
+    case 'params'
+      params = varargin{iarg}+1;
+  end
+end
+
+def = params_pc(varargin{:});
 
 fnames = fieldnames(def);
 
-if isempty(params) || ~isstruct(params)
+if ~exist('params','var') || ~isstruct(params)
   params = def;
   return
 else

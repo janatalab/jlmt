@@ -15,7 +15,7 @@
 % run, since they require different parameters to the model and
 % parameters are set at the top level.
 
-rp_proc_dir = fullfile(fileparts(fileparts(which('jlmt_proc_series'))),...
+rp_proc_dir = fullfile(fileparts(which('jlmt_proc_series')),...
     'data','test_jlmt');
 input_file_pattern = {'*.wav','*.mp3'};
 
@@ -36,9 +36,9 @@ for k=1:length(input_file_pattern)
     case {'.wav','.mp3'}
       params.jlmt.rp   = rp_paramGroups_v2('param_group',...
 				       'reson_filterQSpacing_periodBasedDecay',...
-				       'input_type','ani','gain_type','beta_distribution');
+				       'input_type','ani','gain_type','beta_distribution','prev_steps',{'ani'});
   
-      params.jlmt.glob.process = {'ani','rp'};
+      params.jlmt.glob.process = {{'ani','rp'}};
       %note that the peak ratio bargraph plot is disabled for audio
       %files since the automated procedure for finding peak ratios was mainly
       %tested and used with MIDI files. In order to use the peak ratio

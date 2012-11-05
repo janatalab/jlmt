@@ -1,4 +1,4 @@
-function pp = calc_pp(inData,par)
+function pp = calc_pp(inData,varargin)
 % pp = calc_pp(ani,pp_params);
 %
 % Calculates a periodicity pitch image from an ANI image using IPEM Toolbox
@@ -10,13 +10,20 @@ function pp = calc_pp(inData,par)
 % 12/04/06 Petr Janata
 % 12/10/06 PJ - Added attenuation function capability
 % 4/14/07 Stefan Tomic - data structures now conform to ensemble datastruct
+% 30Oct2012 PJ - added support for varargin and handling of default
+%                parameters
 
-pp = [];
+if nargin > 1 && isstruct(varargin{1})
+  par = varargin{1};
+end
 
 %see if inData was a 'get_default_params' tag
-if(ischar(inData) && strcmp(inData,'getDefaultParams'))
-  if ~exist('par','var'), par = ''; end
-  pp = getDefaultParams(par);
+if ischar(inData) && strcmp(inData,'getDefaultParams')
+  if exist('par','var')
+    pp = getDefaultParams('params',par);
+  else
+    pp = getDefaultParams(varargin{:});
+  end
   return
 else
   aud = inData;
@@ -61,13 +68,20 @@ return
 
 % makes sure that all necessary param fields are populated and
 % non-empty. Sets empty or non-existent values to default values
-function params = getDefaultParams(params)
+function params = getDefaultParams(varargin)
 
-def = params_pp;
+for iarg = 1:2:nargin
+  switch varargin{iarg}
+    case 'params'
+      params = varargin{iarg}+1;
+  end
+end
+
+def = params_pp(varargin{:});
 
 fnames = fieldnames(def);
 
-if isempty(params) || ~isstruct(params)
+if ~exist('params','var') || ~isstruct(params)
   params = def;
   return
 else

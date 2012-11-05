@@ -1,4 +1,4 @@
-function [regval,regnames] = calc_tonreg_fmri(toract,params)
+function [regval,regnames] = calc_tonreg_fmri(toract,varargin)
 % generates fmri tonality tracking regressors for a given timulus
 % 
 %   [regval,regnames] = calc_tonreg_fmri(indata,params);
@@ -30,10 +30,17 @@ function [regval,regnames] = calc_tonreg_fmri(toract,params)
 regval = []; %#ok<NASGU>
 regnames = {};
 
+if nargin > 1 && isstruct(varargin{1})
+  params = varargin{1};
+end
+
 %see if toract was a 'get_default_params' tag
-if(ischar(toract) && strcmp(toract,'getDefaultParams'))
-  if ~exist('params','var'), params = ''; end
-  regval = getDefaultParams(params);
+if ischar(toract) && strcmp(toract,'getDefaultParams')
+  if exist('params','var')
+    regval = getDefaultParams('params', params);
+  else
+    regval = getDefaultParams(varargin{:});
+  end
   return
 end
 
@@ -73,13 +80,21 @@ return
 
 %makes sure that all necessary param fields are populated and
 %non-empty. Sets empty or non-existent values to default values
-function params = getDefaultParams(params)
+function params = getDefaultParams(varargin)
 
-def = params_tonreg_fmri;
+% Check to see if we have a params structure in the input
+for iarg = 1:2:nargin
+  switch varargin{iarg}
+    case 'params'
+      params = varargin{iarg+1};
+  end
+end
+
+def = params_tonreg_fmri(varargin{:});
 
 fnames = fieldnames(def);
 
-if(~exist('params','var'))
+if ~exist('params','var')
   params = def;
   return
 else

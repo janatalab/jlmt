@@ -1,4 +1,4 @@
-function toract = calc_toract(inData,params)
+function toract = calc_toract(inData,varargin)
 % Projects leaky integrated images into toroidal space using a projection map specified in params.
 % 
 %   toract = calc_toract(inData,params);
@@ -34,18 +34,24 @@ function toract = calc_toract(inData,params)
 % 2010.02.19 FB - changed params.ci.siglist to params.ci_siglist
 % 2012.07.03 FB - changed cntxt_img to inData, ci_siglist to li_siglist,
 % added getDefaultParams
+% 2012.10.30 PJ - added support for varargin and handling of default
+% parameters
 
-toract = [];
-if ischar(inData) && ~isempty(strmatch(inData,'getDefaultParams'))
-    if ~exist('params','var'), params = ''; end
-    toract = getDefaultParams(params);
-    return
+if nargin > 1 && isstruct(varargin{1})
+  params = varargin{1};
+end
+  
+if ischar(inData) && strcmp(inData,'getDefaultParams')
+  if exist('params','var')
+    toract = getDefaultParams('params',params);
+  else
+    toract = getDefaultParams(varargin{:});
+  end
+  return
 end
 
-%storage for parameter struct
+% Storage for parameter struct
 toract.params = {};
-
-error(nargchk(2,2,nargin))
 
 inData_cols = set_var_col_const(inData.vars);
 
@@ -137,13 +143,20 @@ toract.data{toract_dataCols.params} = storeParams;
 
 %makes sure that all necessary param fields are populated and
 %non-empty. Sets empty or non-existent values to default values
-function params = getDefaultParams(params)
+function params = getDefaultParams(varargin)
 
-def = params_toract;
+for iarg = 1:2:nargin
+  switch varargin{iarg}
+    case 'params'
+      params = varargin{iarg}+1;
+  end
+end
+
+def = params_toract(varargin{:});
 
 fnames = fieldnames(def);
 
-if isempty(params) || ~isstruct(params)
+if ~exist('params','var') || ~isstruct(params)
   params = def;
   return
 else

@@ -1,4 +1,4 @@
-function outData = calc_ani(inData,ap)
+function outData = calc_ani(inData,varargin)
 % Calls the IPEM auditory nerve image calculation
 %
 % outData = calc_ani(inData,ap);
@@ -21,13 +21,22 @@ function outData = calc_ani(inData,ap)
 % Author(s):
 % 12/04/06 Petr Janata - substantially rewrote code.
 % 4/26/07  Stefan Tomic - edited to comply with ensemble data structs
+% 30Oct2012 PJ - added support for varargin and updated handling of default
+%                parameters
 
 outData = [];
 
+if nargin > 1 && isstruct(varargin{1})
+  ap = varargin{1};
+end
+
 %see if inData was a 'get_default_params' tag
-if(ischar(inData) && strcmp(inData,'getDefaultParams'))
-  if ~exist('ap','var'), ap = ''; end
-  outData = getDefaultParams(ap);
+if ischar(inData) && strcmp(inData,'getDefaultParams')
+  if exist('ap','var')
+    outData = getDefaultParams('params',ap);
+  else
+    outData = getDefaultParams(varargin{:});
+  end
   return
 else
   aud = inData;
@@ -39,7 +48,11 @@ aniCols = set_var_col_const(ani.vars);
 audCols = set_var_col_const(aud.vars);
 
 %populate missing params with defaults
-ap = getDefaultParams(ap);
+if exist('ap','var')
+  ap = getDefaultParams('params',ap);
+else
+  ap = getDefaultParams(varargin{:});
+end
 
 if ~isempty(aud.data{audCols.wvf})
   wvf = aud.data{audCols.wvf};
@@ -54,7 +67,7 @@ if ~isempty(aud.data{audCols.wvf})
   
   %if start time and duration were set, then process only this
   %section of the waveform
-  if(~isempty(ap.start_time_sec) & ~isempty(ap.dur_sec))
+  if(~isempty(ap.start_time_sec) && ~isempty(ap.dur_sec))
     startstop = [ap.start_time_sec, (ap.start_time_sec+ap.dur_sec)]*wavFs;
     check_startstop(startstop, sigsize);
     wvf = wvf(startstop,:);
@@ -92,7 +105,7 @@ try
       ap.CBUStep); 
 catch
   fprintf('ANI calculation failed ...\n');
-  if(exist('tmpDirStatus','var') & ~tmpDirStatus)
+  if(exist('tmpDirStatus','var') && ~tmpDirStatus)
     fprintf('Cleaning up temp directory...');
     rmdir(ap.aniPath);
   end
@@ -136,13 +149,21 @@ return
 
 %makes sure that all necessary param fields are populated and
 %non-empty. Sets empty or non-existent values to default values
-function params = getDefaultParams(params)
+function params = getDefaultParams(varargin)
 
-def = params_ani;
+% Check to see if we have a params structure in the input
+for iarg = 1:2:nargin
+  switch varargin{iarg}
+    case 'params'
+      params = varargin{iarg+1};
+  end
+end
+
+def = params_ani(varargin{:});
 
 fnames = fieldnames(def);
 
-if(~exist('params','var'))
+if ~nargin || ~exist('params','var')
   params = def;
   return
 else

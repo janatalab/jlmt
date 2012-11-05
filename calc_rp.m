@@ -1,4 +1,4 @@
-function outData = calc_rp(inData,params)
+function outData = calc_rp(inData, varargin)
 % This is the entry point for the BTB algorithm
 %
 %   outData = calc_rp(inData,params)
@@ -68,18 +68,24 @@ function outData = calc_rp(inData,params)
 %           determine which calculations to perform. Cleaned up handling of
 %           post JASA paper calculations, and set up handling of rp structs
 %           as inputs.
+% 30Oct2012 PJ - added support for varargin and handling of default
+%                parameters
 
+
+if nargin > 1 && isstruct(varargin{1})
+  params = varargin{1};
+end
 
 %params for converting tree to ensemble data struct
 etParams.encapsulate_in_cells = 1;
   
 %if string 'getDefaultParams' is passed in, then just return the
 %default params struct
-if(ischar(inData) && strcmp(inData,'getDefaultParams'))
-  if(exist('params','var'))
-    outData = getDefaultParams(params);
+if ischar(inData) && strcmp(inData,'getDefaultParams')
+  if exist('params','var')
+    outData = getDefaultParams('params',params);
   else
-    outData = getDefaultParams;
+    outData = getDefaultParams(varargin{:});
   end
   return
 end
@@ -454,17 +460,27 @@ return
 
 
 
-function defParams = getDefaultParams(params)
+function defParams = getDefaultParams(varargin)
 % returns a default parameter struct
 % this can be called from external functions by passing 
 % 'getDefaultParams' to rhythm_profiler
 
-if(exist('params','var') && isfield(params,'inDataType'))
-  switch(params.inDataType)
+for iarg = 1:2:nargin
+  switch varargin{iarg}
+    case 'params'
+      params = varargin{iarg}+1;
+    case 'prev_steps'
+      prev_steps = varargin{iarg}+1;
+  end
+end
+
+
+if exist('params','var') && isfield(params,'inDataType')
+  switch params.inDataType
     
    case 'ani'
     defParams = rp_paramGroups_v2('param_group','reson_filterQSpacing_periodBasedDecay',...
-			       'input_type','ani','gain_type','beta_distribution');
+			       'input_type','ani','gain_type','beta_distribution','prev_steps',prev_steps);
     
    case 'aud'
     defParams = rp_paramGroups_v2('param_group','reson_filterQSpacing_periodBasedDecay','input_type','aud','gain_type','beta_distribution');
@@ -476,7 +492,7 @@ if(exist('params','var') && isfield(params,'inDataType'))
 else
   
    defParams = rp_paramGroups_v2('param_group','reson_filterQSpacing_periodBasedDecay',...
-			       'input_type','ani','gain_type','beta_distribution');
+			       'input_type','ani','gain_type','beta_distribution','prev_steps',prev_steps);
   
 end
   
