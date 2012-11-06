@@ -98,7 +98,7 @@ if strmatch(indata.type,'li','exact')
     pc.sig{isig} = W*limg;
   end % for isig=
 elseif strmatch(indata.type,'pp','exact')
-  pc.sig{1} = W*indata.data{indata.cols.sig};
+  pc.sig{1} = W*indata.data{indata_cols.sig};
 else
   error('unknown indata type: %s',indata.type);
 end
