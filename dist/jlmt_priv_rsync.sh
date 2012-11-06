@@ -33,13 +33,16 @@ EXCLUDES="$PRIVPATH/matlab/jlmt/dist/jlmt_priv_rsync_exclude.txt"
 # specify specific files to copy
 declare -a PubUtils=('cell2str.m' 'check_dir.m' 'check_stim_dirs.m' 'compare_cells.m' 'compare_structs.m')
 declare -a PubDB=('ensemble_init_data_struct.m' 'ensemble_tree2datastruct.m' 'ensemble_datastruct2tree.m' 'ensemble_merge_data.m')
+declare -a PrivUtils('stats/coherence.m' 'signal/find_peaks.m')
 
 # RSYNC directories
 eval "rsync -a --exclude-from=$EXCLUDES $PRIVPATH/matlab/jlmt/ $JLMTPATH/"
 eval "rsync -a --exclude-from=$EXCLUDES $PRIVPATH/matlab/data_types/event_objects $JLMTPATH"
 
 # RSYNC individual files
-eval "rsync -a --exclude-from=$EXCLUDES $PRIVPATH/matlab/utils/stats/coherence.m $JLMTPATH/utils/"
+for fname in ${PrivUtils[@]}
+do eval "rsync -a --exclude-from=$EXCLUDES $PRIVPATH/matlab/utils/$fname $JLMTPATH/utils/"
+done
 
 for fname in ${PubUtils[@]}
 do eval "rsync -a --exclude-from=$EXCLUDES $PUBPATH/matlab/utils/$fname $JLMTPATH/utils/"
