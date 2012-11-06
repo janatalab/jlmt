@@ -15,7 +15,7 @@
 dest_dir = '';
 
 if isempty(dest_dir)
-  error('Please specify "dest_dir" in test/test_jlmt.m');
+  error('Please specify "dest_dir" in test/test_btb.m');
 end
 
 rp_proc_dir = fullfile(fileparts(which('jlmt_proc_series')),...
