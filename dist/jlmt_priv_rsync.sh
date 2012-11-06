@@ -31,9 +31,15 @@ TPPATH="/home/matrpcuser/svn/thirdparty"
 EXCLUDES="$PRIVPATH/matlab/jlmt/dist/jlmt_priv_rsync_exclude.txt"
 
 # specify specific files to copy
-declare -a PubUtils=('cell2str.m' 'check_dir.m' 'check_stim_dirs.m' 'compare_cells.m' 'compare_structs.m')
-declare -a PubDB=('ensemble_init_data_struct.m' 'ensemble_tree2datastruct.m' 'ensemble_datastruct2tree.m' 'ensemble_merge_data.m')
-declare -a PrivUtils('stats/coherence.m' 'signal/find_peaks.m')
+declare -a PubUtils=('cell2str.m' 'check_dir.m' 'check_stim_dirs.m' 'compare_cells.m' 'compare_structs.m'
+  'listFilesOfType.m' 'mkstruct.m' 'rotateticklabel.m' 'rotateyticklabel.m' 'struct_union.m' 'toroidal_spect.m')
+declare -a PubDB=('ensemble_init_data_struct.m' 'ensemble_tree2datastruct.m' 'ensemble_datastruct2tree.m'
+  'ensemble_merge_data.m' 'parse_fh.m' 'set_var_col_const.m')
+declare -a PrivUtils=('stats/coherence.m' 'signal/find_peaks.m' 'signal/invert_sig.m' 'converters/nmat2aud.m'
+   'signal/peak_areas.m' 'signal/peak_heights.m' 'signal/peak_widths.m')
+declare -a Metrics=('jlCorr.m' 'jlKLdist.m' 'jlPost_target_mean.m' 'map_max.m' 'target_relative_readout.m')
+declare -a MIDITB=('javamidi2tr.m' 'Midi2tr.java' 'nmat_columns.m' 'TrackInfo.java')
+declare -a TPSTATS=('bessel_i0.m' 'von_mises_pdf.m')
 
 # RSYNC directories
 eval "rsync -a --exclude-from=$EXCLUDES $PRIVPATH/matlab/jlmt/ $JLMTPATH/"
@@ -44,6 +50,10 @@ for fname in ${PrivUtils[@]}
 do eval "rsync -a --exclude-from=$EXCLUDES $PRIVPATH/matlab/utils/$fname $JLMTPATH/utils/"
 done
 
+for fname in ${Metrics[@]}
+do eval "rsync -a --exclude-from=$EXCLUDES $PRIVPATH/matlab/analysis/tonality/metrics/$fname $JLMTPATH/proc/"
+done
+
 for fname in ${PubUtils[@]}
 do eval "rsync -a --exclude-from=$EXCLUDES $PUBPATH/matlab/utils/$fname $JLMTPATH/utils/"
 done
@@ -52,16 +62,20 @@ for fname in ${PubDB[@]}
 do eval "rsync -a --exclude-from=$EXCLUDES $PUBPATH/matlab/database/$fname $JLMTPATH/utils/"
 done
 
+for fname in ${MIDITB[@]}
+do eval "rsync -a --exclude-from=$EXCLUDES $TPPATH/matlab/miditoolbox/$fname $JLMTPATH/midi/"
+done
 
-eval "rsync -a --exclude-from=$EXCLUDES $TPPATH/matlab/stats/bessel_i0.m $JLMTPATH/utils/"
+for fname in ${TPSTATS[@]}
+do eval "rsync -a --exclude-from=$EXCLUDES $TPPATH/matlab/stats/$fname $JLMTPATH/utils/"
+done
 
 # if we ever want to allow distribution users to update the distribution repository, we
 # may want to use the -u flag (don't overwrite newer files at destination), then also
 # rsync -au the opposite direction
 
-
 # remove emacs backup files
-eval "find $JLMTPATH -regex '*~' -exec rm {} \;"
+eval "find $JLMTPATH -regex '.*~' -exec rm {} \;"
 
 # unit test? if failure, don't commit to svn and send an email to the janatalab
 
