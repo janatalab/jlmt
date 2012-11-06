@@ -19,7 +19,6 @@ have to update the mp3read scripts. Visit the LabROSA web site for more
 information on mp3read.
 
 JLMT also requires installation of the following Matlab Toolboxes:
-     - Neural Net
      - Signal Processing
      - Statistics
 

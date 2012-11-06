@@ -40,11 +40,13 @@ and 'mp3info', acquired from the LabROSA web site at Columbia University
 
 SUBDIRECTORIES
 
-data -	        .mat files containing projection matrices for torus
-                projection and pitch class projection
+data -	      sample stimuli and data used by unit test scripts
 
 event_objects - functions for initializing data structures used to
                 describe auditory or MIDI events.
+
+maps -	        .mat files containing projection matrices for torus
+                projection and pitch class projection
 
 midi -	        functions for reading MIDI files.
 

@@ -1,3 +1,14 @@
+----------------------------------------------------
+Release v1.2 - October XX, 2012
+----------------------------------------------------
+
+- jlmt_proc_series has been updated to support processing of
+individual directories and files without specifying any parameters,
+and relying solely on default parameters.
+
+- Default parameter setting and propogation has been re-worked.
+
+----------------------------------------------------
 Release v1.1 - August 22, 2012
 ----------------------------------------------------
 
