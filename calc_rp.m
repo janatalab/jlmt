@@ -398,7 +398,7 @@ end
 
 if(params.perform.calcMPPByFrame)
   [rp.data{rpCols.mppByFrame},rp.data{rpCols.stdmpByFrame},rp.data{rpCols.ratioBinsByFrame}, ...
-   rp.data{rpCols.ratioEntropyByFrame},rp.data{rpCols.ratioTally}] = calc_mppByFrame(rp.data{rpCols.resonatorEnergy},rp.data{rpCols.resonatorFreqs},params);
+   rp.data{rpCols.ratioEntropyByFrame},rp.data{rpCols.ratioTally}] = rp_mppByFrame(rp.data{rpCols.resonatorEnergy},rp.data{rpCols.resonatorFreqs},params);
 end
 
 if(params.perform.calcOnsetInfo)

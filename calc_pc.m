@@ -6,31 +6,24 @@ function pc = calc_pc(indata,varargin)
 %
 % This script takes auditory data represented in periodicity pitch or
 % integrated periodicity pitch space, and projects it to pitch class space
-% using a trained neural network model, and the MATLAB Neural Network
-% Toolbox.
+% using a weight matrix trained using a neural network model.
 % 
-% This script will accept both context images and periodicity pitch
-% images.
-%
-% IF you want to project context images to pitch class space, you MUST
-% specify 'params.li_siglist', since the output from calc_context.m can
-% contain multiple context images (integrated at different timeconstants).
+% IF you want to project leaky-integrated images to pitch class space, you
+% MUST specify 'params.li_siglist', since the output from calc_li.m can
+% contain multiple images (integrated at different timeconstants).
 % 
-% calc_pitchclass is intended to be called by jlmt_proc_series.m. If you
-% specify params.li_siglist, jlmt_proc_series.m will assume that you want
-% to project context image data into pitch class space, and will therefore
-% send LI data to this function. If you do not specify params.li_siglist,
-% it will assume that you want to project periodicity pitch images to pitch
-% class space, and will therefore send pp data to this function.
+% calc_pc is intended to be called by jlmt_proc_series.m. If you specify
+% params.li_siglist, jlmt_proc_series.m will assume that you want to
+% project leaky integrated data into pitch class space, and will therefore
+% try to identify and send output from calc_li to this function. If you do
+% not specify params.li_siglist, it will assume that you want to project
+% periodicity pitch images to pitch class space, and will therefore try to
+% identify and send calc_pp output to this function.
 % 
 % REQUIRES
-%   indata - output from calc_context.m or calc_pp.m
-%   params.nnet.fname - path to the neural network model that will be used
-%       to project indata into pitch class space. It is assumed that
-%       params.nnet.fname holds a variable named "net" that is the output
-%       of the MATLAB Neural Network Toolbox, containing a trained neural
-%       network model that will project pp or li-space data into pitch
-%       class space.
+%   indata - output from calc_li.m or calc_pp.m
+%   params.wmtx.fname - path to a file containing a weight matrix to
+%       project the input data into pitch class space.
 %   params.HalfDecayTimes (used if indata.type = 'li') - Half Decay Times
 %       used by IPEMLeakyIntegration
 %   params.li_siglist (used if indata.type = 'li') - names of images in
@@ -45,6 +38,8 @@ function pc = calc_pc(indata,varargin)
 %
 % Copyright (c) 2011-2012 The Regents of the University of California
 % All Rights Reserved.
+
+
 %
 
 % 2011.05.06 FB - adapted from calc_toract.m
@@ -75,12 +70,12 @@ indata_cols = set_var_col_const(indata.vars);
 % copy the sampling rate
 params.Fs = indata.data{indata_cols.Fs};
 
-% Load the nnet model
-if ~exist(params.nnet.fname,'file')
-  fprintf('NNet Model file (%s) does not exist\n',params.nnet.fname);
+% Load the wmtx model
+if ~exist(params.wmtx.fname,'file')
+  fprintf('Pitch class projection file (%s) does not exist\n',params.wmtx.fname);
   return
 end
-load(params.nnet.fname,'net');
+load(params.wmtx.fname,'W');
 
 % are we dealing with 'li' data or 'pp' data?
 if strmatch(indata.type,'li','exact')
@@ -100,10 +95,10 @@ if strmatch(indata.type,'li','exact')
       normFunc = inline(params.norm);
       limg = normFunc(limg);
     end
-    pc.sig{isig} = sim(net,limg);
+    pc.sig{isig} = W*limg;
   end % for isig=
 elseif strmatch(indata.type,'pp','exact')
-  pc.sig{1} = sim(net,indata.data{indata_cols.sig});
+  pc.sig{1} = W*indata.data{indata.cols.sig};
 else
   error('unknown indata type: %s',indata.type);
 end

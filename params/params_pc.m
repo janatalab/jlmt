@@ -8,7 +8,7 @@ function params = params_pc(varargin)
 %
 % Input parameters for pitch class projection:
 %
-%       nnet.fname: []
+%       wmtx.fname: []
 %   HalfDecayTimes: []
 %       ci_siglist: []
 %             norm: []
@@ -26,7 +26,7 @@ function params = params_pc(varargin)
 % 2012.07.05 FB - added inDataType and prev_steps
 
 fields = {...
-    'nnet',...
+    'wmtx',...
     'HalfDecayTimes',...
     'ci_siglist',...
     'norm', ...
@@ -34,9 +34,9 @@ fields = {...
     'inDataType'};
 params = mkstruct(fields,varargin);
 
-if isempty(params.nnet)
+if isempty(params.wmtx)
   root_path = fileparts(which('jlmt_proc_series'));
-  params.nnet = struct('fname',fullfile(root_path,'maps','pp2pitchclass_nnet_full_20120611T113342.mat'));
+  params.wmtx = struct('fname',fullfile(root_path,'maps','pp2pitchclass_W_20121105.mat'));
 end
 
 end % params_pc
