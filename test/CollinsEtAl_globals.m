@@ -42,8 +42,7 @@ defs.jlmt.paths.pc_to_torus_fname = fullfile(defs.paths.data_root,'maps',...
     'pc_ci2toract_map_12-Jun-2012_15:47.mat');
   
 % Location of distributions for calculating closure probability.
-defs.paths.closure_struct = fullfile(defs.paths.data_root, 'maps',...
-    'closure_struct');
+defs.paths.closure_struct = fullfile(defs.paths.data_root, 'closure');
 
 % Steps to execute and save
 defs.jlmt.glob.process = {{'ani','pp','li','toract'},...
