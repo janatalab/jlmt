@@ -9,18 +9,18 @@
 % Author:
 % Stefan Tomic, Fred Barrett
 
-% SET TO PATH TO LOCATION OF AUDIO OR MIDI FILES
-% AND SET input_file_pattern TO EITHER *.wav or *.mid
-% Currently, only one type (wav or mid) can be processed during each
-% run, since they require different parameters to the model and
-% parameters are set at the top level.
+% SET THE FOLLOWING LINE to the path where you would like to store
+% data and output from the test scripts (eg. '/home/username/data' or
+% 'C:\Documents and Settings\Username\data')
+dest_dir = '';
+
+if isempty(dest_dir)
+  error("Please specify 'dest_dir' in test/test_jlmt.m");
+end
 
 rp_proc_dir = fullfile(fileparts(which('jlmt_proc_series')),...
     'data','test_jlmt');
 input_file_pattern = {'*.wav','*.mp3'};
-
-% Remove the comment marks on the following line if you are running btb on
-% midi files instead of wav files
 % input_file_pattern = {'*.mid'};
 
 for k=1:length(input_file_pattern)
@@ -28,7 +28,7 @@ for k=1:length(input_file_pattern)
 
   dirStruct = dir(fullfile(rp_proc_dir,input_file_pattern{k}));
   fnames = {dirStruct.name};
-  mapped_audioFileList = check_stim_dirs(fnames,'srcroot',rp_proc_dir,'destroot',rp_proc_dir);
+  mapped_audioFileList = check_stim_dirs(fnames,'srcroot',rp_proc_dir,'destroot',dest_dir);
 
   params.jlmt.ani  = ani_paramGroups;
 

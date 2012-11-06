@@ -9,10 +9,18 @@
 % 13 June 2007 - Stefan Tomic
 % 22 May 2012 - Fred Barrett
 
+% SET THE FOLLOWING LINE to the path where you would like to store
+% data and output from the test scripts (eg. '/home/username/data' or
+% 'C:\Documents and Settings\Username\data')
+dest_dir = '';
+
+if isempty(dest_dir)
+  error("Please specify 'dest_dir' in test/test_jlmt.m");
+end
+
 % Collect test file paths
 jlmt_root = fileparts(which('jlmt_proc_series'));
 test_data_dir = fullfile(jlmt_root,'data','test_jlmt');
-dest_dir = '/Users/pjanata/jlmt_test'; % may not use ~ for user
 
 flist = listFilesOfType(test_data_dir, {'wav','mp3'});
 flist = check_stim_dirs(flist,'srcroot',test_data_dir,'destroot',dest_dir);
