@@ -45,28 +45,28 @@ data -	      sample stimuli and data used by unit test scripts
 event_objects - functions for initializing data structures used to
                 describe auditory or MIDI events.
 
-maps -	        .mat files containing projection matrices for torus
+includes -      a series of thirdparty scripts that are utilized by jlmt
+
+maps -	      .mat files containing projection matrices for torus
                 projection and pitch class projection
 
-midi -	        functions for reading MIDI files.
+midi -	      functions for reading MIDI files.
 
-proc -	        functions to carry out JLMT processing steps. The
-    	        entry point to the JLMT is jlmt_proc_series.m, which
+params -	      functions used to generate default parameter
+	      structures for each of the calc_step() functions
+
+plots -	      functions utilized to visualize calc_step() output
+
+proc -	      functions to carry out JLMT processing steps. The
+    	      entry point to the JLMT is jlmt_proc_series.m, which
                 contains all the basic procedures in our research.
                 The other functions in this directory generally
                 supplement the use of this function.
 
-proc/rp_modules - BTB functions for processing signals through the
-    	        resonator banks (resonatorBanks.m) and for 
+rp_modules -    BTB functions for processing signals through the
+    	      resonator banks (resonatorBanks.m) and for 
                 calculating the RMS of the resonator bank output
                 (resonatorEnergy.m).
-
-plots -	        general plotting functions. Currently, this
-    	        directory only contains BTB functions for plotting
-                resonator bank outputs, RMS of the resonator bank
-                outputs (periodicity surfaces), the average
-                periodicity surface (APS), and the mean periodicity
-                profile (MPP).
 
 test -	        scripts for unit testing your JLMT installation
 
@@ -78,6 +78,14 @@ required to use the JLMT.
 
 
 PREREQUISITES
+
+JLMT is managed and distributed using the subversion (svn) version control
+software (subversion.tigris.org). You will need to install svn in order to
+acquire and update JLMT. Svn does not automatically push updates to your
+checked-out copy; rather, you will have to pull updates as they are made
+available, using the 'update' command within svn. Please refer to the svn
+documentation or the documentation of the svn client you choose to use
+for more information on how to use 'update'.
 
 JLMT requires installation of the IPEM Toolbox. It can be obtained at:
      - http://www.ipem.ugent.be/Toolbox. 
@@ -91,7 +99,6 @@ have to update the mp3read scripts. Visit the LabROSA web site for more
 information on mp3read.
 
 JLMT also requires installation of the following Matlab Toolboxes:
-     - Neural Net
      - Signal Processing
      - Statistics
 
@@ -110,7 +117,9 @@ HOW TO RUN
 A small number of example stimuli have been included in the 'data'
 directory of the distribution. Example scripts have been provided in
 the 'test'directory. The example scripts are heavily commented. Please
-open 'test_jlmt.m' and read through this file to begin.
+refer to 'test/test_jlmt.m' and 'test/test_btb.m' for unit testing to 
+assure that your installation was successful. These scripts are also
+useful templates that demonstrate the intended use of the JLMT.
 
 
 CONTACT

@@ -13,8 +13,6 @@ from periodicity pitch space or leaky-integrated context space to
 pitch class space. This was the only dependency on the NNet Toolbox,
 therefore this package is no longer required for any portion of jlmt.
 
-- Unit testing has been expanded to verify the validity of output.
-
 ----------------------------------------------------
 Release v1.1 - August 22, 2012
 ----------------------------------------------------

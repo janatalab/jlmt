@@ -7,6 +7,14 @@ Janata Lab Music Toolbox (JLMT)
 
 PREREQUISITES
 
+JLMT is managed and distributed using the subversion (svn) version control
+software (subversion.tigris.org). You will need to install svn in order to
+acquire and update JLMT. Svn does not automatically push updates to your
+checked-out copy; rather, you will have to pull updates as they are made
+available, using the 'update' command within svn. Please refer to the svn
+documentation or the documentation of the svn client you choose to use
+for more information on how to use 'update'.
+
 JLMT requires installation of the IPEM Toolbox. It can be obtained at:
      - http://www.ipem.ugent.be/Toolbox. 
 
@@ -33,22 +41,17 @@ INSTALLATION
 
 1) Install all prerequisites for the JLMT.
 
-2) Unpackage the JLMT distribution file. This will create a directory
-named 'jlmt_dist'. Copy the JLMT directory to an appropriate location
-for your matlab installation. Add this directory, and all subdirectories 
-to your Matlab path. This can be easily accomplished by adding the
-following line to your startup.m file:
+2) Check out a copy of the JLMT repository from:
 
-    path(path,genpath(<path_to_JLMT>));
+   https://atonal.ucdavis.edu/repos/jlmt
 
-where <path_to_JLMT> is the absolute path to the JLMT directory. An 
-example of lines to add to your startup.m file can be found in:
+3) add the path to your JLMT repository in your startup.m file, and
+   then add a line to your startup.m file running 'jlmt_startup.m':
 
-    jlmt/jlmt_startup.m
+   addpath("/path/to/jlmt");
+   jlmt_startup;
 
-Make sure to replace '/home/fbarrett/matlab/jlmt_dist' in that file
-with the path to your particular jlmt directory. You may also use the
-MATLAB user interface to add JLMT paths by choosing:
+You may also use the MATLAB user interface to add JLMT paths by choosing:
 
     File -> Set Path
 
@@ -62,9 +65,9 @@ directory.
 If Matlab returns the path to your JLMT installation, then you have
 properly set the JLMT path.
 
-4) Run the 'test_jlmt.m' script in the 'test/' subdirectory of your
-JLMT installation. If this script runs without error, then your JLMT
-installation is complete.
+4) Run the 'test_jlmt.m' and 'test_btb.m' scripts in the 'test/'
+subdirectory of your JLMT installation. If this script runs without
+error, then your JLMT installation is complete.
 
 
 MIDI FILES and BTB
