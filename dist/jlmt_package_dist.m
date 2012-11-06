@@ -1,46 +1,32 @@
-% script to package up jlmt files for distribution
-% 
+% script to copy jlmt files from the private to the jlmt repository
+
 % FB 2012.05.21 - adapted from private/matlab/projects/rhythm_profiler/dist/rp_package_dist.m
+% FB 2012.11.06 - adapted from private/matlab/jlmt/jlmt_package_dist.m
+
+GENERATE_DOCUMENTATION = 1;
+EDIT_FILES = 0;
 
 [~,user] = unix('whoami');
 user = regexprep(user,'\s','');
 
-if isempty(which('btb'))
-  path(path,genpath(sprintf('/home/%s/svn/private/matlab/projects/rhythm_profiler',user)));
-end
-if isempty(which('listFilesOfType'))
-  path(path,genpath(sprintf('/home/%s/svn/private/matlab/projects/tonmodcomp',user)));
-end
-
-vnum = 1.2; % version number
-
-GENERATE_DOCUMENTATION = 1;
-EDIT_FILES = 0;
-DISTRIBUTE_TO_ATONAL = 0;
-
 home_path = fullfile('/home',user);
 priv_path = fullfile(home_path,'svn','private','matlab');
 pub_path = fullfile(home_path,'svn','public','matlab');
+jlmt_path = fullfile(home_path,'svn','jlmt');
+priv_jlmt = fullfile(priv_path,'jlmt');
 
-relative_dist_path = sprintf('jlmt_v%1.1f/',vnum);
-dist_path = fullfile(home_path,relative_dist_path);
-www_path = '/var/www/html/resources/software/';
-dist_file = sprintf('jlmt_v%1.1f.tar.gz',vnum);
+if isempty(which('btb'))
+  path(path,genpath(fullfile(priv_path,'projects','rhythm_profiler')));
+end
+if isempty(which('listFilesOfType'))
+  path(path,genpath(fullfile(priv_path,'projects','tonmodcomp')));
+end
+
 log_file = fullfile(home_path,'data','jlmt_files.log');
-readme_file = fullfile(priv_path,'jlmt','dist','README.txt');
-install_file = fullfile(priv_path,'jlmt','dist','INSTALL.txt');
-release_notes_file = fullfile(priv_path,'jlmt','dist','RELEASE_NOTES.txt');
 
 colormap_list = {fullfile(pub_path,'colormaps','new_seismic')};
 
 data_list = {...
-    fullfile(priv_path,'jlmt','maps','map_10-Dec-2006_16:18.mat'),...
-    fullfile(priv_path,'jlmt','maps','pc_ci2toract_map_12-Jun-2012_15:47.mat'),...
-    fullfile(priv_path,'jlmt','maps','pp2pitchclass_W_20121105.mat'),...
-    '/nfs/stimuli/audio/tension/Bach1_midi_75bpm_03112011.wav',...
-    '/nfs/stimuli/audio/tension/Bach2_midi_75bpm_03112011.wav',...
-    '/nfs/stimuli/audio/groove/polystream_move/funk1_strong.mp3',...
-    '/nfs/stimuli/audio/groove/polystream_move/funk2_strong.mp3',...
     '/usr/local/bin/mpg123',...
     '/usr/local/bin/mp3info',...
     };
@@ -72,7 +58,11 @@ data_list = {...
 %     '/data2/tonmodcomp/closure_work/closure_final/closure_struct_hypo.mat',...
 %     '/data2/tonmodcomp/closure_work/closure_final/closure_struct_smth.mat',...
     
-%     '/data2/modulation/modpitchclass/pp2pitchclass_nnet_full_20120611T113342.mat',...
+%     '/data2/modulation/modpitchclass/pp2pitchclass_nnet_full_20120611T113
+%     342.mat',...
+
+exclude_list = {...
+    };
 
 file_list = {
     'ani_paramGroups',...
