@@ -12,7 +12,7 @@
 % 
 % FB 2012.11.06
 
-if isempty(which('IPEMCalcANI'))
+if isempty(which('IPEMSetup'))
   error(['YOU MUST ADD IPEM TOOLBOX TO YOUR PATHS!! '...
 	 'jlmt will not run if you do not have IPEM Toolbox installed']);
 end
