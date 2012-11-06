@@ -8,15 +8,19 @@ and relying solely on default parameters.
 
 - Default parameter setting and propogation has been re-worked.
 
+- The Neural Network Toolbox is no longer required to project data
+from periodicity pitch space or leaky-integrated context space to
+pitch class space. This was the only dependency on the NNet Toolbox,
+therefore this package is no longer required for any portion of jlmt.
+
+- Unit testing has been expanded to verify the validity of output.
+
 ----------------------------------------------------
 Release v1.1 - August 22, 2012
 ----------------------------------------------------
 
 - Bug fix in jlmt_proc_series.m, where multiple proc params were not
 being honored for the first step in a proc series.
-
-- Added stimuli, scripts, and closure data for Collins Et Al
-  (submitted)
 
 ----------------------------------------------------
 Release v1.0 - July 9, 2012
