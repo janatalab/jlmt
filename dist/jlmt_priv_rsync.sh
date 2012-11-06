@@ -40,6 +40,7 @@ declare -a PrivUtils=('stats/coherence.m' 'signal/find_peaks.m' 'signal/invert_s
 declare -a Metrics=('jlCorr.m' 'jlKLdist.m' 'jlPost_target_mean.m' 'map_max.m' 'target_relative_readout.m')
 declare -a MIDITB=('javamidi2tr.m' 'Midi2tr.java' 'nmat_columns.m' 'TrackInfo.java')
 declare -a TPSTATS=('bessel_i0.m' 'von_mises_pdf.m')
+declare -a ULBIN=('mpg123' 'mp3info')
 
 # RSYNC directories
 eval "rsync -a --exclude-from=$EXCLUDES $PRIVPATH/matlab/jlmt/ $JLMTPATH/"
@@ -67,12 +68,19 @@ do eval "rsync -a --exclude-from=$EXCLUDES $TPPATH/matlab/miditoolbox/$fname $JL
 done
 
 for fname in ${TPSTATS[@]}
-do eval "rsync -a --exclude-from=$EXCLUDES $TPPATH/matlab/stats/$fname $JLMTPATH/utils/"
+do eval "rsync -a --exclude-from=$EXCLUDES $TPPATH/matlab/stats/$fname $JLMTPATH/includes/"
+done
+
+for fname in ${ULBIN[@]}
+do eval "rsync -a --exclude-from=$EXCLUDES /usr/local/bin/$fname $JLMTPATH/includes"
 done
 
 # if we ever want to allow distribution users to update the distribution repository, we
 # may want to use the -u flag (don't overwrite newer files at destination), then also
 # rsync -au the opposite direction
+
+# rename the mp3read.m script
+eval "mv $JLMTPATH/includes/mp3read_jlmt.m $JLMTPATH/includes/mp3read.m"
 
 # remove emacs backup files
 eval "find $JLMTPATH -regex '.*~' -exec rm {} \;"

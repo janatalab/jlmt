@@ -53,8 +53,8 @@ end
 
 %%%%%% Location of the binaries
 jlmt_root = fileparts(fileparts(which('jlmt_proc_series')));
-mpg123 = fullfile(jlmt_root,'utils','mpg123');
-mp3info = fullfile(jlmt_root,'utils','mp3info');
+mpg123 = fullfile(jlmt_root,'includes','mpg123');
+mp3info = fullfile(jlmt_root,'includes','mp3info');
 
 %%%%%% Constants
 NBITS=16;

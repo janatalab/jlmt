@@ -1,6 +1,9 @@
 deprecated/
 dist/
 .svn/
+entries/
+format/
+all-wcprops/
 metric_readout*
 closure_struct*
 CollinsEtAl*

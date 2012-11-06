@@ -13,10 +13,10 @@ JLMT requires installation of the IPEM Toolbox. It can be obtained at:
 If processing mp3 files, "mp3read" scripts are required. These were
 acquired from:
      -  http://labrosa.ee.columbia.edu/matlab/mp3read.html
-and included in the JLMT in the 'jlmt/utils' directory, however they are
-compiled for use on Linux machines. If you are running Windows, you may
-have to update the mp3read scripts. Visit the LabROSA web site for more
-information on mp3read.
+and included in the JLMT in the 'jlmt/includes' directory, however they
+are compiled for use on Linux machines. If you are running Windows, you
+may have to update the mp3read scripts. Visit the LabROSA web site for
+more information on mp3read.
 
 JLMT also requires installation of the following Matlab Toolboxes:
      - Signal Processing
