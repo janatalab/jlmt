@@ -15,7 +15,7 @@
 dest_dir = '';
 
 if isempty(dest_dir)
-  error("Please specify 'dest_dir' in test/test_jlmt.m");
+  error('Please specify "dest_dir" in test/test_jlmt.m');
 end
 
 % Collect test file paths
