@@ -13,9 +13,8 @@
 % FB 2012.11.06
 
 if isempty(which('IPEMCalcANI'))
-  error(['YOU MUST ADD IPEM TOOLBOX TO YOUR PATHS\n'...
-	 'jlmt will not run if you do not have IPEM Toolbox installed\n']);
-  exit;
+  error(['YOU MUST ADD IPEM TOOLBOX TO YOUR PATHS!! '...
+	 'jlmt will not run if you do not have IPEM Toolbox installed']);
 end
 
 fprintf(1,'Adding JLMT paths ...');
