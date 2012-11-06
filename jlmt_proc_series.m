@@ -226,7 +226,7 @@ end
 
 % get a list of all current jlmt calc functions
 rootdir = fileparts(which('jlmt_proc_series'));
-calcs = dir(fullfile(rootdir,'calc*m'));
+calcs = dir(fullfile(rootdir,'proc','calc*m'));
 calcfuncs = cell(1,length(calcs));
 for k=1:length(calcs)
   lname = regexp(calcs(k).name,'^calc_(.*)\.m$','tokens');
