@@ -547,10 +547,9 @@ for ifile = 1:nfiles
             fprintf(lfid,'using params index %d for %s\n',iproc,proc);
             lparams = params.(proc)(iproc);
             break
-          else
-            % If we are on first step and prev_steps is empty, just use the
-            % first specification
-            
+          elseif istep == 1 && (~isfield(params.(proc)(iproc),'prev_steps') ...
+                  || isempty(params.(proc)(iproc).prev_steps))
+            lparams = params.(proc)(iproc);
           end
         end % for iproc = 1:nprocparam
 
@@ -561,7 +560,7 @@ for ifile = 1:nfiles
               cell2str(pseries(1:istep-1),','));
           warning(wstr);
           fprintf(lfid,wstr);
-          lparams = proc_fh('getDefaultParams');
+          lparams = proc_fh('getDefaultParams','prev_steps',pseries(1:istep-1));
         end
       else
         % use the only set of parameters available for this step
@@ -695,7 +694,7 @@ VERBOSE = 0;  % flag for debugging
 
 def.glob.force_recalc = {};
 def.glob.ignore = {};
-def.glob.save_calc = {'ani','pp','li','toract','ani'};
+def.glob.save_calc = {'ani','pp','li','toract','pc','rp'};
 def.glob.process = {{'ani','pp','li','toract'},...
     {'ani','pp','pc','li','toract'}, ...
     {'ani','rp'}};

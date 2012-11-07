@@ -468,9 +468,9 @@ function defParams = getDefaultParams(varargin)
 for iarg = 1:2:nargin
   switch varargin{iarg}
     case 'params'
-      params = varargin{iarg}+1;
+      params = varargin{iarg+1};
     case 'prev_steps'
-      prev_steps = varargin{iarg}+1;
+      prev_steps = varargin{iarg+1};
   end
 end
 
