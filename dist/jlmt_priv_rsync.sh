@@ -47,6 +47,8 @@ eval "rsync -a --exclude-from=$EXCLUDES $PRIVPATH/matlab/jlmt/ $JLMTPATH/"
 eval "rsync -a --exclude-from=$EXCLUDES $PRIVPATH/matlab/data_types/event_objects $JLMTPATH"
 
 # RSYNC individual files
+eval "rsync -a --exclude-from=$EXCLUDES $PUBPATH/matlab/colormaps/new_seismic $JLMTPATH/utils"
+
 for fname in ${PrivUtils[@]}
 do eval "rsync -a --exclude-from=$EXCLUDES $PRIVPATH/matlab/utils/$fname $JLMTPATH/utils/"
 done
