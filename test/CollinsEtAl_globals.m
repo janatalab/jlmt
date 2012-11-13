@@ -11,11 +11,17 @@ function defs = CollinsEtAl_globals(defs)
 % Petr Janata, 2011.10.27. 
 % Tom Collins, 2011.10.27.
 % Frederick Barrett, 2012.07.10.
+% Tom Collins, 2012.11.13. Altered the install_root, data_root, and
+%  project_root paths to test the behavior of
+%  jlmt_proc_series>getDefaultparams.
 
 %% set paths
-defs.paths.install_root = fileparts(fileparts(which('jlmt_proc_series')));
-defs.paths.data_root = fullfile(defs.paths.install_root,'data');
-defs.paths.project_root = fullfile(defs.paths.install_root,'test');
+% defs.paths.install_root = fileparts(fileparts(which('jlmt_proc_series')));
+defs.paths.install_root = '/';
+% defs.paths.data_root = fullfile(defs.paths.install_root,'data');
+defs.paths.data_root = fullfile(defs.paths.install_root,'data', 'tonmodcomp_jlmt_test');
+% defs.paths.project_root = fullfile(defs.paths.install_root,'test');
+defs.paths.project_root = defs.paths.data_root;
 defs.paths.analysis_path = fullfile(defs.paths.project_root, 'analyses');
 defs.paths.log_path = fullfile(defs.paths.project_root, 'logs');
 defs.paths.fig_path = fullfile(defs.paths.project_root, 'figs');
