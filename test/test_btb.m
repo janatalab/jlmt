@@ -12,7 +12,7 @@
 % SET THE FOLLOWING LINE to the path where you would like to store
 % data and output from the test scripts (eg. '/home/username/data' or
 % 'C:\Documents and Settings\Username\data')
-dest_dir = '';
+dest_dir = '/Users/pjanata/Documents/btb_test';
 
 if isempty(dest_dir)
   error('Please specify "dest_dir" in test/test_btb.m');
@@ -47,9 +47,9 @@ for k=1:length(input_file_pattern)
       params.plot.inputSigType = 'wvf'; 
 
     case {'.mid','.midi'}
-      params.jlmt.rp   = rp_paramGroups_v2('param_group',...
+      params.jlmt.rp = rp_paramGroups_v2('param_group',...
                            'reson_filterQSpacing_periodBasedDecay',...
-                           'input_type','aud','gain_type','beta_distribution')
+                           'input_type','aud','gain_type','beta_distribution');
 
       params.jlmt.glob.process = {'rp'};
 

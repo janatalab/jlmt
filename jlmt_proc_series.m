@@ -212,6 +212,11 @@ function outData = jlmt_proc_series(inData,params)
 %                with regard to context specificity. Could still use some
 %                cleanup of the logic associated with returning default
 %                parameters.
+% 11Oct2012 PJ - Added sub-function run_step in an attempt to improve
+%                parallel computation compatibility.  This has not been
+%                fully achieved yet.
+% 13Oct2012 PJ - Miscellaneous fixes to ensure that all elements in a row
+%                of calculations refer to the same calculation
 
 %%
 % Make sure IPEM setup has been run
@@ -267,13 +272,6 @@ if exist('ensemble_globals','file')
   ensemble_globals;
 end
 
-% initialize the output data structure
-outData = ensemble_init_data_struct;
-outData.type = 'jlmt_proc_series';
-outData.name = 'jlmt_proc_series';
-outData.vars = ['stimulus_path' 'proc_series' calcfuncs];
-outDataCols = set_var_col_const(outData.vars);
-outData.data = repmat({{}},size(outData.vars));
 
 % if params were passed in, fill in any missing parameters with
 % defaults. Otherwise, if no params passed in, just set them all to defaults.
@@ -315,6 +313,10 @@ if ~iscell(params.glob.process{1})
   params.glob.process = {params.glob.process};
 end
 nproc = length(params.glob.process);
+
+%% Initialize some variables
+destStimLocs = {};
+stimIDList = [];
 
 %%  identify input format
 if ischar(inData) && exist(inData)
@@ -360,41 +362,53 @@ elseif(iscell(inData) && all(isfield(inData{1},{'vars','type','data'})) ...
 
 elseif isstruct(inData) && all(isfield(inData,{'vars','type','data'}))
 
+  cols = set_var_col_const(inData.vars);
+  
   % deal with ensemble data struct types here
   if(ismember('stimulus_id',inData.vars))
     
     % ensemble structure with stimulus ids : must consult Ensemble database
     inDataType = 'stimulus_id';
-    cols = set_var_col_const(inData.vars);
     stimIDList = inData.data{cols.stimulus_id};
     nfiles = length(stimIDList);
     
-    % check database connection
-    try 
-      params.ensemble.conn_id;
-    catch
-      params.ensemble.conn_id = 0;
-      mysql_make_conn('','',params.ensemble.conn_id);
-      tmp_conn_id = 1;
+    % check database connection - look for a mysql struct first
+    structs2check = {'mysql','ensemble'};
+    nchk = length(structs2check);
+    for ichk = 1:nchk
+      currStruct = structs2check{ichk};
+      
+      if isfield(params,currStruct)
+        conn_id = mysql_make_conn(params.(currStruct));
+        break % exit the loop
+      end
     end
     
     % get location field rows for the stimuli
     stimLocs = mysql_extract_data('table','stimulus','stimulus_id', ...
-				  stimIDList,'extract_vars',{'location'},'conn_id',params.ensemble.conn_id);
+				  stimIDList,'extract_vars',{'location'},'conn_id', conn_id);
     stimLocs = stimLocs{1};
+    
+    if isfield(params,'paths')
+      if isfield(params.paths,'stimulus_root')
+        stimulus_root = params.paths.stimulus_root;
+      end
+      if isfield(params.paths,'destroot')
+        stimulus_ipem_analysis_root = params.paths.destroot;
+      end
+    end
+    
     destStimLocs = check_stim_dirs(stimLocs,'srcroot',stimulus_root,'destroot',stimulus_ipem_analysis_root,'verbose',false);
   elseif(strcmp(inData.type,'aud'))
     
     % ensemble structure with aud info
     inDataType = 'aud';
-    cols = set_var_col_const(inData.vars);
     nfiles = length(inData);
     
   elseif(ismember('path',inData.vars) && ismember('filename',inData.vars))
     
     % ensemble structure with path info
     inDataType = 'file_data_struct';
-    cols = set_var_col_const(inData.vars);
     nfiles = length(inData.data{cols.filename});
 
   end
@@ -439,6 +453,14 @@ if ~nfiles
 end
 
 for ifile = 1:nfiles
+  
+  % initialize the jlmt data structure
+  jlmtData{ifile} = ensemble_init_data_struct;
+  jlmtData{ifile}.type = 'jlmt_proc_series';
+  jlmtData{ifile}.name = 'jlmt_proc_series';
+  jlmtData{ifile}.vars = ['stimulus_path' 'proc_series' calcfuncs];
+  outDataCols = set_var_col_const(jlmtData{ifile}.vars);
+  jlmtData{ifile}.data = repmat({{}},size(jlmtData{ifile}.vars));
 
   switch inDataType
    case 'aud_file_string'
@@ -477,6 +499,7 @@ for ifile = 1:nfiles
     
    case 'aud'
     sig_st = inData;
+    cols = set_var_col_const(inData.vars);
     descript = 'aud structure';
     fpath = inData.data{cols.path};
     filename = inData.data{cols.filename};
@@ -520,44 +543,46 @@ for ifile = 1:nfiles
     pseries = params.glob.process{iseries};
     if isempty(pseries), continue, end
     series_params = struct();
-    nseries = length(pseries);
 
     fprintf(lfid,'jlmt_proc_series: running job series %d/%d (%s)\n',...
         iseries,nproc,cell2str(pseries,'-'));
     
-    sidx = length(outData.data{1}) + 1;
-    outData.data{outDataCols.stimulus_path}{sidx,1} = fullfile(fpath,filename);
-    outData.data{outDataCols.proc_series}{sidx,1} = cell2str(pseries,'->');
+    jlmtData{ifile}.data{outDataCols.stimulus_path}{iseries,1} = fullfile(fpath,filename);
+    jlmtData{ifile}.data{outDataCols.proc_series}{iseries,1} = cell2str(pseries,'->');
+    
+    % Perhaps move the istep loop into a function
+    % run_series(pseries)
     
     % iterate over steps in this series
-    for istep = 1:nseries
+    nsteps = length(pseries);
+    allStepData = struct;
+    for istep = 1:nsteps
       proc = pseries{istep};
-      proc_fh = parse_fh(sprintf('calc_%s',proc));
       
       % get parameters for this calc step
       nprocparam = length(params.(proc));
       if nprocparam > 1
-
+        
         lparams = '';
         for iproc = 1:nprocparam
           if (istep > 1 && (isfield(params.(proc)(iproc),'prev_steps') && ...
-                  compare_cells(pseries(1:istep-1),params.(proc)(iproc).prev_steps))) || ...
-                  (isfield(params.(proc)(iproc),'future_steps') && ...
-                  compare_cells(pseries(istep+1:nseries),params.(proc)(iproc).future_steps))
+              compare_cells(pseries(1:istep-1),params.(proc)(iproc).prev_steps))) || ...
+              (isfield(params.(proc)(iproc),'future_steps') && ...
+              compare_cells(pseries(istep+1:nsteps),params.(proc)(iproc).future_steps))
             fprintf(lfid,'using params index %d for %s\n',iproc,proc);
             lparams = params.(proc)(iproc);
             break
           elseif istep == 1 && (~isfield(params.(proc)(iproc),'prev_steps') ...
-                  || isempty(params.(proc)(iproc).prev_steps))
+              || isempty(params.(proc)(iproc).prev_steps))
             lparams = params.(proc)(iproc);
           end
         end % for iproc = 1:nprocparam
-
+        
         if isempty(lparams)
           wstr = sprintf(['multiple param structs specified for %s, '...
-              'however none matched the previous jobs for the current '...
-              'series (%s). Default parameters are being used\n'],proc,...
-              cell2str(pseries(1:istep-1),','));
+            'however none matched the previous jobs for the current '...
+            'series (%s). Default parameters are being used\n'],proc,...
+            cell2str(pseries(1:istep-1),','));
           warning(wstr);
           fprintf(lfid,wstr);
           lparams = proc_fh('getDefaultParams','prev_steps',pseries(1:istep-1));
@@ -576,75 +601,22 @@ for ifile = 1:nfiles
       else
         series_params.(proc) = lparams;
       end
-
-      % do the parameters specify an input data type?
-      if istep == 1
-        % the first job in a series must take the stimulus signal as its
-        % input
-        input_data = 'sig_st';
-      elseif isfield(lparams,'inDataType') && ~isempty(lparams.inDataType)
-        input_data = lparams.inDataType;
-      else
-        input_data = pseries{istep-1};
-      end % if isfield(lparams,'inDataType
-      
-      % look for previously run jobs that match this parameter set
-      lfname = construct_analfname(fullfile(fpath,filename),proc);
-      lPath = fileparts(lfname);
-
-      % find existing analysis
-      clear matchParams;
-      matchParams.varName = proc;
-      matchParams.paramFind = series_params;
-      matchParams.ignore = [params.glob.ignore 'ani.aniPath' 'future_steps'];
-      previousCalcFname = check_anal_exist(lPath,matchParams);
     
-      % run this step?
-      if ~ismember(proc,params.glob.force_recalc) && ~isempty(previousCalcFname)
-        % previous job with matching parameters exists, and this job hasn't
-        % been listed for a force recalc, so load the previous results
-        fprintf(lfid,['jlmt_proc_series: Loading a previously calculated '...
-            '%s with matching parameters...\n'],proc);
-        lfname = fullfile(lPath,previousCalcFname{1});
-        load(lfname,proc)
-      elseif eval(sprintf('isempty(%s)',input_data))
-        fprintf('Input data (%s) for %s is empty! Skipping ...\n', input_data, proc);
-        continue
+      % Specify the input data to this step
+      if istep == 1
+        input_data = sig_st;
+      elseif isfield(lparams,'inDataType') && ~isempty(lparams.inDataType)
+        input_data = allStepData.(lparams.inDataType);
       else
-        % run this step!
-        fprintf(lfid,'jlmt_proc_series: Calculating %s ...\n\n',proc);
-        eval(sprintf('%s = proc_fh(%s,lparams);',proc,input_data));
-     
-        % save the output?
-        if ismember(proc,params.glob.save_calc{iseries})
-          % if a previous calculation exists and we are recalculating,
-          % use previous calculation filename and overwrite it
-          if ~isempty(previousCalcFname)
-            fprintf(lfid,['FORCE RECALC WAS SET. Overwriting a previous' ...
-                ' %s calculation\n\n'],proc);
-      	    lfname = fullfile(lPath,previousCalcFname{1});
-          end
-        
-          fprintf(lfid,'jlmt_proc_series: Saving %s to %s\n\n',proc,lfname);
-          save(lfname,proc);
-        end % if ismember(proc,params.glob.save_calc
-      end % if ~ismember(proc,params.glob.force_recalc) && ~isempty(...
-      
-      % plot function?
-      if isfield(lparams,'plotfun') && ~isempty(lparams.plotfun)
-        plotfun = parse_fh(lparams.plotfun);
-        eval(sprintf('plotfun(%s,lparams);',proc));
-        %% FIXME: add functionality to support multiple inputs to plotfun
-      end % if isfield(lparams,'plotfun...
-      
-      % output
-      if strcmp(params.glob.outputType,'filepath') && ...
-              ismember(proc,params.glob.save_calc) && ...
-              exist(lfname,'file')
-        outData.data{outDataCols.(proc)}{sidx,1} = lfname;
-      else
-        eval(sprintf('outData.data{outDataCols.%s}{sidx,1} = %s;',proc,proc));
+        input_data = allStepData.(pseries{istep-1});
       end
+      
+      % the following line is an attempt to make the parallelization happy
+      allStepData.(proc) = run_step('proc',proc,'params',params,'pseries',pseries,'iseries',iseries,'istep',istep, ...
+        'filename',filename,'fpath',fpath, 'input_data', input_data, 'lparams', lparams, ...
+        'series_params', series_params, 'lfid', lfid);
+      jlmtData{ifile}.data{outDataCols.(proc)}{iseries,1} = allStepData.(proc);
+      
     end % for istep = 1:nseries
 
 %%% FIXME: plot code from previous versions for rhythm profiler: must
@@ -661,20 +633,24 @@ for ifile = 1:nfiles
     end
 
   end % for iseries = 1:nproc
+  
+  % fill out short columns
+  numRows = max(cellfun('length',jlmtData{ifile}.data));
+  for k=1:length(jlmtData{ifile}.vars)
+    if length(jlmtData{ifile}.data{k}) < numRows
+      jlmtData{ifile}.data{k}{numRows,1} = [];
+    end
+  end
 end % for ifile=
 
-% fill out short columns
-for k=1:length(outData.vars)
-  if length(outData.data{k}) < sidx
-    outData.data{k}{sidx,1} = [];
-  end
-end
+% Concatenate the jlmtData structures
+outData = ensemble_concat_datastruct(jlmtData);
 
 if(exist('tmp_conn_id','var'))
   mysql(params.ensemble.conn_id,'close');
 end
 
-
+end
 
 % % 
 %           subfunctions
@@ -859,3 +835,102 @@ end
 end % if 0
 
 return
+end
+
+function stepData = run_step(varargin)
+  % Parse the input arguments
+  for iarg = 1:2:nargin
+    currArg = varargin{iarg};
+    switch currArg
+      case 'proc'
+        proc = varargin{iarg+1};
+      case 'params'
+        params = varargin{iarg+1};
+      case 'series_params'
+        series_params = varargin{iarg+1};
+      case 'pseries'
+        pseries = varargin{iarg+1};
+      case 'iseries'
+        iseries = varargin{iarg+1};
+      case 'istep'
+        istep = varargin{iarg+1};
+      case 'fpath'
+        fpath = varargin{iarg+1};
+      case 'filename'
+        filename = varargin{iarg+1};
+      case 'input_data'
+        input_data = varargin{iarg+1};
+      case 'lparams'
+        lparams = varargin{iarg+1};
+      case 'lfid'
+        lfid = varargin{iarg+1};
+  
+    end
+  end % for iarg
+    
+  proc_fh = parse_fh(sprintf('calc_%s',proc));
+  
+  
+  % look for previously run jobs that match this parameter set
+  lfname = construct_analfname(fullfile(fpath,filename),proc);
+  lPath = fileparts(lfname);
+  
+  % find existing analysis
+  matchParams = struct;
+  matchParams.varName = proc;
+  matchParams.paramFind = series_params;
+  matchParams.ignore = [params.glob.ignore 'ani.aniPath' 'future_steps'];
+  previousCalcFname = check_anal_exist(lPath,matchParams);
+  
+  % run this step?
+  % run_step('proc',proc,'params',params,'previousCalcFname',previousCalcFname)
+  % - trying to figure out how to best encapsulate the proc_series
+  % stuff so that parfor has no problem looping over files. I think it
+  % has to be done outside of the series loop
+  
+  if ~ismember(proc,params.glob.force_recalc) && ~isempty(previousCalcFname)
+    % previous job with matching parameters exists, and this job hasn't
+    % been listed for a force recalc, so load the previous results
+    fprintf(lfid,['jlmt_proc_series: Loading a previously calculated '...
+      '%s with matching parameters...\n'],proc);
+    lfname = fullfile(lPath,previousCalcFname{1});
+    load(lfname,proc)
+    eval(sprintf('stepData = %s;', proc))
+  elseif isempty(input_data)
+    fprintf('Input data for %s is empty! Skipping ...\n', proc);
+    return
+  else
+    % run this step!
+    fprintf(lfid,'jlmt_proc_series: Calculating %s ...\n\n',proc);
+    stepData = proc_fh(input_data,lparams);
+    eval(sprintf('%s = stepData;', proc))
+    
+    % save the output?
+    if ismember(proc,params.glob.save_calc{iseries})
+      % if a previous calculation exists and we are recalculating,
+      % use previous calculation filename and overwrite it
+      if ~isempty(previousCalcFname)
+        fprintf(lfid,['FORCE RECALC WAS SET. Overwriting a previous' ...
+          ' %s calculation\n\n'],proc);
+        lfname = fullfile(lPath,previousCalcFname{1});
+      end
+      
+      fprintf(lfid,'jlmt_proc_series: Saving %s to %s\n\n',proc,lfname);
+      save(lfname,proc);
+    end % if ismember(proc,params.glob.save_calc
+  end % if ~ismember(proc,params.glob.force_recalc) && ~isempty(...
+  
+  % plot function?
+  if isfield(lparams,'plotfun') && ~isempty(lparams.plotfun)
+    plotfun = parse_fh(lparams.plotfun);
+    eval(sprintf('plotfun(%s,lparams);',proc));
+    %% FIXME: add functionality to support multiple inputs to plotfun
+  end % if isfield(lparams,'plotfun...
+  
+  % If we are simply returning a path to the output matfile
+  if strcmp(params.glob.outputType,'filepath') && ...
+      ismember(proc,params.glob.save_calc) && ...
+      exist(lfname,'file')
+    stepData = lfname;
+  end
+end % run_step()

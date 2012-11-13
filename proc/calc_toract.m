@@ -36,6 +36,8 @@ function toract = calc_toract(inData,varargin)
 % added getDefaultParams
 % 2012.10.30 PJ - added support for varargin and handling of default
 % parameters
+% 2012.11.13 PJ - Fs is no longer stored in the params structure, but
+%                 rather as a variable
 
 if nargin > 1 && isstruct(varargin{1})
   params = varargin{1};
@@ -56,7 +58,7 @@ toract.params = {};
 inData_cols = set_var_col_const(inData.vars);
 
 % copy the sampling rate
-params.Fs = inData.data{inData_cols.Fs};
+toract.Fs = inData.data{inData_cols.Fs};
 
 % Load the weight matrix
 if ~isfield(params.som,'fname')
@@ -121,7 +123,7 @@ for isig = 1:nsig
     % timepoints.
     
     % Generate a time vector
-    timevect = (1:size(tmp.data,1))/params.Fs;
+    timevect = (1:size(tmp.data,1))/toract.Fs;
     
     % Do the spline interpolation. Note that spherical harmonics columns become
     % rows.

@@ -38,7 +38,7 @@ function li = calc_li(inData, varargin)
 %
 % Copyright (c) 2007-2012 The Regents of the University of California
 % All Rights Reserved.
-%
+
 % 12/04/06 Petr Janata
 % 4/14/07 Stefan Tomic - changed data to conform to ensemble data struct
 % 2010/02/18 FB - adapted to support calculation of multiple (more than 2)
@@ -46,6 +46,7 @@ function li = calc_li(inData, varargin)
 % IPEMContextualityIndex. Added a bit of header documentation.
 % 2012/07/03 FB - changed to 'calc_li' to reflect expansion beyound
 % contextuality images calculated from ani or pp space
+% 13Nov2012 PJ - Fs is no longer stored in the params structure.
 
 li = [];
 
@@ -82,12 +83,7 @@ inSig = inData.data{dataCols.sig};
 
 if(iscell(inSig)), inSig = inSig{1}; end
 
-switch inData.type
-    case 'pc'
-      Fs = inData.data{dataCols.params}.pc.Fs;
-    otherwise
-      Fs = inData.data{dataCols.Fs};
-end
+Fs = inData.data{dataCols.Fs};
 
 % The following two data entries were previously saved as params.
 % They are saved into the data struct now to facilitate param

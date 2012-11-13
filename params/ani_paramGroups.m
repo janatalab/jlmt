@@ -7,6 +7,10 @@ function ani = ani_paramGroups
 % Author(s):
 % Stefan Tomic
 
+% 13Nov2012 PJ - added initial call to params_ani to populate with global
+% ani defaults
+
+ani = params_ani;
 
 ani.PlotFlag = 0;
 ani.DownSampleFactor = 5;

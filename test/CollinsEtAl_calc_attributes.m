@@ -54,7 +54,7 @@ if ismember('CL', calculation_type)
   ndb = size(closure_distributions, 2);
   distrbn = cell(1, ndb);
   for idb = 1:ndb
-    closure_struct = load(fullfile(params.paths.closure_struct,...
+  closure_struct = load(fullfile(params.paths.closure_struct,...
       ['closure_struct_' closure_distributions{idb} '.mat']));
     distrbn{idb} = closure_struct.closure_struct;
   end
@@ -128,7 +128,7 @@ for Istim = 1:3:Nstim
             sc = set_var_col_const(svar.vars);
             % Half decay times and sampling rate.
             hdt = svar.data{sc.params}.toract.HalfDecayTimes;
-            Fs = svar.data{sc.params}.toract.Fs;
+            Fs = svar.data{sc.Fs};
             % Find local time constant, define space variable.
             [~, idx_loc] = ismember(integration_constants(iconstant),hdt);
             sarr_loc = svar.data{sc.activations}{idx_loc};

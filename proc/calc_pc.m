@@ -47,6 +47,8 @@ function pc = calc_pc(indata,varargin)
 %                 dependent weight matrices can be returned
 % 2012.11.01 TC - inserted "pc.params = [];" at line 100, to avoid error at
 %                  line 111, where there is a reference to params.
+% 2012.11.13 PJ - Fs is no longer being stored in the params structure, but
+%                 rather as its own variable
 
 if nargin > 1 && isstruct(varargin{1})
   params = varargin{1};
@@ -68,7 +70,7 @@ pc.params = {};
 indata_cols = set_var_col_const(indata.vars);
 
 % copy the sampling rate
-params.Fs = indata.data{indata_cols.Fs};
+pc.Fs = indata.data{indata_cols.Fs};
 
 % Load the wmtx model
 if ~exist(params.wmtx.fname,'file')
@@ -103,7 +105,6 @@ else
   error('unknown indata type: %s',indata.type);
 end
 
-pc.Fs = params.Fs;
 pc.params = [];
 pc = ensemble_tree2datastruct(pc);
 pc_dataCols = set_var_col_const(pc.vars);
