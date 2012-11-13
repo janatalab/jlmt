@@ -754,8 +754,8 @@ for iseries = 1:numSeries
         currSpec = params.(currCalc)(ispec);
         
         if ~isfield(currSpec, 'prev_steps') || isempty(currSpec.prev_steps)
-          currSpec.prev_steps = [];
-          params.(currCalc)(ispec).prev_steps = [];
+          currSpec.prev_steps = {};
+          params.(currCalc)(ispec).prev_steps = {};
           nullContextIdx = ispec;
         end
         
@@ -763,7 +763,7 @@ for iseries = 1:numSeries
         % otherwise get a new spec for this context. If the context was
         % empty, assume that we want to use those parameters throughout
         if length(currSpec.prev_steps) == length(procCalc(1:k-1)) ...
-            && all(strcmp(currSpec.prev_steps, procCalc(1:k-1)))
+            && k > 1 && all(strcmp(currSpec.prev_steps, procCalc(1:k-1)))
           contextIdx = ispec;
           break     
         end

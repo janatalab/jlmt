@@ -68,6 +68,9 @@ function rp = rp_paramGroups_v2(varargin)
 % All Rights Reserved.
 %
 % Author: Stefan Tomic 10/18/2007
+% Changes:
+%  TC, 11.13.2012. Added some default parameters for onset detection, line
+%   142 onwards.
 
 for iarg = 1:2:nargin
   
@@ -92,6 +95,8 @@ for iarg = 1:2:nargin
   end
   
 end
+
+if ~isfield(rp,'Fs') || isempty(rp.Fs), rp.Fs = 100; end
 
 %assign default 'perform' flags.
 %these will be overridden based 
@@ -135,6 +140,13 @@ rp.resonatorBank.peakFinder.ratioLabels = ...
 %rp.resonatorBank.interpMPPInterval = 0.0005;
 rp.resonatorBank.interpMPPInterval = 0.01;
 rp.onsetInfo.thresh = 0.05;
+% Adding some default parameters for onset detection.
+rp.onsetInfo.peak_height_thresh = 0.05;
+rp.onsetInfo.peak_height_window = 0.05;
+rp.onsetInfo.throwOutFirstOnset = 1;
+rp.onsetInfo.Fs = rp.Fs;
+rp.resonatorBand = 1;
+% End of additions.
 rp.onsetInfo.peakBaseThreshold = 0;
 rp.temporalExpect.predictSec = 5.0;
 rp.vmExpect.normalizeWindow = 4;
@@ -155,7 +167,6 @@ switch(input_type)
   rp.sumChannels.after = 'HWR';
   %throw out first onset for ANI (see rp_temporalExpectationError code)
   rp.temporalExpect.throwOutFirstOnset = 1; 
-  try rp.Fs; catch  rp.Fs = 100; end
   rp.rmsFrameWidth = 0.050;
   rp.perform.calcRMS = 1;
   rp.perform.calcDiff = 1;
@@ -163,12 +174,10 @@ switch(input_type)
   rp.perform.sumChannels = 1;
  case 'aud'
   rp.inDataType = 'aud';
-  try rp.Fs; catch rp.Fs = 100; end
   rp.perform.convertInputToMono = 1;
    rp.temporalExpect.throwOutFirstOnset = 0; 
  case 'mat'
   rp.inDataType = 'mat';
-  try rp.Fs; catch rp.Fs = 100; end
    rp.temporalExpect.throwOutFirstOnset = 0; 
 end
 

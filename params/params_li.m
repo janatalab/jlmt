@@ -26,6 +26,7 @@ function params = params_li(varargin)
 % 2010.02.18 FB - adapted to use HalfDecayTimes
 % 2011.01.28 FB - added field for metrics
 % 2012.07.05 FB - added inDataType, prev_steps
+% 2012.11.13 TC. Altered prev_steps to empty cell array, not double.
 
 fields = {...
       'PeriodicityPitch', ...
@@ -44,7 +45,7 @@ def.SnapShot = [];
 def.HalfDecayTimes = [0.1 2];
 def.Enlargement = [];
 def.PlotFlag = [];
-def.prev_steps = [];
+def.prev_steps = {};
 def.inDataType = [];
 
 for ifld = 1:length(fields)

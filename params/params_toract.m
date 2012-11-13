@@ -29,6 +29,7 @@ function params = params_toract(varargin)
 % 2012.07.03 FB - move from ci_siglist to li_siglist, add inDataType and
 %   prev_steps
 % 2012.10.30 PJ - added context dependent assignment of weight matrices
+% 2012.11.13 TC - Altered prev_steps to empty cell array, not double.
 
 fields = {...
     'li_siglist',...
@@ -61,7 +62,7 @@ switch cell2str(params.prev_steps,'_')
 end
 def.Fs = [];
 def.inDataType = '';
-def.prev_steps = [];
+def.prev_steps = {};
 
 for ifld = 1:length(fields)
   if isempty(params.(fields{ifld}))

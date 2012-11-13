@@ -24,6 +24,8 @@ function params = params_tonreg_fmri(varargin)
 %
 % Author(s):
 % Fred Barrett - 2012.07.05
+% Changes.
+%  2012.11.13 TC. Altered prev_steps to empty cell array, not double.
 
 %this is the parameter list
 %if you need to add more parameters, add them here
@@ -35,7 +37,7 @@ params = mkstruct(fields,varargin);
 def.scanner = struct('TR',2,'dt',16); % Janata Lab defaults: 2s TR, 1/16 dt
 def.use_sig = calc_li('calc_names',[2]); % timescale used in Janata 2009 Cerebral Cortex
 def.inDataType = '';
-def.prev_steps = [];
+def.prev_steps = {};
 
 for ifld = 1:length(fields)
   if isempty(params.(fields{ifld}))

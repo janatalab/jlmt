@@ -23,7 +23,9 @@ function params = params_pc(varargin)
 %
 % Author:
 % 05/06/2011 - FB
-% 2012.07.05 FB - added inDataType and prev_steps
+% 2012.07.05 FB - added inDataType and prev_steps.
+% 2012.11.13 TC - if empty, set prev_steps to an empty cell array rather
+%  than an empty double.
 
 fields = {...
     'wmtx',...
@@ -33,6 +35,9 @@ fields = {...
     'prev_steps', ...
     'inDataType'};
 params = mkstruct(fields,varargin);
+if isempty(params.prev_steps)
+  params.prev_steps = {};
+end
 
 if isempty(params.wmtx)
   root_path = fileparts(which('jlmt_proc_series'));

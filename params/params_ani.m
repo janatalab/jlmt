@@ -35,6 +35,7 @@ function params = params_ani(varargin)
 % Author(s):
 % Stefan Tomic - first version
 % 12/4/06 Petr Janata - made handling of varargin more dynamic
+% 2012.11.13 TC. Altered prev_steps to empty cell array, not double.
 
 %this is the parameter list
 %if you need to add more parameters, add them here
@@ -56,7 +57,7 @@ def.dur_sec = [];
 def.aniPath = create_jlmt_tmpdir;  % '/tmp/jlmt'
 def.normalize_wav = 1;
 def.normalize_maxVal = 0.95;
-def.prev_steps = [];
+def.prev_steps = {};
 def.future_steps = [];
 def.inDataType = [];
 

@@ -26,6 +26,8 @@ function params = params_pp(varargin)
 %
 % Author:
 % 12/4/06 Petr Janata
+% Changes.
+%  2012.11.13 TC. Altered prev_steps to empty cell array, not double.
 
 fields = {...
     'LowFrequency', ...
@@ -43,7 +45,7 @@ def.FrameWidth = 0.0381;
 def.FrameStepSize = 0.0381;
 def.PlotFlag = 0;
 def.Atten = 'ipem_squash_hf';
-def.prev_steps = [];
+def.prev_steps = {};
 def.inDataType = '';
 
 for ifld = 1:length(fields)
