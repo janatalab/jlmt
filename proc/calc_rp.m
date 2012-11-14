@@ -465,8 +465,11 @@ function defParams = getDefaultParams(varargin)
 % this can be called from external functions by passing 
 % 'getDefaultParams' to rhythm_profiler
 
+inDataType = '';
 for iarg = 1:2:nargin
   switch varargin{iarg}
+      case 'inDataType'
+          inDataType = varargin{iarg+1};
     case 'params'
       params = varargin{iarg+1};
     case 'prev_steps'
@@ -475,17 +478,27 @@ for iarg = 1:2:nargin
 end
 
 
-if exist('params','var') && isfield(params,'inDataType')
-  switch params.inDataType
+if ~exist('inDataType') && exist('params','var') && isfield(params,'inDataType')
+    inDataType = params.inDataType;
+end
+
+if ~isempty(inDataType)
+  switch inDataType
     
    case 'ani'
     defParams = rp_paramGroups_v2('param_group','reson_filterQSpacing_periodBasedDecay',...
 			       'input_type','ani','gain_type','beta_distribution','prev_steps',prev_steps);
     
    case 'aud'
-    defParams = rp_paramGroups_v2('param_group','reson_filterQSpacing_periodBasedDecay','input_type','aud','gain_type','beta_distribution');
+    defParams = rp_paramGroups_v2('param_group','reson_filterQSpacing_periodBasedDecay', ...
+        'input_type','aud', ...
+        'gain_type','beta_distribution', ...
+        'prev_steps', {});
    case 'mat'
-    defParams = rp_paramGroups_v2('param_group','reson_filterQSpacing_periodBasedDecay','input_type','mat','gain_type','beta_distribution');
+    defParams = rp_paramGroups_v2('param_group','reson_filterQSpacing_periodBasedDecay',...
+        'input_type','mat',...
+        'gain_type','beta_distribution', ...
+        'prev_steps', {});
   
   end
 

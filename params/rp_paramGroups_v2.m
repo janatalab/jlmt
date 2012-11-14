@@ -72,6 +72,19 @@ function rp = rp_paramGroups_v2(varargin)
 %  TC, 11.13.2012. Added some default parameters for onset detection, line
 %   142 onwards.
 
+% Initialize an empty RP structure
+rp = struct('Fs',[], ...
+    'perform', struct, ...
+    'timeLimSecs', [], ...
+    'resonatorBank', struct, ...
+    'onsetInfo', struct, ...
+    'resonatorBand', [], ...
+    'temporalExpect', struct, ...
+    'vmExpect', struct, ...
+    'mppByFrame', struct, ...
+    'inDataType', '', ...
+    'prev_steps', {});
+
 for iarg = 1:2:nargin
   
   switch(varargin{iarg})  
@@ -85,18 +98,20 @@ for iarg = 1:2:nargin
     gain_type = varargin{iarg+1};
     
    case 'Fs'
-    rp.Fs = varargin{iarg+1};
+    rp(1).Fs = varargin{iarg+1};
     
    case 'perform'
-    rp.perform = varargin{iarg+1};
+    rp(1).perform = varargin{iarg+1};
     
    case 'prev_steps'
-    rp.prev_steps = varargin{iarg+1};
+    rp(1).prev_steps = varargin{iarg+1};
   end
   
 end
 
-if ~isfield(rp,'Fs') || isempty(rp.Fs), rp.Fs = 100; end
+if ~exist('rp') || isempty(rp) || ~isfield(rp,'Fs') || isempty(rp.Fs)
+    rp(1).Fs = 100; 
+end
 
 %assign default 'perform' flags.
 %these will be overridden based 
@@ -256,3 +271,5 @@ switch(param_group)
   rp.resonatorBank.halfEnergyTimeSecs = 1.5;
   rp.resonatorBank.numFilters = 99;
 end
+
+% Add previous steps info
