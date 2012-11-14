@@ -314,6 +314,21 @@ if ~iscell(params.glob.process{1})
 end
 nproc = length(params.glob.process);
 
+if ~iscell(params.glob.save_calc);
+  params.glob.save_calc = {params.glob.save_calc};
+end
+if ~iscell(params.glob.save_calc{1})
+  params.glob.save_calc = {params.glob.save_calc};
+end
+if length(params.glob.save_calc) < nproc && ...
+    length(params.glob.save_calc) == 1
+  tmpcell = params.glob.save_calc;
+  params.glob.save_calc = {};
+  for k=1:nproc
+    params.glob.save_calc{k} = tmpcell;
+  end % for k=1:nproc
+end
+
 %% Initialize some variables
 destStimLocs = {};
 stimIDList = [];
