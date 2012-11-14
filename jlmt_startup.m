@@ -17,20 +17,17 @@ if isempty(which('IPEMSetup'))
 	 'jlmt will not run if you do not have IPEM Toolbox installed']);
 end
 
-fprintf(1,'Adding JLMT paths ...');
+fprintf(1,'jlmt_startup: adding jlmt paths ...');
 
 jlmtpath = fileparts(which('jlmt_proc_series'));
 
-addpath(fullfile(jlmtpath,'event_objects'));
-addpath(fullfile(jlmtpath,'includes'));
-addpath(fullfile(jlmtpath,'maps'));
-addpath(fullfile(jlmtpath,'midi'));
-addpath(fullfile(jlmtpath,'params'));
-addpath(fullfile(jlmtpath,'plots'));
-addpath(fullfile(jlmtpath,'proc'));
-addpath(fullfile(jlmtpath,'rp_modules'));
-addpath(fullfile(jlmtpath,'test'));
-addpath(fullfile(jlmtpath,'utils'));
+dirs = {'event_objects','includes','maps','midi','params','plots',...
+    'proc','rp_modules','test','utils'};
+
+for k=1:length(dirs)
+  tmp = fullfile(jlmtpath,dirs{k});
+  if exist(tmp), addpath(tmp); end
+end % for k=1:length(dirs)
 
 fprintf(1,'\n');
 
