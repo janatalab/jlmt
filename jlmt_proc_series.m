@@ -439,17 +439,23 @@ elseif(isnumeric(inData)) || (iscell(inData) && isnumeric(inData{1}))
     stimIDList = inData;
   end
   nfiles = length(stimIDList);
+
+  if ~exist('conn_id','var')
+    % check database connection - look for a mysql struct first
+    structs2check = {'mysql','ensemble'};
+    nchk = length(structs2check);
+    for ichk = 1:nchk
+      currStruct = structs2check{ichk};
+      
+      if isfield(params,currStruct)
+        conn_id = mysql_make_conn(params.(currStruct));
+        break % exit the loop
+      end
+    end
+  end % if ~exist('conn_id','var')
   
-  % get location field rows for the stimuli
-  try 
-    params.ensemble.conn_id;
-  catch
-    params.ensemble.conn_id = 0;
-    mysql_make_conn('','',params.ensemble.conn_id);
-    tmp_conn_id = 1;
-  end
   stimLocs = mysql_extract_data('table','stimulus','stimulus_id', ...
-				stimIDList,'extract_vars',{'location'},'conn_id',params.ensemble.conn_id);
+      stimIDList,'extract_vars',{'location'},'conn_id',conn_id);
   stimLocs = stimLocs{1};
   destStimLocs = check_stim_dirs(stimLocs,'srcroot',stimulus_root,'destroot',stimulus_ipem_analysis_root,'verbose',false);
 
