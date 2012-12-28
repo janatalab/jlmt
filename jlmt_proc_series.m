@@ -687,7 +687,7 @@ function params = getDefaultParams(params,calc_names)
 % a partial set of parameters has been passed in and we need to complete
 % the set.
 
-VERBOSE = 0;  % flag for debugging
+VERBOSE = 1;  % flag for debugging
 
 def.glob.force_recalc = {};
 def.glob.ignore = {};
