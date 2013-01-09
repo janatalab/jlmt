@@ -21,10 +21,19 @@ function tmpdir = create_jlmt_tmpdir(tmpdir)
 dir_root = '/tmp/jlmt/';
 check_dir(dir_root);
 
-if nargin < 1
-  tmpdir = fullfile(dir_root,sprintf('tmp%s', num2hex(datenum(now))));
-end
+tries = 10;
+curtry = 1;
+while curtry < tries
+  if nargin < 1
+    tmpdir = fullfile(dir_root,sprintf('tmp%s', num2hex(datenum(now))));
+  end
 
-if check_dir(tmpdir)
-  error(sprintf('Could not create directory: %s', tmpdir))
-end
+  if check_dir(tmpdir)
+    warning('Could not create directory: %s\nattempt %d/%d', tmpdir, curtry, tries)
+    pause(rand);
+  else
+    return
+  end
+end % while curtry < tries
+
+error('could not create directory: %s\n',tmpdir);
