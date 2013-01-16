@@ -14,6 +14,8 @@ function outdata = calc_mode_estimate(inData,varargin)
 % RETURNS
 %   outdata.vars/data
 %       params - the input parameter structure
+%       time_constants - time constants associated with each toract source
+%       labels - time constant labels associated with each toract source
 %       avg - the average mode estimate of the entire given toract
 %           timeseries. > 0 indicates that the source signal is, on
 %           average, in major mode, < 0 indicates that the source signal
@@ -40,7 +42,8 @@ end
 
 % initialize variables
 outdata = ensemble_init_data_struct();
-outdata.vars = {'params','avg','pct_minor','pct_major','timeseries'};
+outdata.vars = {'params','time_constants','labels',...
+    'avg','pct_minor','pct_major','timeseries'};
 oc = set_var_col_const(outdata.vars);
 for k=1:length(outdata.vars)
   outdata.data{k} = [];
@@ -74,6 +77,8 @@ end % for itor=1:length(inData.data{tc.activations
 
 % append the parameters structure to the output data
 outdata.data{oc.params} = params;
+outdata.data{oc.time_constants} = inData.data{tc.time_constants};
+outdata.data{oc.labels} = inData.data{tc.labels};
 
 %%%%%%%%%%%%%%%
 %makes sure that all necessary param fields are populated and
