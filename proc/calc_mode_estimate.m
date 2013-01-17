@@ -50,6 +50,7 @@ oc = set_var_col_const(outdata.vars);
 for k=1:length(outdata.vars)
   outdata.data{k} = [];
 end
+outdata.data{oc.labels} = {};
 
 % load toract mode map information
 load(params.toract_mode_map.fname);
@@ -58,7 +59,7 @@ tc = set_var_col_const(inData.vars);
 nsig = length(params.li_siglist);
 for isig=1:nsig
     signame = params.li_siglist{isig};
-    lidx = find(ismember(inData.data{inData_cols.names},signame));
+    lidx = find(ismember(inData.data{tc.labels},signame));
     if isempty(lidx)
       warning('no context image found for %s, SKIPPING',signame);
       continue
@@ -82,7 +83,7 @@ for isig=1:nsig
         'pct_minor',sum(mode_tc < 0)/length(mode_tc),...
         'pct_major',sum(mode_tc > 0)/length(mode_tc),...
         'timeseries',mode_tc,...
-        'time_constants',inData.data{tc.time_constants}{lidx},...
+        'time_constants',inData.data{tc.time_constants}(lidx),...
         'labels',inData.data{tc.labels}{lidx});
 end % for isig=1:nsig
 
