@@ -6,10 +6,12 @@ function outdata = calc_mode_estimate(inData,varargin)
 % 
 % REQUIRES
 %   inData - the output of jlmt calc_toract()
-%   params.toract_mode_map.fname - path to file containing the mode map for
-%       the given toract model. This must contain the variables
-%       'bound_params' and 'grp_mtx', which can be generated using the
-%       utility file 'make_toract_mode_map.m'
+%   params
+%       .toract_mode_map.fname - path to file containing the mode map for
+%           the given toract model. This must contain the variables
+%           'bound_params' and 'grp_mtx', which can be generated using the
+%           utility file 'make_toract_mode_map.m'
+%       .li_siglist - names of images in inData to use
 % 
 % RETURNS
 %   outdata.vars/data
@@ -53,9 +55,16 @@ end
 load(params.toract_mode_map.fname);
 
 tc = set_var_col_const(inData.vars);
-for itor=1:length(inData.data{tc.activations})
+nsig = length(params.li_siglist);
+for isig=1:nsig
+    signame = params.li_siglist{isig};
+    lidx = find(ismember(inData.data{inData_cols.names},signame));
+    if isempty(lidx)
+      warning('no context image found for %s, SKIPPING',signame);
+      continue
+    end
     
-    planes = inData.data{tc.activations}{itor};
+    planes = inData.data{tc.activations}{lidx};
     new_plane = planes(:,:,1);
 
     % get the average value for all cells within a given region
@@ -72,13 +81,13 @@ for itor=1:length(inData.data{tc.activations})
     outdata = ensemble_add_data_struct_row(outdata,'avg',mean(mode_tc),...
         'pct_minor',sum(mode_tc < 0)/length(mode_tc),...
         'pct_major',sum(mode_tc > 0)/length(mode_tc),...
-        'timeseries',mode_tc);
-end % for itor=1:length(inData.data{tc.activations
+        'timeseries',mode_tc,...
+        'time_constants',inData.data{tc.time_constants}{lidx},...
+        'labels',inData.data{tc.labels}{lidx});
+end % for isig=1:nsig
 
 % append the parameters structure to the output data
 outdata.data{oc.params} = params;
-outdata.data{oc.time_constants} = inData.data{tc.time_constants};
-outdata.data{oc.labels} = inData.data{tc.labels};
 
 %%%%%%%%%%%%%%%
 %makes sure that all necessary param fields are populated and
