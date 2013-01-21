@@ -15,7 +15,7 @@ if SAVE_NEW_FILE
   out_root = fileparts(which('jlmt_proc_series'));
   out_fname = fullfile(out_root,'maps',sprintf('toract_mode_map_%s.mat',...
       datestr(now(),'yyyymmdd')));
-  if exist(out_fname,'file'), delete(outfname); end
+  if exist(out_fname,'file'), delete(out_fname); end
 end % if SAVE_NEW_FILE
 
 % load toract data, for visualization purposes only
@@ -123,6 +123,13 @@ for k=1:size(planes,1)
   end % for l=1:size(new_plane,2
 end % for k=1:size(new_plane,1
 
+bound_weights = zeros(8,1);
+for k=1:8
+  bound_weights(k) = sum(ismember(grp_mtx(:),k));
+end % for k=1:8
+nminor = sum(ismember(grp_mtx(:),1:2:8));
+nmajor = numel(grp_mtx)-nminor;
+
 figure();
 imagesc(grp_mtx);
 title('torus pixel group membership');
@@ -135,5 +142,6 @@ title('timecourse of mode estimate (maj > 0, min < 0)');
 
 if SAVE_NEW_FILE
   save(out_fname,'line_params','bound_params','grp_mtx',...
-      'line_order','line_class','label_coords','line_class','sM');
+      'line_order','line_class','label_coords','line_class','sM',...
+      'new_label_array','label_idxs','nminor','nmajor','bound_weights');
 end % if SAVE_NEW_FILE
