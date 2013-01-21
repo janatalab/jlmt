@@ -32,7 +32,7 @@ function outdata = calc_mode_estimate(inData,varargin)
 if nargin > 1 && isstruct(varargin{1})
   params = varargin{1};
 end
-  
+
 if ischar(inData) && strcmp(inData,'getDefaultParams')
   if exist('params','var')
     outdata = getDefaultParams('params',params);
@@ -66,18 +66,39 @@ for isig=1:nsig
     end
     
     planes = inData.data{tc.activations}{lidx};
-    new_plane = planes(:,:,1);
+%     new_plane = planes(:,:,1);
 
     % get the average value for all cells within a given region
-    areas = cell(size(bound_params,1)+1,1);
-    for k=1:size(planes,1)
-      for l=1:size(planes,2)
-        areas{grp_mtx(k,l)}(end+1,:) = planes(k,l,:);
-      end % for l=1:size(new_plane,2
-    end % for k=1:size(new_plane,1
-
-    tcs = cell2mat(cellfun(@nanmean,areas,'UniformOutput',false));
-    mode_tc = line_class*tcs;
+    mode_tc = nan(1,size(planes,3));
+%     figure();
+    for k=1:size(planes,3)
+      new_plane = planes(:,:,k);
+      [myidx,mxidx] = find(new_plane == repmat(max(new_plane(:)),size(new_plane)));
+%       clf;
+%       imagesc(new_plane);
+% 
+%       for l=1:size(bound_params,1)
+%         avg_slope = mean(bound_params(l,1));
+%         avg_int = mean(bound_params(l,2));
+%         x = [0 -avg_int/avg_slope];
+%         y = [avg_int 0];
+%         line(x,y,'color','w','fontsize',15,'fontweight','bold');
+%       end % for l=1:size(bound_params,1
+%       
+%       text(mxidx,myidx,'X','color','w');
+%       pause(0.25);
+      mode_tc(k) = line_class(grp_mtx(myidx,mxidx));
+    end % for k=1:size(planes,3
+    
+%     areas = cell(size(bound_params,1)+1,1);
+%     for k=1:size(planes,1)
+%       for l=1:size(planes,2)
+%         areas{grp_mtx(k,l)}(end+1,:) = planes(k,l,:);
+%       end % for l=1:size(new_plane,2
+%     end % for k=1:size(new_plane,1
+% 
+%     tcs = cell2mat(cellfun(@nanmean,areas,'UniformOutput',false));
+%     mode_tc = line_class*tcs;
 
     outdata = ensemble_add_data_struct_row(outdata,'avg',mean(mode_tc),...
         'pct_minor',sum(mode_tc < 0)/length(mode_tc),...
