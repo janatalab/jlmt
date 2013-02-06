@@ -54,6 +54,8 @@ outdata.data{oc.labels} = {};
 
 % load toract mode map information
 load(params.toract_mode_map.fname);
+try labelSize = params.labelSize; catch labelSize=14; end
+map_coords = som_vis_coords(sM.topol.lattice,sM.topol.msize);
 
 tc = set_var_col_const(inData.vars);
 nsig = length(params.li_siglist);
@@ -75,17 +77,29 @@ for isig=1:nsig
       new_plane = planes(:,:,k);
       [myidx,mxidx] = find(new_plane == repmat(max(new_plane(:)),size(new_plane)));
 %       clf;
+%       subplot(1,2,1)
 %       imagesc(new_plane);
+% 
+%       coord_translation = size(new_plane)./sM.topol.msize;
+%       label_coords = (map_coords(label_idxs,:)-0.5).*repmat(coord_translation,length(label_idxs),1);
+%       t = text(label_coords(:,1),label_coords(:,2),new_label_array, ...
+%           'fontweight','bold','fontsize', labelSize, ...
+%           'horizontalalignment', 'center', ...
+%           'verticalalign', 'middle');
 % 
 %       for l=1:size(bound_params,1)
 %         avg_slope = mean(bound_params(l,1));
 %         avg_int = mean(bound_params(l,2));
 %         x = [0 -avg_int/avg_slope];
 %         y = [avg_int 0];
-%         line(x,y,'color','w','fontsize',15,'fontweight','bold');
+%         line(x,y,'color','w');
 %       end % for l=1:size(bound_params,1
 %       
-%       text(mxidx,myidx,'X','color','w');
+%       subplot(1,2,1);
+%       text(mxidx,myidx,'X','color','w','fontsize',15,'fontweight','bold');
+%       subplot(1,2,2)
+%       imagesc(grp_mtx);
+%       text(mxidx,myidx,'X','color','w','fontsize',15,'fontweight','bold');
 %       pause(0.25);
       mode_tc(k) = line_class(grp_mtx(myidx,mxidx));
     end % for k=1:size(planes,3
