@@ -350,6 +350,10 @@ if ischar(inData) && exist(inData)
     inDataType = 'aud_file_string_cell_array';
     nfiles = size(inData,1);
   else
+    % a single file path as a string
+    inData = jlmt_prepare_dirs(inData);
+    inData = inData{1};
+    
     [fpath,fstub,ext] = fileparts(inData);
     switch ext
       case {'.wav','.aif','.mp3'}
@@ -358,11 +362,7 @@ if ischar(inData) && exist(inData)
         inDataType = 'mat_file_string';
     end
     
-    % a single file path as a string
-    inData = jlmt_prepare_dirs(inData);
-    inData = inData{1};
-    
-    nfiles = 1;
+    nfiles = length(inData);
   end
 elseif(iscell(inData) && ischar(inData{1}))
 
