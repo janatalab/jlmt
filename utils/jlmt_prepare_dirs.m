@@ -8,6 +8,11 @@ function flist = jlmt_prepare_dirs(fpath,params)
 % 
 
 % 29Oct2012 Petr Janata
+% 2013.02.06 FB - previously only checked to see if fpath pointed to a file
+%                 in its nested position. This script now also checks to see
+%                 if fpath points to a file that had been nested, but where
+%                 fpath indicated its pre-nested position. In this case, it
+%                 returns the proper nested fpath path.
 
 % Check to see if path is a cell array of strings (paths to files), or a
 % directory

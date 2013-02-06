@@ -217,6 +217,14 @@ function outData = jlmt_proc_series(inData,params)
 %                fully achieved yet.
 % 13Oct2012 PJ - Miscellaneous fixes to ensure that all elements in a row
 %                of calculations refer to the same calculation
+% 2013.02.06 FB - Bugfix: previously, when sending a cell array of strings
+%                 containing paths to stims, jlmt_prepare_dirs was not 
+%                 being called, this lead to problems downstream. This is
+%                 now remedied. I also changed checking of previously
+%                 existing analyses: previously, any .mat files in a given
+%                 proc directory would be checked against proc parameters.
+%                 Now, only .mat files matching the sound file's file stub
+%                 before the hash are being considered.
 
 %%
 % Make sure IPEM setup has been run

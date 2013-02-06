@@ -31,6 +31,7 @@ function [foundFile,firstViolation,violationReason] = check_anal_exist(dirPath, 
 %                           of the art.
 % 01Nov2011, Petr Janata - added ability to request analyses matching subsets of values.  
 %                          See compare_structs() for more info.
+% 2013.02.06 FB - now handles additional case where dirPath ends in a filestub
 
 foundFile = '';
 firstViolation = {};
