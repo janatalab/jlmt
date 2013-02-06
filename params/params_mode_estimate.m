@@ -16,6 +16,7 @@ function params = params_mode_estimate(varargin)
 
 fields = {...
     'toract_mode_map',...
+    'mode_tc_fun',...
     'li_siglist',...
     'ci_siglist',... % for backwards compability
     'HalfDecayTimes',...
@@ -26,10 +27,10 @@ params = mkstruct(fields,varargin);
 
 jlmt_root = fileparts(which('jlmt_proc_series'));
 def.toract_mode_map.fname = fullfile(jlmt_root,'maps','toract_mode_map_20130118.mat');
+def.mode_tc_fun = {'mode_est_max','mode_est_ratio','mode_est_hr_ratio'};
 def.li_siglist = [];
 def.ci_siglist = [];
 def.HalfDecayTimes = [0.1 2];
-
 def.inDataType = '';
 def.prev_steps = {};
 
