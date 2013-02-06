@@ -37,7 +37,19 @@ firstViolation = {};
 violationReason = '';
 
 varName = params.varName;
-fullpath = fullfile(dirPath,'*.mat');
+
+if exist(dirPath,'dir')
+  % a search directory has been given
+  fullpath = fullfile(dirPath,'*.mat');
+elseif exist(fileparts(dirPath),'dir')
+  % a search directory with a file stub has been given
+  fullpath = [dirPath '*.mat'];
+  dirPath = fileparts(dirPath);
+else
+  firstViolation = {'fileStruct'};
+  violationReason = sprintf('input path %s not found',dirPath);
+  return
+end
 
 fileStruct = dir(fullpath);
 nFiles = length(fileStruct);

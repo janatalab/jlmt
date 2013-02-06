@@ -368,6 +368,7 @@ elseif(iscell(inData) && ischar(inData{1}))
   end
   nfiles = length(inData);
 
+  inData = jlmt_prepare_dirs(inData);
 elseif(iscell(inData) && all(isfield(inData{1},{'vars','type','data'})) ...
        && strcmp(inData{1}.type,'aud'))
 
@@ -893,8 +894,7 @@ function stepData = run_step(varargin)
   
   
   % look for previously run jobs that match this parameter set
-  lfname = construct_analfname(fullfile(fpath,filename),proc);
-  lPath = fileparts(lfname);
+  [lfname,lPath] = construct_analfname(fullfile(fpath,filename),proc);
   
   % find existing analysis
   matchParams = struct;
@@ -914,7 +914,7 @@ function stepData = run_step(varargin)
     % been listed for a force recalc, so load the previous results
     fprintf(lfid,['jlmt_proc_series: Loading a previously calculated '...
       '%s with matching parameters...\n'],proc);
-    lfname = fullfile(lPath,previousCalcFname{1});
+    lfname = fullfile(fileparts(lPath),previousCalcFname{1});
     load(lfname,proc)
     eval(sprintf('stepData = %s;', proc))
   elseif isempty(input_data)
@@ -933,7 +933,7 @@ function stepData = run_step(varargin)
       if ~isempty(previousCalcFname)
         fprintf(lfid,['FORCE RECALC WAS SET. Overwriting a previous' ...
           ' %s calculation\n\n'],proc);
-        lfname = fullfile(lPath,previousCalcFname{1});
+        lfname = fullfile(fileparts(lPath),previousCalcFname{1});
       end
       
       fprintf(lfid,'jlmt_proc_series: Saving %s to %s\n\n',proc,lfname);

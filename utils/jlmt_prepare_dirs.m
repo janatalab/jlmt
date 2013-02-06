@@ -12,7 +12,9 @@ function flist = jlmt_prepare_dirs(fpath,params)
 % Check to see if path is a cell array of strings (paths to files), or a
 % directory
 flist = {};
-if isdir(fpath)
+if iscell(fpath)
+  flist = fpath(:);
+elseif isdir(fpath)
   
   % If the present directory is specified, get the full path to it so that
   % we can check for proper nesting
@@ -33,8 +35,6 @@ if isdir(fpath)
   
   % Convert flist to be full path
   flist = strcat(fpath,filesep,flist);
-elseif iscell(fpath)
-  flist = fpath(:);
 else
   flist = {fpath};
 end % if isdir
@@ -44,11 +44,10 @@ nfiles = size(flist,1);
 for ifile = 1:nfiles
   currFile = flist{ifile};
   [fpath,fstub,fext] = fileparts(currFile);
-  fext(1) = []; % remove dot
   
   % Check to see if this file is already properly nested
   [parentPath,parentStub] = fileparts(fpath);
-  if strcmp(fext,parentStub)
+  if strcmp(fext(2:end),parentStub)
     [~,grandparentStub] = fileparts(parentPath);
     if strcmp(fstub, grandparentStub)
       continue
@@ -61,16 +60,17 @@ for ifile = 1:nfiles
   
   % Check to see whether a sub-directory for the particular audio format
   % exists
-  targdir = fullfile(targdir, fext);
+  targdir = fullfile(targdir, fext(2:end));
   check_dir(targdir);
-  
-  % Move the file over to the sub-directory
-  fprintf('Moving file %s to %s ...\n', currFile, targdir);
-  movefile(currFile,targdir)
+
+  if ~exist(fullfile(targdir,[fstub fext]))
+    % Move the file over to the sub-directory
+    fprintf('Moving file %s to %s ...\n', currFile, targdir);
+    movefile(currFile,targdir)
+  end % if ~exist(fullfile(targdir,currFile
   
   % Replace name in flist with new name
-  flist{ifile} = fullfile(targdir,sprintf('%s.%s', fstub, fext));
-  
+  flist{ifile} = fullfile(targdir,[fstub fext]);
 end
 
 return
