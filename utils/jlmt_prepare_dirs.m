@@ -12,7 +12,10 @@ function flist = jlmt_prepare_dirs(fpath,params)
 %                 in its nested position. This script now also checks to see
 %                 if fpath points to a file that had been nested, but where
 %                 fpath indicated its pre-nested position. In this case, it
-%                 returns the proper nested fpath path.
+%                 returns the proper nested fpath path. Also, given a
+%                 directory, this will check the first-level sub-directories
+%                 underneath to search for previously nested stimulus
+%                 analysis directories.
 
 % Check to see if path is a cell array of strings (paths to files), or a
 % directory
@@ -37,7 +40,25 @@ elseif isdir(fpath)
     list = dir(fullfile(fpath,sprintf('*.%s', cfmt)));
     flist = [flist; {list.name}'];
   end % for ifmt
-  
+
+  % look for previously prepared/nested directories
+  dirlist = dir(fpath);
+  dirlist(~[dirlist.isdir]) = [];
+  fprintf(1,'checking directories...\n');
+  for idir=1:length(dirlist)
+    if ~isempty(strmatch(dirlist(idir).name,{'.','..'}))
+      continue
+    end
+    
+    for ifmt=1:length(fmts)
+      list = dir(fullfile(fpath,dirlist(idir).name,fmts{ifmt},...
+          sprintf('*.%s',fmts{ifmt})));
+      if ~length(list), continue, end
+      flist = [flist; cellfun(@fullfile,...
+          repmat({fullfile(dirlist(idir).name,fmts{ifmt})},1,...
+          length(list)),{list.name}','UniformOutput',false)];
+    end % ifmt=1:length(fmts
+  end % for idir=1:length(dirlist
   % Convert flist to be full path
   flist = strcat(fpath,filesep,flist);
 else
@@ -53,8 +74,9 @@ for ifile = 1:nfiles
   % Check to see if this file is already properly nested
   [parentPath,parentStub] = fileparts(fpath);
   if strcmp(fext(2:end),parentStub)
-    [~,grandparentStub] = fileparts(parentPath);
-    if strcmp(fstub, grandparentStub)
+    [~,grandparentStub,grandparentExt] = fileparts(parentPath);
+    if strcmp(fstub, grandparentStub) || ...
+            strcmp(fstub,[grandparentStub grandparentExt])
       continue
     end
   end
