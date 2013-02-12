@@ -362,7 +362,7 @@ if ischar(inData) && exist(inData)
         inDataType = 'mat_file_string';
     end
     
-    nfiles = length(inData);
+    nfiles = 1;
   end
 elseif(iscell(inData) && ischar(inData{1}))
 

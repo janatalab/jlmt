@@ -18,7 +18,12 @@ function plot_toract_w_mode_map(inData,params)
 % FB 2013.01.17
 
 % load/init variables
-load(params.toract_mode_map.fname);
+try mode_map_fname = params.toract_mode_map.fname;
+catch mode_map_fname = fullfile(fileparts(which('jlmt_proc_series')),...
+        'maps','toract_mode_map_20130118.mat');
+end
+load(mode_map_fname);
+
 map_coords = som_vis_coords(sM.topol.lattice,sM.topol.msize);
 try labelSize = params.labelSize; catch labelSize=14; end
 try pause_length = params.pause_length; catch pause_length = 0.25; end

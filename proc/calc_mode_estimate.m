@@ -4,12 +4,13 @@ function outdata = calc_mode_estimate(inData,varargin)
 % 
 %   outdata = calc_mode_estimate(inData,params)
 % 
-% Three different mode estimate techniques are currently implemented:
+% Five different mode estimate techniques are currently implemented:
 %   1. ratio of the avg pixel value in major vs minor mode torus regions
 %   2. ratio of the avg half-rectified (only accepting positive values)
 %      pixel value in major vs minor torus regions
 %   3. region (major or minor) containing the max value in the torus
 %      projection
+%   4. ratio of the max pixel value in major vs minor mode torus regions
 % 
 % REQUIRES
 %   inData - the output of jlmt calc_toract()
@@ -21,7 +22,8 @@ function outdata = calc_mode_estimate(inData,varargin)
 %       .li_siglist - names of images in inData to use
 %       .mode_tc_fun - a string or cell array of strings indicating the
 %           function or functions containing the algorithm to estimate the
-%           mode timecourse (mode_est_max,mode_est_ratio,mode_est_hr_ratio)
+%           mode timecourse (mode_est_max,mode_est_ratio,mode_est_hr_ratio,
+%           mode_est_max_ratio,mode_est_hr_ratio_2)
 % 
 % RETURNS
 %   outdata.vars/data
@@ -62,6 +64,7 @@ for k=1:length(outdata.vars)
 end
 outdata.data{oc.labels} = {};
 outdata.data{oc.method} = {};
+outdata.data{oc.timeseries} = {};
 
 % load toract mode map information
 load(params.toract_mode_map.fname);
@@ -89,21 +92,17 @@ for ifun=1:length(params.mode_tc_fun)
     planes = inData.data{tc.activations}{lidx};
 
     % get the average value for all cells within a given region
-    mode_tc = fh(planes,grp_mtx);
+    [mode_tc,avg,pct_major,pct_minor] = fh(planes,grp_mtx);
     
     outdata = ensemble_add_data_struct_row(outdata,...
-        'avg',mean(mode_tc),...
-        'pct_minor',sum(mode_tc < 0)/length(mode_tc),...
-        'pct_major',sum(mode_tc > 0)/length(mode_tc),...
+        'avg',avg,'pct_minor',pct_major,'pct_major',pct_minor,...
         'timeseries',mode_tc,...
         'method',func2str(fh),...
         'time_constants',inData.data{tc.time_constants}(lidx),...
-        'labels',inData.data{tc.labels}{lidx});
+        'labels',inData.data{tc.labels}{lidx},...
+        'params',params);
   end % for isig=1:nsig
 end % for ifun=1:length(params.mode_tc_fun
-
-% append the parameters structure to the output data
-outdata.data{oc.params} = params;
 
 %%%%%%%%%%%%%%%
 %makes sure that all necessary param fields are populated and
