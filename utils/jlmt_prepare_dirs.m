@@ -72,7 +72,7 @@ for ifile = 1:nfiles
   currFile = flist{ifile};
   [fpath,fstub,fext] = fileparts(currFile);
   
-  % Check to see if this file is already properly nested
+  % Check to see if currFile points to a properly nested mp3
   [parentPath,parentStub] = fileparts(fpath);
   if strcmp(fext(2:end),parentStub) || strcmp('audio',parentStub)
     [~,grandparentStub,grandparentExt] = fileparts(parentPath);
@@ -81,7 +81,19 @@ for ifile = 1:nfiles
       continue
     end
   end
-  
+
+  if ~exist(currFile)
+    % check to see if currFile points to a file that doesn't exist because
+    % it has already been properly nested
+    tmpPath = fullfile(fpath,fstub,fext(2:end),[fstub fext]);
+    if exist(tmpPath,'file')
+      flist{ifile} = tmpPath;
+      continue
+    end
+    warning('Neither %s nor %s exist!!!\n',currFile,tmpPath);
+    continue
+  end
+
   % Check to see whether directory for this file exists
   targdir = fullfile(fpath,fstub);
   check_dir(targdir);
