@@ -32,7 +32,7 @@
 fprintf(1,'initializing variables\n');
 
 GENERATE_DOCUMENTATION = 0;
-RSYNC = 0; % 0=dry run, will list all files it would have copied, 1=rsync
+RSYNC = 1; % 0=dry run, will list all files it would have copied, 1=rsync
 
 [~,user] = unix('whoami');
 user = regexprep(user,'\s','');
@@ -155,13 +155,13 @@ if RSYNC
   fprintf(1,'rsyncing: %s to %s\n',priv_jlmt,jlmt_path);
   
   % rsync command
-  rcmd = ['rsync -Cav ' rsync_excludes ' ' priv_jlmt ' ' jlmt_path];
+  rcmd = ['rsync -Cav ' rsync_excludes ' ' priv_jlmt ' ' fileparts(jlmt_path)];
 else
   fprintf(fid,'rsync DRY RUN: %s to %s\n',priv_jlmt,jlmt_path);
   fprintf(1,'rsync DRY RUN: %s to %s\n',priv_jlmt,jlmt_path);
   
   % dry run command, which lists all files that would have been moved
-  rcmd = ['rsync -Cavn ' rsync_excludes ' ' priv_jlmt ' ' jlmt_path];
+  rcmd = ['rsync -Cavn ' rsync_excludes ' ' priv_jlmt ' ' fileparts(jlmt_path)];
 end % if RSYNC
 fprintf(fid,'executing: %s\n',rcmd);
 [status,msg] = unix(rcmd);
