@@ -1,4 +1,4 @@
-% Copyright (c) 2012 The Regents of the University of California
+% Copyright (c) 2013 The Regents of the University of California
 % All Rights Reserved.
 
 % This script is intended to accompany:

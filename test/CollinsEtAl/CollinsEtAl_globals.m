@@ -1,6 +1,6 @@
 function defs = CollinsEtAl_globals(defs)
 
-% Copyright (c) 2012 The Regents of the University of California
+% Copyright (c) 2013 The Regents of the University of California
 % All Rights Reserved.
 
 % This function sets global parameters for the script CollinsEtAl_analysis.
@@ -16,12 +16,14 @@ function defs = CollinsEtAl_globals(defs)
 %  jlmt_proc_series>getDefaultparams.
 
 %% set paths
-% defs.paths.install_root = fileparts(fileparts(which('jlmt_proc_series')));
-defs.paths.install_root = '/';
-% defs.paths.data_root = fullfile(defs.paths.install_root,'data');
-defs.paths.data_root = fullfile(defs.paths.install_root,'data', 'tonmodcomp_jlmt_test');
-% defs.paths.project_root = fullfile(defs.paths.install_root,'test');
-defs.paths.project_root = defs.paths.data_root;
+defs.paths.install_root = fileparts(which('jlmt_proc_series'));
+
+% under install_root
+defs.paths.map_root = fullfile(defs.paths.install_root,'maps');
+defs.paths.data_root = fullfile(defs.paths.install_root,'data','CollinsEtAl');
+defs.paths.project_root = fullfile(defs.paths.install_root,'test','CollinsEtAl');
+
+% under project_root
 defs.paths.analysis_path = fullfile(defs.paths.project_root, 'analyses');
 defs.paths.log_path = fullfile(defs.paths.project_root, 'logs');
 defs.paths.fig_path = fullfile(defs.paths.project_root, 'figs');
@@ -36,15 +38,15 @@ pparams.inHalfDecayTimes = [0.1 2 4];
 names = calc_li('calc_names',pparams.inHalfDecayTimes);
 
 % torus projection weight matrix path
-defs.jlmt.paths.map_fname = fullfile(defs.paths.data_root,'maps',...
+defs.jlmt.paths.map_fname = fullfile(defs.paths.map_root,...
     'map_10-Dec-2006_16:18.mat');
 
 % pitch class projection weight matrix path
-defs.jlmt.paths.pcmap_fname = fullfile(defs.paths.data_root,'maps',...
+defs.jlmt.paths.pcmap_fname = fullfile(defs.paths.map_root,...
     'pp2pitchclass_W_20121105.mat');
 
 % pitch class to torus weight matrix
-defs.jlmt.paths.pc_to_torus_fname = fullfile(defs.paths.data_root,'maps',...
+defs.jlmt.paths.pc_to_torus_fname = fullfile(defs.paths.map_root,...
     'pc_ci2toract_map_12-Jun-2012_15:47.mat');
   
 % Location of distributions for calculating closure probability.

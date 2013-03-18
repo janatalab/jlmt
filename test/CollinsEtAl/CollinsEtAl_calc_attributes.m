@@ -1,6 +1,6 @@
 function results = CollinsEtAl_calc_attributes(in_data, params, jlmt_out)
 
-% Copyright (c) 2012 The Regents of the University of California
+% Copyright (c) 2013 The Regents of the University of California
 % All Rights Reserved.
 
 % This function calculates attributes of audio representations in a

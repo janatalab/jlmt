@@ -22,11 +22,11 @@ fprintf(1,'jlmt_startup: adding jlmt paths ...');
 jlmtpath = fileparts(which('jlmt_proc_series'));
 
 dirs = {'event_objects','includes','maps','midi','params','plots',...
-    'proc','rp_modules','test','utils'};
+    'proc','rp_modules','utils','test'};
 
 for k=1:length(dirs)
   tmp = fullfile(jlmtpath,dirs{k});
-  if exist(tmp), addpath(tmp); end
+  if exist(tmp), path(path,genpath(tmp)); end
 end % for k=1:length(dirs)
 
 fprintf(1,'\n');
