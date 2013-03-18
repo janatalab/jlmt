@@ -12,7 +12,7 @@
 % SET THE FOLLOWING LINE to the path where you would like to store
 % data and output from the test scripts (eg. '/home/username/data' or
 % 'C:\Documents and Settings\Username\data')
-dest_dir = '/home/fbarrett/data/partest';
+dest_dir = '';
 
 if isempty(dest_dir)
   error('Please specify "dest_dir" in test/test_jlmt.m');
@@ -29,7 +29,6 @@ flist = check_stim_dirs(flist,'srcroot',test_data_dir,'destroot',dest_dir);
 % for each step.
 params.glob.process = {{'ani','pp','li','toract','tonreg_fmri'},...
     {'ani','pp','pc','li','toract','tonreg_fmri'},...
-    {'ani','pp','pc','li','toract','mode_estimate'},...
     };
 params.glob.force_recalc = {};
 params.glob.save_calc = params.glob.process;

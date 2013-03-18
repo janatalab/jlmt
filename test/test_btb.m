@@ -12,7 +12,7 @@
 % SET THE FOLLOWING LINE to the path where you would like to store
 % data and output from the test scripts (eg. '/home/username/data' or
 % 'C:\Documents and Settings\Username\data')
-dest_dir = '/Users/pjanata/Documents/btb_test';
+dest_dir = '';
 
 if isempty(dest_dir)
   error('Please specify "dest_dir" in test/test_btb.m');

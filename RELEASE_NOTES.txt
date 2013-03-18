@@ -1,5 +1,20 @@
 ----------------------------------------------------
-Release v1.2 - October XX, 2012
+Release v1.3 - March 18, 2013
+----------------------------------------------------
+
+- added scripts and data to accompany:
+
+  Tom Collins, Barbara Tillmann, Frederick S. Barrett, Charles Delbé,
+    and Petr Janata. A combined model of sensory and cognitive
+    representations underlying tonal expectation: from audio signals
+    to behavior. Submitted, 2013.
+
+- minor bug fixes relating to identification of audio files nested
+within directories and management of parameters when none or sparse
+parameters are specified
+
+----------------------------------------------------
+Release v1.2 - October, 2012
 ----------------------------------------------------
 
 - jlmt_proc_series has been updated to support processing of

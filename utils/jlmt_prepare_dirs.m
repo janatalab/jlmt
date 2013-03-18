@@ -33,7 +33,7 @@ elseif isdir(fpath)
   fprintf('Searching for audio files in %s ...\n', fpath);
   
   % Look for all .wav, .mp3, and .aif or .aiff files
-  fmts = {'wav','mp3','aif','aiff','mat'};
+  fmts = {'wav','mp3','aif','aiff','mat','audio'};
   for ifmt = 1:length(fmts);
     cfmt = fmts{ifmt};
     fprintf('\t%s ...\n', cfmt);
@@ -73,7 +73,7 @@ for ifile = 1:nfiles
   
   % Check to see if this file is already properly nested
   [parentPath,parentStub] = fileparts(fpath);
-  if strcmp(fext(2:end),parentStub)
+  if strcmp(fext(2:end),parentStub) || strcmp('audio',parentStub)
     [~,grandparentStub,grandparentExt] = fileparts(parentPath);
     if strcmp(fstub, grandparentStub) || ...
             strcmp(fstub,[grandparentStub grandparentExt])

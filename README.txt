@@ -42,6 +42,9 @@ SUBDIRECTORIES
 
 data -	      sample stimuli and data used by unit test scripts
 
+documentation - html documentation of each all JLMT scripts, formatted
+	      by m2html (http://www.artefact.tk/software/matlab/m2html/)
+
 event_objects - functions for initializing data structures used to
                 describe auditory or MIDI events.
 
