@@ -36,7 +36,7 @@ function plot_rpBandSigs(thisRP,params)
 %  params.savePath: file path to save plots (if separatePages is
 %                   set, an extra tag will be added to separate the files)
 %
-% Copyright (c) 2007-2012 The Regents of the University of California
+% Copyright (c) 2007-2013 The Regents of the University of California
 % All Rights Reserved
 %
 % Author:

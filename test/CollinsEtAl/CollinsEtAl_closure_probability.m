@@ -1,6 +1,6 @@
 function p = CollinsEtAl_closure_probability(ecm, closure_struct)
 
-% Copyright (c) 2012 The Regents of the University of California
+% Copyright (c) 2012-2013 The Regents of the University of California
 % All Rights Reserved.
 
 % This function takes two values (correlations, stored in an event

@@ -23,6 +23,9 @@ function [mode_tc,avg,pct_major,pct_minor] = mode_est_max_ratio(planes,grp_mtx)
 %   pct_major - percentage of samples estimated to be in major mode
 %   pct_minor - percentage of samples estiamted to be in minor mode
 % 
+% Copyright (c) 2013 The Regents of the University of California
+% All Rights Reserved.
+
 % FB 2013.02.05
 
 mode_tc = nan(1,size(planes,3));

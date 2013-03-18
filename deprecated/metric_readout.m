@@ -12,7 +12,7 @@ function out_st = metric_readout(data_st, params)
 %       .jlmt.(params_to_match_spaces_and_data_you_want_to_use)
 %       .verbose
 % 
-% Copyright (c) 2012 The Regents of the University of California
+% Copyright (c) 2012-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 

@@ -36,7 +36,7 @@ function pc = calc_pc(indata,varargin)
 % RETURNS
 %   pc - an ensemble data struct with the following variables:
 %
-% Copyright (c) 2011-2012 The Regents of the University of California
+% Copyright (c) 2011-2013 The Regents of the University of California
 % All Rights Reserved.
 
 

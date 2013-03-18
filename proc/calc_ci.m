@@ -5,7 +5,7 @@ function ci = calc_ci(inData,varargin)
 % for more information on this function. calc_ci is a wrapper to provide
 % backwards compatibility with earlier versions of calc_li (calc_context)
 %
-% Copyright (c) 2012 The Regents of the University of California
+% Copyright (c) 2012-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 % FB 2012.07.12

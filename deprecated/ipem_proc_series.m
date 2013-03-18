@@ -67,7 +67,7 @@ function outData = ipem_proc_series(inData,params)
 %
 % The calculations to be performed are specified in the params structure
 %
-% Copyright (c) 2006-2011 The Regents of the University of California
+% Copyright (c) 2006-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 % Authors:

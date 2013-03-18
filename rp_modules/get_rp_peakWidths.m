@@ -21,7 +21,7 @@ function [outData] = get_rp_peakWidths(varargin)
 %  outData: vector of peak widths (in Hz) for the peak values
 %  corresponding to peakFreqs.
 %
-% Copyright (c) 2007-2012 The Regents of the University of California
+% Copyright (c) 2007-2013 The Regents of the University of California
 % All Rights Reserved
 %
 % Author:

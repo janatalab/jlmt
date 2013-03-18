@@ -1,7 +1,7 @@
 function ani = ani_paramGroups
 % Returns ani parameter structure commonly used for BTB algorithm
 %
-% Copyright (c) 2007-2012 The Regents of the University of California
+% Copyright (c) 2007-2013 The Regents of the University of California
 % All Rights Reserved
 %
 % Author(s):

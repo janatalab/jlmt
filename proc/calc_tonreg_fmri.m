@@ -21,7 +21,7 @@ function [regval,regnames] = calc_tonreg_fmri(toract,varargin)
 %   regnames - a cell array of strings identifying each spherical harmonic
 %       timecourse in the 'regval' matrix
 % 
-% Copyright (c) 2012 The Regents of the University of California
+% Copyright (c) 2012-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 % 2012.05.22 FB - adapted from fmri_generate_tonreg.m

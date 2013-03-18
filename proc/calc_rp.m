@@ -60,7 +60,7 @@ function outData = calc_rp(inData, varargin)
 %                 resonatorBank.peakFinder: param struct for peak
 %                                           finder function (see get_resonPeakInfo.m and find_peaks.m)
 %
-% Copyright (c) 2006-2012 The Regents of the University of California
+% Copyright (c) 2006-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 % Author: Stefan Tomic 12/2006

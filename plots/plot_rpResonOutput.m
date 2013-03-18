@@ -25,7 +25,7 @@ function plot_rpResonOutput(ax,thisRP,params)
 % OUTPUT
 % No output variables. Plots to an axes.
 %
-% Copyright (c) 2007-2012 The Regents of the University of California
+% Copyright (c) 2007-2013 The Regents of the University of California
 % All Rights Reserved
 %
 % Author:

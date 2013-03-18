@@ -7,6 +7,9 @@
 % this script generates a static file that is referenced by
 % 'get_toract_mode_estimate.m' in the 'utils' directory of the jlmt distro.
 % 
+% Copyright (c) 2013 The Regents of the University of California
+% All Rights Reserved.
+
 % FB 2013.01.16
 
 % initialize some variables

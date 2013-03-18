@@ -10,7 +10,7 @@ function outData = get_resonPeakInfo(meanEnergy,resonFreqs,params)
 % This function passes the params struct to find_peaks.m
 % Please see the discription for that function for details on params.
 %
-% Copyright (c) 2007-2012 The Regents of the University of California
+% Copyright (c) 2007-2013 The Regents of the University of California
 % All Rights Reserved
 %
 % Author(s):

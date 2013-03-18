@@ -10,7 +10,7 @@ function tmpdir = create_jlmt_tmpdir(tmpdir)
 % JLMT in a multi-user environment. Otherwise there is the risk of
 % different jobs clobbering each other.
 %
-% Copyright (c) 2006-2012 The Regents of the University of California
+% Copyright (c) 2006-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 % Author(s):

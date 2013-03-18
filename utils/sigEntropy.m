@@ -5,8 +5,10 @@ function ent = sig_entropy(inSig,params)
 % params.normalize: 0 or 1. Whether or not to normalize by the
 %                   length of the signal
 %
+% Copyright (c) 2008-2013 The Regents of the University of California
+% All Rights Reserved.
+
 % 12/11/2008 First Version, Stefan Tomic
-%
 
 
 nSig = length(inSig);

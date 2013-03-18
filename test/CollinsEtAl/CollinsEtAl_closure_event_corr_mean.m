@@ -1,7 +1,7 @@
 function ecm = CollinsEtAl_closure_event_corr_mean(corr_timecourse, Fs,...
     rp, params)
 
-% Copyright (c) 2007-2012 The Regents of the University of California
+% Copyright (c) 2007-2013 The Regents of the University of California
 % All Rights Reserved.
 
 % This function takes a correlation time course, a rhythm profile, and

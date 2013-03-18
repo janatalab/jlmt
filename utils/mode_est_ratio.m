@@ -12,6 +12,9 @@ function [mode_tc,avg,pct_major,pct_minor] = mode_est_ratio(planes,grp_mtx)
 % 
 % This is a sub-function, to be used with calc_mode_estimate.
 % 
+% Copyright (c) 2013 The Regents of the University of California
+% All Rights Reserved.
+%
 % REQUIRES
 %   planes
 %   grp_mtx

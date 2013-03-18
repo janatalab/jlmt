@@ -16,7 +16,7 @@ function plot_rpMeanResonEnergy(ax,inData,params)
 %                 then standard deviation bars will be plotted
 % params.color: 0 or 1. Whether or not to plot in color
 %
-% Copyright (c) 2007-2012 The Regents of the University of California
+% Copyright (c) 2007-2013 The Regents of the University of California
 % All Rights Reserved
 %
 % Author(s):

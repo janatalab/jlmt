@@ -19,7 +19,7 @@ function [fig_h,ax_h] = rp_figure(params)
 %  params.rowLabels: cell array of strings for subplot row labels
 %  params.colLabels: cell array of strings for subplot column labels
 %
-% Copyright (c) 2007-2012 The Regents of the University of California
+% Copyright (c) 2007-2013 The Regents of the University of California
 % All Rights Reserved
 %
 % Author(s):

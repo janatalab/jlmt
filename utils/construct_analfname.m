@@ -10,7 +10,7 @@ function [analfname,lPath] = construct_analfname(fname,anal_stub)
 % that can be easily used to search for previously run analysis files with
 % a different hash.
 %
-% Copyright (c) 2006-2012 The Regents of the University of California
+% Copyright (c) 2006-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 % Author:

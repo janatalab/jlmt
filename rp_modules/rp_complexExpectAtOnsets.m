@@ -8,7 +8,7 @@ function onsetExpectMtxByBand = rp_complexExpectAtOnsets(rp,params)
 % PARAMS
 %  params.resonType: 'reson','reson_z', or 'reson_r'
 %  params.inputType: '
-% Copyright (c) 2009-2012 The Regents of the University of California
+% Copyright (c) 2009-2013 The Regents of the University of California
 % All Rights Reserved
 %
 % Author(s):

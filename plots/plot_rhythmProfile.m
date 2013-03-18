@@ -21,7 +21,7 @@ function outData = plot_rhythmProfile(inData,params)
 %                                   *(only performed when
 %                                   resonEnergy is performed)
 %
-% Copyright (c) 2007-2012 The Regents of the University of California
+% Copyright (c) 2007-2013 The Regents of the University of California
 % All Rights Reserved
 %
 % Author(s):

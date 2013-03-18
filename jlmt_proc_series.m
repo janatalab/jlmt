@@ -175,7 +175,7 @@ function outData = jlmt_proc_series(inData,params)
 % parameters, including a prev_steps field, that were used to generate the
 % given data.
 %
-% Copyright (c) 2006-2012 The Regents of the University of California
+% Copyright (c) 2006-2013 The Regents of the University of California
 % All Rights Reserved.
 
 % Authors:

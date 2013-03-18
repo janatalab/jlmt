@@ -5,7 +5,8 @@ function flist = jlmt_prepare_dirs(fpath,params)
 %
 % flist = jlmt_prepare_dirs(fpath, params);
 %
-% 
+% Copyright (c) 2013 The Regents of the University of California
+% All Rights Reserved. 
 
 % 29Oct2012 Petr Janata
 % 2013.02.06 FB - previously only checked to see if fpath pointed to a file

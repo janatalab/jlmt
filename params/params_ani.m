@@ -29,7 +29,7 @@ function params = params_ani(varargin)
 %
 % Initialization values must be passed in as parameter/value pairs
 %
-% Copyright (c) 2006-2012 The Regents of the University of California
+% Copyright (c) 2006-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 % Author(s):

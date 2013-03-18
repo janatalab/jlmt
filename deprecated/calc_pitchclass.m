@@ -49,7 +49,7 @@ function pc = calc_pitchclass(indata,params)
 % RETURNS
 %   pc - an ensemble data struct with the following variables:
 %
-% Copyright (c) 2011 The Regents of the University of California
+% Copyright (c) 2011-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 % 2011.05.06 FB - adapted from calc_toract.m

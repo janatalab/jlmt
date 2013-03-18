@@ -65,7 +65,7 @@ function rp = rp_paramGroups(varargin)
 %                                    constant half-energy time.
 %
 %
-% Copyright (c) 2007 The Regents of the University of California
+% Copyright (c) 2007-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 % Author: Stefan Tomic 10/18/2007

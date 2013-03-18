@@ -1,6 +1,6 @@
 function dset = CollinsEtAl_datasets
 
-% Copyright (c) 2012 The Regents of the University of California
+% Copyright (c) 2012-2013 The Regents of the University of California
 % All Rights Reserved.
 
 % This function sets a variable called dset, short for datasets, which

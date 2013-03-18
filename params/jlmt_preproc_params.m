@@ -3,7 +3,7 @@ function pp = jlmt_preproc_params(project_name)
 %
 %  Initializes various pre-processing parameters for the JLMT
 %
-% Copyright (c) 2007-2012 The Regents of the University of California
+% Copyright (c) 2007-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 % Authors: Petr Janata, Stefan Tomic, Fred Barrett

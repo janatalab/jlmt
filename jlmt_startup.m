@@ -10,6 +10,9 @@
 % Make sure to include your JLMT paths AFTER you include the paths to your
 % installation of the IPEM toolbox.
 % 
+% Copyright (c) 2006-2013 The Regents of the University of California
+% All Rights Reserved.
+
 % FB 2012.11.06
 
 if isempty(which('IPEMSetup'))

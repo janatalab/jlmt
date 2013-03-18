@@ -3,7 +3,7 @@
 % This script tests jlmt_proc_series and JLMT rhythm profiler analyses on
 % .wav and .mp3 files to verify that everything is working. 
 %
-% Copyright (c) 2007-2012 The Regents of the University of California
+% Copyright (c) 2007-2013 The Regents of the University of California
 % All Rights Reserved
 %
 % Author:

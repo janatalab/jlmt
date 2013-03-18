@@ -12,7 +12,7 @@ function rp = init_rp_struct(varargin)
 %	               meanResonatorEnergy,stdResonatorEnergy,peakFreqs,maxFilt
 %
 %
-% Copyright (c) 2007-2012 The Regents of the University of California
+% Copyright (c) 2007-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 % Author: Stefan Tomic 10/18/2007

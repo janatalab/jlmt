@@ -30,7 +30,7 @@ function ci = calc_context(inData,par)
 %       .vars = {'Fs','periods','params',...
 %           'names','signals'}
 %
-% Copyright (c) 2007 The Regents of the University of California
+% Copyright (c) 2007-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 % 12/04/06 Petr Janata

@@ -22,7 +22,7 @@ function params = params_toract(varargin)
 %                   OR the pp->pc->li->toract map at:
 %                       jlmt/data/maps/pc_ci2toract_map_12-Jun-2012_15:47.mat
 %
-% Copyright (c) 2006-2012 The Regents of the University of California
+% Copyright (c) 2006-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 % 2011.01.10 FB - adapted from params_ci.m

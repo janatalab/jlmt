@@ -4,6 +4,9 @@ function plot_toract_w_mode_map(inData,params)
 % 
 %   plot_toract_w_mode_map(inData,params)
 % 
+% Copyright (c) 2006-2013 The Regents of the University of California
+% All Rights Reserved.
+%
 % REQUIRES
 %   inData - output from calc_toract
 %   params
@@ -14,7 +17,7 @@ function plot_toract_w_mode_map(inData,params)
 %       .li_siglist - names of images in inData to use
 %       .pause_length (default: 0.25s) - length in seconds to pause between
 %           displaying successive toract frames
-% 
+
 % FB 2013.01.17
 
 % load/init variables

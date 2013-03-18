@@ -4,6 +4,9 @@ function outdata = calc_mode_estimate(inData,varargin)
 % 
 %   outdata = calc_mode_estimate(inData,params)
 % 
+% Copyright (c) 2013 The Regents of the University of California
+% All Rights Reserved.
+%
 % Five different mode estimate techniques are currently implemented:
 %   1. ratio of the avg pixel value in major vs minor mode torus regions
 %   2. ratio of the avg half-rectified (only accepting positive values)

@@ -19,7 +19,7 @@ function params = params_li(varargin)
 %                          that should be encountered when using the given
 %                          parameters (optional)
 %
-% Copyright (c) 2006 The Regents of the University of California
+% Copyright (c) 2006-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 % 12/4/06 Petr Janata

@@ -1,4 +1,7 @@
 % load/init variables
+% Copyright (c) 2013 The Regents of the University of California
+% All Rights Reserved.
+
 if ~exist('sM','var')
   try mode_map_fname = params.toract_mode_map.fname;
   catch mode_map_fname = fullfile(fileparts(which('jlmt_proc_series')),...

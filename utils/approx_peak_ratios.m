@@ -34,7 +34,7 @@ function [approxRatios,ratioBinIdx,errorVec] = approx_peak_ratios(varargin)
 %                         in params.peakFreqs.
 %    
 %
-% Copyright (c) 2008-2012 The Regents of the University of California
+% Copyright (c) 2008-2013 The Regents of the University of California
 % All Rights Reserved
 %
 % Author(s):

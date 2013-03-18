@@ -12,7 +12,7 @@ function outData = rp_vonMisesExpectCalc(varargin)
 %              params.vmExpect.distResolution: The bin size of the
 %                 von Mises distribution
 %
-% Copyright (c) 2009-2012 The Regents of the University of California
+% Copyright (c) 2009-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 % Author: Stefan Tomic 04/23/2009

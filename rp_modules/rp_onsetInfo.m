@@ -15,7 +15,7 @@ function outData = rp_onsetInfo(varargin)
 %            params.Fs: the sampling rate of the reson filters
 %            params.predictCurrentOutput: params struct for predictCurrentOutput.m
 %            
-% Copyright (c) 2009-2012 The Regents of the University of California
+% Copyright (c) 2009-2013 The Regents of the University of California
 % All Rights Reserved.
 %
 % Author: Stefan Tomic 03/19/2009
