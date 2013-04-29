@@ -8,7 +8,7 @@ function dset = CollinsEtAl_datasets
 % used in seven tonal priming experiments. See the paper cited in the
 % script CollinsEtAl_analysis for more details.
 
-% Tom Collins, 2011.10.28.
+% Tom Collins, 2011.10.28
 
 nd = 0;
 dset = struct();
