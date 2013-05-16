@@ -44,7 +44,7 @@ if exist(dirPath,'dir')
   fullpath = fullfile(dirPath,'*.mat');
 elseif exist(fileparts(dirPath),'dir')
   % a search directory with a file stub has been given
-  fullpath = [dirPath '*.mat'];
+  fullpath = [dirPath '_*.mat'];
   dirPath = fileparts(dirPath);
 else
   firstViolation = {'fileStruct'};
