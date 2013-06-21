@@ -225,6 +225,7 @@ function outData = jlmt_proc_series(inData,params)
 %                 proc directory would be checked against proc parameters.
 %                 Now, only .mat files matching the sound file's file stub
 %                 before the hash are being considered.
+% May2013 PJ - Cleaned up handling of save_calc specification
 
 %%
 % Make sure IPEM setup has been run
@@ -320,19 +321,15 @@ end
 if ~iscell(params.glob.process{1})
   params.glob.process = {params.glob.process};
 end
-nproc = length(params.glob.process);
+nseries = length(params.glob.process);
 
 if ~iscell(params.glob.save_calc);
   params.glob.save_calc = {params.glob.save_calc};
 end
-if ~iscell(params.glob.save_calc{1})
-  params.glob.save_calc = {params.glob.save_calc};
-end
-if length(params.glob.save_calc) < nproc && ...
-    length(params.glob.save_calc) == 1
+if ~iscell(params.glob.save_calc{1}) && nseries > 1
   tmpcell = params.glob.save_calc;
   params.glob.save_calc = {};
-  for k=1:nproc
+  for k=1:nseries
     params.glob.save_calc{k} = tmpcell;
   end % for k=1:nproc
 end
@@ -569,13 +566,13 @@ for ifile = 1:nfiles
       ifile, nfiles, descript);
 
   % iterate over job series
-  for iseries = 1:nproc
+  for iseries = 1:nseries
     pseries = params.glob.process{iseries};
     if isempty(pseries), continue, end
     series_params = struct();
 
     fprintf(lfid,'jlmt_proc_series: running job series %d/%d (%s)\n',...
-        iseries,nproc,cell2str(pseries,'-'));
+        iseries,nseries,cell2str(pseries,'-'));
     
     jlmtData{ifile}.data{outDataCols.stimulus_path}{iseries,1} = fullfile(fpath,filename);
     jlmtData{ifile}.data{outDataCols.proc_series}{iseries,1} = cell2str(pseries,'->');
