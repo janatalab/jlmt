@@ -1,7 +1,7 @@
-function outData = jlmt_proc_series(inData,params)
+function outData = jlmt_proc_series_parallel(inData,params)
 % Performs a series of analyses for the Janata Lab Music Toolbox 
 % 
-%   outData = jlmt_proc_series(inData,params)
+%   outData = jlmt_proc_series_parallel(inData,params)
 %
 % INPUTS
 %  inData: this could be one of many different input types:
@@ -175,11 +175,6 @@ function outData = jlmt_proc_series(inData,params)
 % parameters, including a prev_steps field, that were used to generate the
 % given data.
 %
-% If params.glob.outputType = 'filepath', only the path to the output file
-% for each processing step is returned. This is useful in the event that
-% the stack of stimuli is so large that not all results can be stored in
-% memory at the same time.
-%
 % Copyright (c) 2006-2013 The Regents of the University of California
 % All Rights Reserved.
 
@@ -237,10 +232,7 @@ function outData = jlmt_proc_series(inData,params)
 %                the slot. Also, modified way in which parameters selected
 %                during the first processing step in a series if the
 %                prev_steps field is missing or empty.
-% 15Aug2013 PJ - Only considers unique stimulus_ids if input is a stimulus
-%                ID list.
-% 17Aug2013 PJ - Fixed handling of case where input data for a processing
-%                step are read from disk instead of being maintained in memory.
+% 15Aug2013 PJ - minor temporary variable fixes to make parfor happy
 
 %%
 % Make sure IPEM setup has been run
@@ -307,22 +299,26 @@ end
 
 %option to set log file ID in params
 %if not set, then output is sent to stdout (id 1)
-if isfield(params.glob,'lfid')
+try
   lfid = params.glob.lfid;
-else
+catch
   lfid = 1;
 end
 
 %force_recalc global param is a cell array of strings that
 %specifies which calculations should be forced to recalculate, even
 %if a previous matching saved calculation was found
-if ~isfield(params.glob,'force_recalc')
+try
+  params.glob.force_recalc;
+catch
   params.glob.force_recalc = {};
 end
 
 % outputType dictates whether the output will contain the actual data, or
 % a filepath
-if ~isfield(params.glob,'outputType')
+try
+  params.glob.outputType;
+catch
   params.glob.outputType = 'data';
 end
 
@@ -350,6 +346,9 @@ destStimLocs = {};
 stimIDList = [];
 inputpath = '';
 flist = {};
+fd_st = struct;
+aud_array = {};
+aud_st = struct;
 audfname = '';
 matfname = '';
 
@@ -358,15 +357,15 @@ if ischar(inData) && (exist(inData,'dir') || exist(inData,'var'))
   % Check to see if this is a directory, in which case we would try to
   % process all .wav, .aif, .mp3 and .aiff files
   if isdir(inData)
-    inData = jlmt_prepare_dirs(inData);
+    flist = jlmt_prepare_dirs(inData);
     inDataType = 'aud_file_string_cell_array';
-    nfiles = size(inData,1);
+    nfiles = size(dirList,1);
   else
     % a single file path as a string
-    inData = jlmt_prepare_dirs(inData);
-    inData = inData{1};
+    flist = jlmt_prepare_dirs(inData);
+    flist = flist{1};
     
-    [inputpath,fstub,ext] = fileparts(inData);
+    [inputpath,fstub,ext] = fileparts(flist);
     switch ext
       case {'.wav','.aif','.mp3'}
         audfname = [fstub ext];
@@ -396,7 +395,8 @@ elseif(iscell(inData) && all(isfield(inData{1},{'vars','type','data'})) ...
 
   % aud cell array as input
   inDataType = 'aud_cell_array';
-  nfiles = length(inData);
+  aud_array = inData;
+  nfiles = length(aud_array);
 
 elseif isstruct(inData) && all(isfield(inData,{'vars','type','data'}))
 
@@ -441,12 +441,14 @@ elseif isstruct(inData) && all(isfield(inData,{'vars','type','data'}))
     
     % ensemble structure with aud info
     inDataType = 'aud';
-    nfiles = length(inData);
+    aud_st = inData;   
+    nfiles = length(aud_st);
     
   elseif(ismember('path',inData.vars) && ismember('filename',inData.vars))
     
     % ensemble structure with path info
     inDataType = 'file_data_struct';
+    fd_st = inData;
     nfiles = length(inData.data{cols.filename});
 
   end
@@ -496,21 +498,40 @@ if ~nfiles
   return
 end
 
+% Check to see if we want to run jobs in parallel and if it makes sense
+if nfiles > 1 && isfield(params,'parallel') && isfield(params.parallel,'use') && ...
+    params.parallel.use && ~isempty(which('matlabpool'))
+  myCluster = parcluster();
+  maxWorkers = myCluster.NumWorkers;
+  if isfield(params.parallel,'num_workers')
+    numWorkers = params.parallel.num_workers;
+  else
+    numWorkers = maxWorkers;
+  end
+  
+  % Check to see if workers are already started, and start them if
+  % necessary
+  if ~matlabpool('size')
+    matlabpool(myCluster, min([maxWorkers-2 numWorkers nfiles]))
+  end
+  using_parallel = 1;
+else
+  using_parallel = 0;
+end
+
 jlmtData = cell(nfiles,1);
-for ifile = 1:nfiles
+parfor ifile = 1:nfiles
   
   % initialize the jlmt data structure
-  jlmtData{ifile} = ensemble_init_data_struct;
-  jlmtData{ifile}.type = 'jlmt_proc_series';
-  jlmtData{ifile}.name = 'jlmt_proc_series';
-  jlmtData{ifile}.vars = ['stimulus_path' 'proc_series' calcfuncs];
-  outDataCols = set_var_col_const(jlmtData{ifile}.vars);
-  jlmtData{ifile}.data = repmat({{}},size(jlmtData{ifile}.vars));
+  jlmt_st = ensemble_init_data_struct;
+  jlmt_st.type = 'jlmt_proc_series';
+  jlmt_st.name = 'jlmt_proc_series';
+  jlmt_st.vars = ['stimulus_path' 'proc_series' calcfuncs];
+  outDataCols = set_var_col_const(jlmt_st.vars);
+  jlmt_st.data = repmat({{}},size(jlmt_st.vars));
 
   switch inDataType
    case 'aud_file_string'
-%    [fpath,name,ext] = fileparts(inData);
-%    filename = [name ext];
     paramsSig = params_aud('path',inputpath,'filename',audfname);
     sig_st = new_aud(paramsSig);
     descript = '(single audio file)';
@@ -543,24 +564,25 @@ for ifile = 1:nfiles
     descript = '(single mat file)';
     
    case 'aud'
-    sig_st = inData;
+    sig_st = aud_st;
+    audcols = set_var_col_const(sig_st.vars);
     % Need to call the column indexing variable audcols to make parfor
     % happy
-    audcols = set_var_col_const(inData.vars);
     descript = 'aud structure';
-    fpath = inData.data{audcols.path};
-    filename = inData.data{audcols.filename};
+    fpath = sig_st.data{audcols.path};
+    filename = sig_st.data{audcols.filename};
     
    case 'aud_cell_array'
-    sig_st = inData{ifile};
-    audcols = set_var_col_const(inData{ifile}.vars);
+    sig_st = aud_array{ifile};
+    audcols = set_var_col_const(sig_st.vars);
     descript = ['aud_struct ' num2str(ifile)];
-    fpath = inData{ifile}.data{audcols.path};
-    filename = inData{ifile}.data{audcols.path};
+    fpath = sig_st.data{audcols.path};
+    filename = sig_st.data{audcols.path};
     
    case 'file_data_struct'
-    fpath = inData.data{cols.path}{ifile};
-    filename = inData.data{cols.filename}{ifile};
+     fdcols = set_var_col_const(fd_st.vars);
+    fpath = fd_st.data{fdcols.path}{ifile};
+    filename = fd_st.data{fdcols.filename}{ifile};
     paramsSig = params_aud('path',fpath,'filename',filename);
     sig_st = new_aud(paramsSig);
     descript = fullfile(fpath,filename);
@@ -591,11 +613,11 @@ for ifile = 1:nfiles
     if isempty(pseries), continue, end
     series_params = struct();
 
-    fprintf(lfid,'\njlmt_proc_series: running job series %d/%d (%s)\n',...
+    fprintf(lfid,'jlmt_proc_series: running job series %d/%d (%s)\n',...
         iseries,nseries,cell2str(pseries,'-'));
     
-    jlmtData{ifile}.data{outDataCols.stimulus_path}{iseries,1} = fullfile(fpath,filename);
-    jlmtData{ifile}.data{outDataCols.proc_series}{iseries,1} = cell2str(pseries,'->');
+    jlmt_st.data{outDataCols.stimulus_path}{iseries,1} = fullfile(fpath,filename);
+    jlmt_st.data{outDataCols.proc_series}{iseries,1} = cell2str(pseries,'->');
     
     % Perhaps move the istep loop into a function
     % run_series(pseries)
@@ -644,10 +666,7 @@ for ifile = 1:nfiles
       end % if isfield(params,proc
       
       % save the previous steps in this proc series
-      if istep > 1
-        lparams.prev_steps = pseries(1:istep); 
-        prev_step = pseries{istep-1};
-      end
+      if istep > 1, lparams.prev_steps = pseries(1:istep); end
       
       % save this step's parameters to the series params
       if isfield(series_params,proc)
@@ -662,14 +681,14 @@ for ifile = 1:nfiles
       elseif isfield(lparams,'inDataType') && ~isempty(lparams.inDataType)
         input_data = allStepData.(lparams.inDataType);
       else
-        input_data = allStepData.(prev_step);
+        input_data = allStepData.(pseries{istep-1});
       end
       
       % the following line is an attempt to make the parallelization happy
       allStepData.(proc) = run_step('proc',proc,'params',params,'pseries',pseries,'iseries',iseries,'istep',istep, ...
         'filename',filename,'fpath',fpath, 'input_data', input_data, 'lparams', lparams, ...
         'series_params', series_params, 'lfid', lfid);
-      jlmtData{ifile}.data{outDataCols.(proc)}{iseries,1} = allStepData.(proc);
+      jlmt_st.data{outDataCols.(proc)}{iseries,1} = allStepData.(proc);
       
     end % for istep = 1:nseries
 
@@ -689,12 +708,14 @@ for ifile = 1:nfiles
   end % for iseries = 1:nproc
   
   % fill out short columns
-  numRows = max(cellfun('length',jlmtData{ifile}.data));
-  for k=1:length(jlmtData{ifile}.vars)
-    if length(jlmtData{ifile}.data{k}) < numRows
-      jlmtData{ifile}.data{k}{numRows,1} = [];
+  numRows = max(cellfun('length',jlmt_st.data));
+  for k=1:length(jlmt_st.vars)
+    if length(jlmt_st.data{k}) < numRows
+      jlmt_st.data{k}{numRows,1} = [];
     end
   end
+  
+  jlmtData{ifile} = jlmt_st;
 end % for ifile=
 
 % Concatenate the jlmtData structures
@@ -702,6 +723,11 @@ outData = ensemble_concat_datastruct(jlmtData);
 
 if(exist('tmp_conn_id','var'))
   mysql(params.ensemble.conn_id,'close');
+end
+
+% Close the parallel processing pool if necessary
+if using_parallel
+  matlabpool close
 end
 
 end
@@ -719,6 +745,8 @@ function params = getDefaultParams(params,calc_names)
 % everything with default parameters.  The other is the situation in which
 % a partial set of parameters has been passed in and we need to complete
 % the set.
+
+VERBOSE = 1;  % flag for debugging
 
 def.glob.force_recalc = {};
 def.glob.ignore = {};
@@ -812,11 +840,82 @@ for iseries = 1:numSeries
       end
       
     end % if ~isfield(params, currCalc)
+    
+    if 0
+      tmpdef = fh('getDefaultParams','prev_steps',procCalc(1:k-1));
+      if ~isfield(params, currCalc)
+        params.(currCalc) = tmpdef;
+      else
+        % compare structures and see if we need to append this spec
+        
+        % Set fields to ignore
+        switch currCalc
+          case 'ani'
+            ignoreFlds = 'aniPath';
+          otherwise
+            ignoreFlds = {};
+        end
+        
+        [structsMatch, firstViolation, violationReason] = ...
+          compare_structs(params.(currCalc), tmpdef, 'ignore_fieldnames',ignoreFlds, 'verbose', VERBOSE);
+        if structsMatch
+          % Perform any cleanup necessary due to redundancy
+          switch currCalc
+            case 'ani'
+              if exist(tmpdef.aniPath,'dir'), rmdir(tmpdef.aniPath), end
+          end
+        else
+          
+          % Append this new definition
+          params.(currCalc)(end+1) = tmpdef;
+        end % if compare_structs
+      end % if ~isfield(def, currCalc)
+    end % if 0
   end % for k=1:length(calc_names
 end % for iseries
 
 
-end % function getDefaultParams
+if 0
+
+%only assign defaults to the processes that we are performing
+if(isfield(params,'glob') && isfield(params.glob,'process'))
+  defTypes = [params.glob.process{:} {'glob'}];
+else
+  defTypes = fieldnames(def);
+end
+
+for iType = 1:length(defTypes)
+  
+  type = defTypes{iType};
+  
+  if ~isfield(params,type)
+    params.(type) = struct();
+  end
+  
+  [validParams,badFields,~] = compare_structs(params.(type),def.(type),'values',0,'substruct',1,'types',0);
+  if(~validParams)
+    if iscell(badFields), badFields = cell2str(badFields,', '); end
+    warning(['Field(s) %s for ''%s'' calculation is not specified in '...
+      'default parameters. Check spelling or add'...
+      ' the field(s) to the list of defaults\n\n'],badFields,type);
+  end
+  
+  %populate missing param fields with defaults
+  nspec = length(def.(type));
+  for l=1:nspec
+    if l == 1
+      tmpstruct = struct_union(params.(type)(l),def.(type)(l));
+    else
+      tmpstruct(l) = struct_union(params.(type)(l),def.(type)(l));
+    end
+  end % for l=1:nparam
+  params.(type) = tmpstruct;
+end
+
+end % if 0
+
+return
+end
 
 function stepData = run_step(varargin)
   % Parse the input arguments
@@ -849,12 +948,6 @@ function stepData = run_step(varargin)
     end
   end % for iarg
     
-  if strcmp(params.glob.outputType,'data')
-    keepDataInMemory = true;
-  else
-    keepDataInMemory = false;
-  end
-  
   proc_fh = parse_fh(sprintf('calc_%s',proc));
   
   
@@ -880,29 +973,13 @@ function stepData = run_step(varargin)
     fprintf(lfid,['jlmt_proc_series: Loading a previously calculated '...
       '%s with matching parameters...\n'],proc);
     lfname = fullfile(fileparts(lPath),previousCalcFname{1});
-
-    if keepDataInMemory
-      load(lfname,proc)
-      eval(sprintf('stepData = %s;', proc))
-    end
+    load(lfname,proc)
+    eval(sprintf('stepData = %s;', proc))
   elseif isempty(input_data)
     fprintf('Input data for %s is empty! Skipping ...\n', proc);
     return
   else
-    % Make sure we have the data we need
-    % If the input_data is a path to a file, load the file
-    if istep > 1 && ischar(input_data)
-      prev_step = pseries{istep-1};
-      if exist(input_data,'file')
-        fprintf(lfid,'Loading %s from %s\n', prev_step, input_data);
-        tmp = load(input_data,prev_step);
-        input_data = tmp.(prev_step);
-      else
-        error('Expected input file not found: %s', input_data)
-      end
-    end
-    
-    % run this step!    
+    % run this step!
     fprintf(lfid,'jlmt_proc_series: Calculating %s ...\n\n',proc);
     stepData = proc_fh(input_data,lparams);
     eval(sprintf('%s = stepData;', proc))
@@ -930,7 +1007,7 @@ function stepData = run_step(varargin)
   end % if isfield(lparams,'plotfun...
   
   % If we are simply returning a path to the output matfile
-  if ~keepDataInMemory && ...
+  if strcmp(params.glob.outputType,'filepath') && ...
       ismember(proc,params.glob.save_calc{iseries}) && ...
       exist(lfname,'file')
     stepData = lfname;
