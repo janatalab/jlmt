@@ -3,10 +3,10 @@
 
 % This script is intended to accompany:
 %
-%  Tom Collins, Barbara Tillmann, Frederick S. Barrett, Charles Delbé, and
+%  Tom Collins, Barbara Tillmann, Frederick S. Barrett, Charles Delbe, and
 %   Petr Janata. A combined model of sensory and cognitive representations
 %   underlying tonal expectation: from audio signals to behavior.
-%   Submitted, 2012.
+%   Psychological Review, in press.
 %
 % Please cite the paper if you use/adapt this code in your own work. This
 % script sets parameters and then iterates over the datasets defined in
@@ -107,12 +107,6 @@ jlmt_out = jlmt_proc_series(in_data, params.jlmt);
 % Parameters within this script can be experimented with if you wish.
 results = CollinsEtAl_calc_attributes(in_data, params, jlmt_out);
 
-%% Iterate over each entry of results and check that the attribute value is
-% the same as that in X from tonmodcomp_regressions.m (the analysis upon
-% which the paper is written).
-
-
-
 %% Predict zero-mean response times using our regression equation (2) from
 % the paper. The variables in this model are:
 exp_vars2 = {...
@@ -122,6 +116,9 @@ exp_vars2 = {...
   'PP' [.1 4] 'MC' 'abs' [201 600] 2;...          % z_PP
   'PP' 4 'MV' 'abs' [201 600] 14;...              % y_PP
   'CV' 4 'MV' 'abs' [0 200] 21};                  % z_PP
+% The commented column above is the label used in the paper. The last
+% column in the cell is for checking that the current results match a
+% previous analysis.
 nresults = size(results, 1);
 stim_names2 = in_data.data{4}';
 % Coefficient values from equation (2).
@@ -146,7 +143,7 @@ for istim = 1:nstim
       if strcmp(results{irow, 2}, stim_names2{istim}) &&...
           ... % Test match on representational space.
           strcmp(results{irow, 3}, exp_vars2{ivar, 1}) &&...
-          ... % Test match on time constraints.
+          ... % Test match on time constants.
           sum(results{irow, 4} == exp_vars2{ivar, 2})...
           == size(exp_vars2{ivar, 2}, 2) &&...
           ... % Test match on calculation type.
@@ -175,40 +172,73 @@ for istim = 1:nstim
   zeroMeanRTfit(istim) = alphaHat + betaHat*x;
 end
 
-
-close all
-imagesc(X2)
+% Now plot the fitted and observed RTs and add a line of best fit.
 plot(zeroMeanRTobs, zeroMeanRTfit, 'ko')
-
-
-plot(scal, 'r')
 hold on
-plot(scal, 'b')
+pfit = polyfit(zeroMeanRTobs, zeroMeanRTfit, 1);
+l = pfit(1)*(-250:1:250) + pfit(2);
+plot(-250:1:250, l, '-');
 hold off
-legend({'jlmt' 'ipem'})
-print('-dpsc', '-append', fullfile('~', 'projects', 'tonmodcomp',...
-  'testingToractFromTorus', 'toractCorrCorpusVTorus.ps'))
+title('Plot of Fitted v Observed RT Using Eq. 2 from Paper')
+xlabel('Observed Response Time (Zero-Mean)')
+ylabel('Fitted Response Time (Zero-Mean)')
 
-
-idx_in_tmcr = [239 241 258 270 282 294 1 17 33 48 218 214 216 219 215 ...
- 217 225 224 222 221 89 86 160 162];
-
-% Search results for the value probe_val.
-probe_val = -0.111992633662869;
-rel_idx = [];
-irow = 2;
-while irow <= nresults
-  if abs(results{irow, 8} - probe_val) < 1e-5
-    rel_idx = irow;
-    irow = nresults;
-  end
-  irow=irow+1;
-end
-
-
-
-
-
-
-
-
+%% First author used this chunk of code to iterate over each entry of
+% results and check that the attribute value is the same as that in X from
+% tonmodcomp_regressions.m (the analysis upon which results in the paper
+% are based). Before executing the code below, run tonmodcomp_regressions.m
+% up to line 188.
+% X2 = zeros(nstim, 6);
+% % For each stimulus, get the regression variable values from the results
+% % table, compare them with the appropriate element of X from
+% % tonmodcomp_regressions.m, and place the results of the comparisons in
+% % the variable X2.
+% for istim = 1:nstim
+%   for ivar = 1:nexp_vars
+%     % Find the relevant row for this stimulus and variable combination.
+%     rel_row = [];
+%     irow = 2;
+%     while irow <= nresults
+%       % Test match on stimulus string.
+%       if strcmp(results{irow, 2}, stim_names2{istim}) &&...
+%           ... % Test match on representational space.
+%           strcmp(results{irow, 3}, exp_vars2{ivar, 1}) &&...
+%           ... % Test match on time constants.
+%           sum(results{irow, 4} == exp_vars2{ivar, 2})...
+%           == size(exp_vars2{ivar, 2}, 2) &&...
+%           ... % Test match on calculation type.
+%           sum(strcmp(results{irow, 5}, exp_vars2{ivar, 3}))...
+%           == size(exp_vars2{ivar, 2}, 3) &&...
+%           ... % Test match on window comparison.
+%           strcmp(results{irow, 6}, exp_vars2{ivar, 4}) &&...
+%           ... % Test match on post-target window.
+%           sum(results{irow, 7} == exp_vars2{ivar, 5})...
+%           == size(exp_vars2{ivar, 5}, 2)
+%         rel_row = irow;
+%         irow = nresults;
+%       end
+%       irow=irow+1;
+%     end
+%     % Found the relevant row. Now compare with value in X.
+%     if abs(results{rel_row, 8} -...
+%         X(find(strcmp(stim_names2{istim}, stim_names)),...
+%         exp_vars2{ivar, 6})) < 1e-5
+%       X2(istim, ivar) = 1;
+%     end
+%   end
+% end
+% % Should be all ones if results are the same.
+% close all
+% imagesc(X2)
+% 
+% % Some other older analyses.
+% plot(scal, 'r')
+% hold on
+% plot(scal, 'b')
+% hold off
+% legend({'jlmt' 'ipem'})
+% print('-dpsc', '-append', fullfile('~', 'projects', 'tonmodcomp',...
+%   'testingToractFromTorus', 'toractCorrCorpusVTorus.ps'))
+% 
+% idx_in_tmcr = [239 241 258 270 282 294 1 17 33 48 218 214 216 219 215 ...
+%  217 225 224 222 221 89 86 160 162];

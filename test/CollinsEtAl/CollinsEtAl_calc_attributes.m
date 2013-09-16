@@ -23,8 +23,7 @@ function results = CollinsEtAl_calc_attributes(in_data, params, jlmt_out)
 % Petr Janata, 2011.11.08.
 
 % Default parameters.
-% integration_constants = [.1 2 4];
-integration_constants = [.1 4];
+integration_constants = [.1 2 4];
 representational_space = {'PP' 'CV' 'TS'};
 calculation_type = {'MC' 'MV' 'CL'};
 window_comparison = {'abs' 'rel'};
