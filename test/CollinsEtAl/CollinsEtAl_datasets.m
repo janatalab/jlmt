@@ -23,6 +23,7 @@ dset(nd).stimCategoryLabels = {'Mediant', 'LeadingTone'};
 dset(nd).stimCategoryLabelsShort = {'III', 'VII'};
 dset(nd).stimCategoryMembership.Mediant = {'Riii0'};
 dset(nd).stimCategoryMembership.LeadingTone = {'Rvii0'};
+dset(nd).zeroMeanRTobs = [-115.714338754167; -24.2758202541665];
 dset(nd).event_onsets = 0:789.5:5526.5;
 % NB stimuli have different rhythmic profiles, so provided eighth-note
 % onsets.
@@ -41,6 +42,8 @@ dset(nd).stimCategoryMembership.PianoTonicDull = {'piano1MiF'};
 dset(nd).stimCategoryMembership.PianoSubdominantDull = {'piano2MivF'};
 dset(nd).stimCategoryMembership.PureTonicA = {'pure1AiF'};
 dset(nd).stimCategoryMembership.PureSubdominantA = {'pure2AivF'};
+dset(nd).zeroMeanRTobs = [-176.590484887500; -132.590484887500;...
+    62.9852727124999;91.6907651124999];
 dset(nd).event_onsets = 0:789.5:5526.5;
 % NB stimuli have different rhythmic profiles, so provided eighth-note
 % onsets.
@@ -69,6 +72,8 @@ dset(nd).stimCategoryMembership.RelatedConsonantInB = {'1RCinBB'};
 dset(nd).stimCategoryMembership.RelatedConsonantInC = {'1RCinCB'};
 dset(nd).stimCategoryMembership.UnrelatedConsonantInB = {'3UCinBB'};
 dset(nd).stimCategoryMembership.UnrelatedConsonantInC = {'3UCinCB'};
+dset(nd).zeroMeanRTobs = [-118.409861244445; -42.1470407444449;...
+    45.4362925555552; 227.436292555555];
 dset(nd).event_onsets = 0:500:3500;
 
 nd = nd+1;
@@ -99,6 +104,9 @@ dset(nd).stimCategoryMembership.Subdominant = {'LS'};
 dset(nd).stimCategoryMembership.TonicBaseline = {'LTb'};
 dset(nd).stimCategoryMembership.DominantBaseline = {'LDb'};
 dset(nd).stimCategoryMembership.SubdominantBaseline = {'LSb'};
+dset(nd).zeroMeanRTobs = [-26.6910897819445; 15.4215538180556;...
+    49.8310776180556; -88.0895572819444; 32.4659983180555;...
+    -70.7117794819444];
 dset(nd).event_onsets = 0:500:3500;
 
 nd = nd+1;
@@ -128,6 +136,8 @@ dset(nd).stimCategoryMembership.TonicBaselineConsonant =...
 dset(nd).stimCategoryMembership.SubdominantConsonant = {'L_IV_cons'};
 dset(nd).stimCategoryMembership.SubdominantBaselineConsonant =...
     {'L_IV_baseline_cons'};
+dset(nd).zeroMeanRTobs = [-51.0047418604167; -30.1118847604167;...
+    6.54525813958321; -40.2547418604167];
 dset(nd).event_onsets = 0:500:3500;
 
 nd = nd+1;
@@ -147,6 +157,7 @@ dset(nd).stimCategoryLabels = {'TonicNTC', 'SubdominantNTC'};
 dset(nd).stimCategoryLabelsShort = {'I NTC', 'IV NTC'};
 dset(nd).stimCategoryMembership.TonicNTC = {'B_I_NTC'};
 dset(nd).stimCategoryMembership.SubdominantNTC = {'B_IV_NTC'};
+dset(nd).zeroMeanRTobs = [101.000927087500; 57.2227452875000];
 dset(nd).event_onsets = 0:600:4200;
 
 nd = nd+1;
@@ -159,6 +170,7 @@ dset(nd).stimCategoryLabels = {'Tonic', 'Subdominant'};
 dset(nd).stimCategoryLabelsShort = {'I', 'IV'};
 dset(nd).stimCategoryMembership.Tonic = {'Gi'};
 dset(nd).stimCategoryMembership.Subdominant = {'Giv'};
+dset(nd).zeroMeanRTobs = [-161.432369833334; -66.3826622333336];
 dset(nd).event_onsets = 0:789.5:5526.5;
 % NB stimuli have different rhythmic profiles, so provided eighth-note
 % onsets.

@@ -49,6 +49,10 @@ function pc = calc_pc(indata,varargin)
 %                  line 111, where there is a reference to params.
 % 2012.11.13 PJ - Fs is no longer being stored in the params structure, but
 %                 rather as its own variable
+% 2013.09.16 TC - inserted a check for whether W exists, and, if not,
+%                  reverts to former method of calculating the
+%                  multiplication of trained matrix and incoming pp
+%                  variable, consistent with the naming in older maps.
 
 if nargin > 1 && isstruct(varargin{1})
   params = varargin{1};
@@ -78,6 +82,9 @@ if ~exist(params.wmtx.fname,'file')
   return
 end
 load(params.wmtx.fname,'W');
+if ~exist('W', 'var')
+  load(params.wmtx.fname,'net');
+end
 
 % are we dealing with 'li' data or 'pp' data?
 if strmatch(indata.type,'li','exact')
@@ -100,7 +107,11 @@ if strmatch(indata.type,'li','exact')
     pc.sig{isig} = W*limg;
   end % for isig=
 elseif strmatch(indata.type,'pp','exact')
-  pc.sig{1} = W*indata.data{indata_cols.sig};
+  if exist('W', 'var')
+    pc.sig{1} = W*indata.data{indata_cols.sig};
+  else
+    pc.sig{1} = sim(net, indata.data{indata_cols.sig});
+  end
 else
   error('unknown indata type: %s',indata.type);
 end
