@@ -161,11 +161,6 @@ for istim = 1:nstim
     end
     % Found the relevant row. Now assign the value to the variable.
     x(ivar) = results{rel_row, 8};
-    if abs(results{rel_row, 8} -...
-        X(find(strcmp(stim_names2{istim}, stim_names)),...
-        exp_vars2{ivar, 6})) < 1e-5
-      X2(istim, ivar) = 1;
-    end
   end
   % Form a linear combintation with the coefficients to estimate zero-mean
   % response time.

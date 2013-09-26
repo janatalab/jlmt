@@ -34,7 +34,8 @@ defs.paths.tablepath = fullfile(defs.paths.project_root,'tables');
 pparams = jlmt_preproc_params('modulation');
 
 % Integration times that we want to use for this project
-pparams.inHalfDecayTimes = [0.1 2 4];
+pparams.inHalfDecayTimes = [0.1 4];
+% pparams.inHalfDecayTimes = [0.1 2 4];
 names = calc_li('calc_names',pparams.inHalfDecayTimes);
 
 % torus projection weight matrix path
