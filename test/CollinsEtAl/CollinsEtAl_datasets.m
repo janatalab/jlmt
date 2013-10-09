@@ -28,6 +28,8 @@ dset(nd).event_onsets = 0:789.5:5526.5;
 % NB stimuli have different rhythmic profiles, so provided eighth-note
 % onsets.
 
+return
+
 nd = nd+1;
 dset(nd).id = 'marmel_etal_jep_2010';
 dset(nd).description = ['Marmel, Tillmann and Delbe (2010) compare'...
