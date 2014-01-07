@@ -25,6 +25,8 @@ function outData = calc_rp(inData, varargin)
 %                                           'calcAPS'
 %                                           'calcMPP'
 %                                           'calcPeakInfo'
+%                                           'calcComplexExpectAtOnsets'
+%                                           'calcComplexOutput'
 %                                           
 %                            ipemRMSMethod: logical 1 or 0 (determines whether to use IPEM
 %                                           RMS method or not)
@@ -70,6 +72,11 @@ function outData = calc_rp(inData, varargin)
 %           as inputs.
 % 30Oct2012 PJ - added support for varargin and handling of default
 %                parameters
+% 20Dec2013 PJ & BH - fixed fleshing out of missing parameters with defaults
+% 22Dec2013 BH - added rp_complexResonOut.m (transforms 'real' reson output
+%                to complex signal) as a post-JASA analysis option. Changed
+%                the params.perform flags for rp_complexExpectAtOnsets.m
+%                and rp_copmlexResonOut.m functions
 
 
 if nargin > 1 && isstruct(varargin{1})
@@ -405,8 +412,12 @@ if(params.perform.calcOnsetInfo)
   [rp.data{rpCols.onsetInfo}] = rp_onsetInfo('inputSig',inputToResonators,'rp',rp);
 end
 
-if(params.perform.calcComplexOutput)
-  [rp.data{rpCols.complexExpectAtOnsets}] = rp_complexExpectAtOnsets(rp,params);
+if(params.perform.calcComplexExpectAtOnsets) % assigned more appropriate flag name to this function (was priviously 'perform.calcComplexOutput') - 22Dec2013 BH
+    [rp.data{rpCols.complexExpectAtOnsets}] = rp_complexExpectAtOnsets(rp,params);
+end 
+    
+if(params.perform.calcComplexOutput) % this flag now controls rp_complexResonOut.m as its name suggests (rather than its previous control of rp_complexExpectAtOnset) - 22Dec2013 BH
+    [rp.data{rpCols.complexOutput}] = rp_complexResonOut(rp,params);
 end
 
 if(params.perform.calcVonMises)
@@ -478,7 +489,7 @@ for iarg = 1:2:nargin
 end
 
 
-if ~exist('inDataType') && exist('params','var') && isfield(params,'inDataType')
+if isempty(inDataType) && exist('params','var') && isfield(params,'inDataType')
     inDataType = params.inDataType;
 end
 
@@ -508,5 +519,22 @@ else
 			       'input_type','ani','gain_type','beta_distribution','prev_steps',prev_steps);
   
 end
-  
+
+% Flesh out missing parameters with default parameters. NOTE: This only
+% checks top-level fields, not nested structures.
+fldnames = fieldnames(defParams);
+nflds = length(fldnames);
+
+% Make a structure from the input params
+origParams = mkstruct(fldnames,varargin);
+
+for ifld = 1:nflds
+   currFld = fldnames{ifld};
+   if ~isfield(origParams, currFld) || isempty(origParams.(currFld))
+       origParams.(currFld) = defParams.(currFld);
+   end
+end
+
+defParams = origParams;
+
 return

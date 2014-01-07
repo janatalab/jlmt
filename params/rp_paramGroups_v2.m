@@ -71,6 +71,7 @@ function rp = rp_paramGroups_v2(varargin)
 % Changes:
 %  TC, 11.13.2012. Added some default parameters for onset detection, line
 %   142 onwards.
+%  BH 22Dec2013 - Added rp.perform.calcComplexExpectAtOnsets as a default 'perform' flag
 
 % Initialize an empty RP structure
 rp = struct('Fs',[], ...
@@ -130,12 +131,14 @@ rp.perform.calcPeakInfo = 1;
 rp.perform.calcMPPByFrame = 1;
 rp.perform.calcOnsetInfo = 0;
 rp.perform.calcComplexOutput = 0;
+rp.perform.calcComplexExpectAtOnsets = 0;
 rp.perform.calcVonMises = 0;
 rp.perform.calcPhaseCoherence = 0;
 rp.perform.interpMPP = 0;
 rp.perform.vmExpect.useInterpPeak = 1;
 rp.perform.phaseCoherence.useInterpPeak = 1;
 rp.perform.normalize.denv = 0;
+rp.perform.complexOut.useOnsetInfo = 0;
 
 %SETTINGS THAT ARE IN COMMON WITH ALL PARAM SETS
 rp.timeLimSecs = [];
