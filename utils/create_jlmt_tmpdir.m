@@ -22,10 +22,18 @@ function tmpdir = create_jlmt_tmpdir(tmpdir)
 %   already existing tmpdir. The re-try mechanism places randomly spaced pauses. These
 %   random pauses do not collide in parallel computing space. Rand() (without seeding)
 %   will generate different random numbers for each worker.
+% 2014.01.08 PJ - dealt with persistent issue of jlmt directory permissions
+%   being set by another user by creating the jlmt directory within a user
+%   directory within tmp
 
 % Make sure we have the basic root directory
-dir_root = '/tmp/jlmt/';
-check_dir(dir_root);
+
+% Get the name of the user
+[status,user] = system('whoami');
+user = strtrim(user);
+
+dir_root = fullfile('/tmp',user,'jlmt');
+check_dir(dir_root,'parents',1);
 
 tries = 10;
 curtry = 1;
