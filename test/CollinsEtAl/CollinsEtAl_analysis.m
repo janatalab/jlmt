@@ -6,7 +6,7 @@
 %  Tom Collins, Barbara Tillmann, Frederick S. Barrett, Charles Delbe, and
 %   Petr Janata. A combined model of sensory and cognitive representations
 %   underlying tonal expectation: from audio signals to behavior.
-%   Psychological Review, in press.
+%   Psychological Review, 121(1):33-65, 2014.
 %
 % Please cite the paper if you use/adapt this code in your own work. This
 % script sets parameters and then iterates over the datasets defined in
@@ -177,63 +177,3 @@ hold off
 title('Plot of Fitted v Observed RT Using Eq. 2 from Paper')
 xlabel('Observed Response Time (Zero-Mean)')
 ylabel('Fitted Response Time (Zero-Mean)')
-
-%% First author used this chunk of code to iterate over each entry of
-% results and check that the attribute value is the same as that in X from
-% tonmodcomp_regressions.m (the analysis upon which results in the paper
-% are based). Before executing the code below, run tonmodcomp_regressions.m
-% up to line 188.
-% X2 = zeros(nstim, 6);
-% % For each stimulus, get the regression variable values from the results
-% % table, compare them with the appropriate element of X from
-% % tonmodcomp_regressions.m, and place the results of the comparisons in
-% % the variable X2.
-% for istim = 1:nstim
-%   for ivar = 1:nexp_vars
-%     % Find the relevant row for this stimulus and variable combination.
-%     rel_row = [];
-%     irow = 2;
-%     while irow <= nresults
-%       % Test match on stimulus string.
-%       if strcmp(results{irow, 2}, stim_names2{istim}) &&...
-%           ... % Test match on representational space.
-%           strcmp(results{irow, 3}, exp_vars2{ivar, 1}) &&...
-%           ... % Test match on time constants.
-%           sum(results{irow, 4} == exp_vars2{ivar, 2})...
-%           == size(exp_vars2{ivar, 2}, 2) &&...
-%           ... % Test match on calculation type.
-%           sum(strcmp(results{irow, 5}, exp_vars2{ivar, 3}))...
-%           == size(exp_vars2{ivar, 2}, 3) &&...
-%           ... % Test match on window comparison.
-%           strcmp(results{irow, 6}, exp_vars2{ivar, 4}) &&...
-%           ... % Test match on post-target window.
-%           sum(results{irow, 7} == exp_vars2{ivar, 5})...
-%           == size(exp_vars2{ivar, 5}, 2)
-%         rel_row = irow;
-%         irow = nresults;
-%       end
-%       irow=irow+1;
-%     end
-%     % Found the relevant row. Now compare with value in X.
-%     if abs(results{rel_row, 8} -...
-%         X(find(strcmp(stim_names2{istim}, stim_names)),...
-%         exp_vars2{ivar, 6})) < 1e-5
-%       X2(istim, ivar) = 1;
-%     end
-%   end
-% end
-% % Should be all ones if results are the same.
-% close all
-% imagesc(X2)
-% 
-% % Some other older analyses.
-% plot(scal, 'r')
-% hold on
-% plot(scal, 'b')
-% hold off
-% legend({'jlmt' 'ipem'})
-% print('-dpsc', '-append', fullfile('~', 'projects', 'tonmodcomp',...
-%   'testingToractFromTorus', 'toractCorrCorpusVTorus.ps'))
-% 
-% idx_in_tmcr = [239 241 258 270 282 294 1 17 33 48 218 214 216 219 215 ...
-%  217 225 224 222 221 89 86 160 162];
