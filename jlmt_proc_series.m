@@ -798,17 +798,52 @@ for iseries = 1:numSeries
       end % for l=1:nspec
       
       if isempty(contextIdx)
-        if ~isempty(nullContextIdx)
-          % Copy this as a default spec)
-          defSpec = params.(currCalc)(nullContextIdx);
-          defSpec.prev_steps = procCalc(1:k-1);
-          extraParams = [fieldnames(defSpec) struct2cell(defSpec)]';
-        else
-          extraParams = {'prev_steps',procCalc(1:k-1)};
-        end
+          if ~isempty(nullContextIdx)
+              % Copy this as a default spec)
+              defSpec = params.(currCalc)(nullContextIdx);
+              defSpec.prev_steps = procCalc(1:k-1);
+              extraParams = defSpec; % 19Dec2013 BH - assigned param struct to extraParams
+              %           extraParams = [fieldnames(defSpec) struct2cell(defSpec)]'; % removed 19Dec2013 - BH
+              
+          else
+              extraParams = {'prev_steps',procCalc(1:k-1)};
+          end
           
-        tmpParams = fh('getDefaultParams',extraParams{:});
-        params.(currCalc)(ispec) = tmpParams;% 13Aug2013 PJ - changed from (end+1) to (ispec)
+          % FIXME: As of now, the below code overwrites existing param
+          % settings with defaults, regardless of the param settings passed in
+          % with getDefaultParams. Since the getDefaultParams subfucntion
+          % disregards any pre-defined params, regardless of the param
+          % settings passed into it, do we need to add some code below the
+          % tmpParams assignment that checks each param field for existing
+          % settings and replaces with defaults where no fields exist?
+          % 19Dec2013 BH
+          
+          tmpParams = fh('getDefaultParams',extraParams);
+          
+          % tmpParams = fh('getDefaultParams',extraParams{:});
+          
+          
+          tmpFieldNames = fieldnames(tmpParams);
+          n_tmpParamFlds = length(tmpFieldNames);
+          for itmpField = 1:n_tmpParamFlds
+              thisFldName = tmpFieldNames{itmpField};
+              if isfield(defSpec,thisFldName)
+                  if isstruct(tmpParams.(thisFldName))
+                      substruct_flds = fieldnames(tmpParams.(thisFldName));
+                      nsubstruct_flds = length(substruct_flds);
+                      for isubstrct = 1:nsubstruct_flds
+                          this_substrct = substruct_flds{isubstrct};
+                          if isfield(defSpec.(thisFldName),substruct_flds(isubstrct))
+                              tmpParams.(thisFldName).(this_substrct) = defSpec.(thisFldName).(this_substrct);
+                          end
+                      end
+                  else
+                      tmpParams.(thisFldName) = defSpec.(thisFldName);
+                  end
+              end
+          end
+          
+          params.(currCalc)(ispec) = tmpParams;% 13Aug2013 PJ - changed from (end+1) to (ispec)
       end
       
     end % if ~isfield(params, currCalc)
@@ -931,7 +966,7 @@ function stepData = run_step(varargin)
   
   % If we are simply returning a path to the output matfile
   if ~keepDataInMemory && ...
-      ismember({proc},params.glob.save_calc(iseries)) && ...
+      ismember({proc},params.glob.save_calc{iseries}) && ...
       exist(lfname,'file')
     stepData = lfname;
   end
