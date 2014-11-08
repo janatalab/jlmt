@@ -241,6 +241,8 @@ function outData = jlmt_proc_series(inData,params)
 %                ID list.
 % 17Aug2013 PJ - Fixed handling of case where input data for a processing
 %                step are read from disk instead of being maintained in memory.
+% 17Sep2014 PJ - Changed location of where stimulus_root and destroot are
+%                overridden
 
 %%
 % Make sure IPEM setup has been run
@@ -251,6 +253,12 @@ if isempty(getpref('IPEMToolbox'))
     otherwise
       IPEMSetupLinuxOSX;
   end
+end
+
+if isfield(params,'verbose')
+  verbose = params.verbose;
+else
+  verbose = 0;
 end
 
 % get a list of all current jlmt calc functions
@@ -304,6 +312,17 @@ if(exist('params','var'))
 else
   params = getDefaultParams;
 end
+
+% See if we are overriding the default stimulus_root and destroot paths
+if isfield(params,'paths')
+  if isfield(params.paths,'stimulus_root')
+    stimulus_root = params.paths.stimulus_root;
+  end
+  if isfield(params.paths,'destroot')
+    stimulus_ipem_analysis_root = params.paths.destroot;
+  end
+end
+
 
 %option to set log file ID in params
 %if not set, then output is sent to stdout (id 1)
@@ -426,17 +445,8 @@ elseif isstruct(inData) && all(isfield(inData,{'vars','type','data'}))
     stimLocs = mysql_extract_data('table','stimulus','stimulus_id', ...
 				  stimIDList,'extract_vars',{'location'},'conn_id', conn_id);
     stimLocs = stimLocs{1};
-    
-    if isfield(params,'paths')
-      if isfield(params.paths,'stimulus_root')
-        stimulus_root = params.paths.stimulus_root;
-      end
-      if isfield(params.paths,'destroot')
-        stimulus_ipem_analysis_root = params.paths.destroot;
-      end
-    end
-    
-    destStimLocs = check_stim_dirs(stimLocs,'srcroot',stimulus_root,'destroot',stimulus_ipem_analysis_root,'verbose',false);
+        
+    destStimLocs = check_stim_dirs(stimLocs,'srcroot',stimulus_root,'destroot',stimulus_ipem_analysis_root,'verbose',verbose);
   elseif(strcmp(inData.type,'aud'))
     
     % ensemble structure with aud info
@@ -480,7 +490,7 @@ elseif(isnumeric(inData)) || (iscell(inData) && isnumeric(inData{1}))
   stimLocs = mysql_extract_data('table','stimulus','stimulus_id', ...
       stimIDList,'extract_vars',{'location'},'conn_id',conn_id);
   stimLocs = stimLocs{1};
-  destStimLocs = check_stim_dirs(stimLocs,'srcroot',stimulus_root,'destroot',stimulus_ipem_analysis_root,'verbose',false);
+  destStimLocs = check_stim_dirs(stimLocs,'srcroot',stimulus_root,'destroot',stimulus_ipem_analysis_root,'verbose',verbose);
 
 elseif(ischar(inData) && strcmp(inData,'getDefaultParams'))
     
@@ -818,10 +828,13 @@ for iseries = 1:numSeries
           % settings and replaces with defaults where no fields exist?
           % 19Dec2013 BH
           
-          tmpParams = fh('getDefaultParams',extraParams);
-          
-          % tmpParams = fh('getDefaultParams',extraParams{:});
-          
+          % 17Sep2014 PJ - added conditional branching when getting default
+          % params to accommodate both structs and cell arrays
+          if isstruct(extraParams)
+            tmpParams = fh('getDefaultParams',extraParams);
+          else
+            tmpParams = fh('getDefaultParams',extraParams{:});
+          end
           
           tmpFieldNames = fieldnames(tmpParams);
           n_tmpParamFlds = length(tmpFieldNames);
@@ -901,7 +914,7 @@ function stepData = run_step(varargin)
   matchParams.varName = proc;
   matchParams.paramFind = series_params;
   matchParams.ignore = [params.glob.ignore 'ani.aniPath' 'future_steps'];
-  previousCalcFname = check_anal_exist(lPath,matchParams);
+  [previousCalcFname, firstViolation, violationReason] = check_anal_exist(lPath,matchParams);
   
   % run this step?
   % run_step('proc',proc,'params',params,'previousCalcFname',previousCalcFname)
