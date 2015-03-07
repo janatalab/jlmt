@@ -380,6 +380,7 @@ if ischar(inData) && (exist(inData,'dir') || exist(inData,'var'))
     inData = jlmt_prepare_dirs(inData);
     inDataType = 'aud_file_string_cell_array';
     nfiles = size(inData,1);
+    flist = inData;
   else
     % a single file path as a string
     inData = jlmt_prepare_dirs(inData);
@@ -397,6 +398,7 @@ if ischar(inData) && (exist(inData,'dir') || exist(inData,'var'))
     
     nfiles = 1;
   end
+  
 elseif(iscell(inData) && ischar(inData{1}))
 
   % cell array of filepaths as strings

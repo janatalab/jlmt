@@ -96,12 +96,12 @@ for ifile = 1:nfiles
 
   % Check to see whether directory for this file exists
   targdir = fullfile(fpath,fstub);
-  check_dir(targdir);
+  check_dir(targdir,0,1);
   
   % Check to see whether a sub-directory for the particular audio format
   % exists
   targdir = fullfile(targdir, fext(2:end));
-  check_dir(targdir);
+  check_dir(targdir,0,1);
 
   if ~exist(fullfile(targdir,[fstub fext]))
     % Move the file over to the sub-directory
