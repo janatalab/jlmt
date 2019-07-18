@@ -31,6 +31,7 @@ function params = params_toract(varargin)
 % 2012.10.30 PJ - added context dependent assignment of weight matrices
 % 2012.11.13 TC - Altered prev_steps to empty cell array, not double.
 % 2012.11.13 PJ - Fs is no longer part of the params struct
+% 2019.07.09 PJ - Added support for Principal Components analysis
 
 fields = {...
     'li_siglist',...
@@ -40,17 +41,22 @@ fields = {...
     'spher_harm',...
     'norm',...
     'som',...
+    'pca',...
     'inDataType', ...
     'prev_steps'};
 params = mkstruct(fields,varargin);
 
 def.li_siglist = [];
 def.ci_siglist = [];
-def.HalfDecayTimes = [0.1 2];
+def.HalfDecayTimes = [0.2 2];
 def.calc_spher_harm = 1;
 def.spher_harm = struct('nharm_theta',3,'nharm_phi',4,'min_rsqr',0.95);
 def.norm = 'x./repmat(sum(x),size(x,1),1)';
 def.som = [];
+
+def.pca.calculate = 1;
+def.pca.sources = {'toroidal_surface','toroidal_harmonics'};
+
 % Assign the default weight matrix based on context
 switch cell2str(params.prev_steps,'_')
   case 'ani_pp_li'

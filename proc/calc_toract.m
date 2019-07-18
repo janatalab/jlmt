@@ -38,6 +38,8 @@ function toract = calc_toract(inData,varargin)
 % parameters
 % 2012.11.13 PJ - Fs is no longer stored in the params structure, but
 %                 rather as a variable
+% 2019.07.17 PJ - Added support for Principal Components analysis of both
+%                 the toroidal activations and the spherical harmonics
 
 if nargin > 1 && isstruct(varargin{1})
   params = varargin{1};
@@ -102,13 +104,13 @@ for isig = 1:nsig
     
     tmp = [];
     [tmp.data, tmp.theta, tmp.phi, tmp.spher_names, tmp.Rsqr, X] = ...
-	toroidal_spect(act', sM.topol.msize, nharm_theta, nharm_phi);
-
+      toroidal_spect(act', sM.topol.msize, nharm_theta, nharm_phi);
+    
     if isfield('min_rsqr',params.spher_harm) && ...
-	  ~isempty(params.spher_harm.min_rsqr)
+        ~isempty(params.spher_harm.min_rsqr)
       if any(tmp.Rsqr < params.spher_harm.min_rsqr)
-	warning(['calc_toract: Fit of spherical harmonics less than criterion' ...
-	      ' value (%1.3f)'], params.spher_harm.min_rsqr)
+        warning(['calc_toract: Fit of spherical harmonics less than criterion' ...
+          ' value (%1.3f)'], params.spher_harm.min_rsqr)
       end
     end
     
@@ -132,6 +134,41 @@ for isig = 1:nsig
     
     toract.spherharm{isig} = tmp;
   end % if params.calc_spher_harm
+  
+  % Perform PCA if desired
+  if params.pca.calculate
+    for isrc = 1:length(params.pca.sources)
+      curr_src = params.pca.sources{isrc};
+      
+      switch curr_src
+        case 'toroidal_surface'
+        % Perform PCA on the toroidal activation
+        
+        % Reshape the matrix so that we have timepoints in rows and
+        % toroidal locations in columns
+        pcadata = act';
+        
+        case 'toroidal_harmonics'
+        % Perform PCA on the toroidal harmonics
+        pcadata = toract.spherharm{isig}.data;
+        
+      end
+      
+      fprintf('Running PCA for %s ...\n', curr_src)
+      
+      % Run pca
+      [result.coeff, ...
+        result.score, ...
+        result.latent, ...
+        result.tsquared, ...
+        result.explained, ...
+        result.mu] = pca(pcadata);
+      
+      % Store the results in the output structure
+      toract.pca.(curr_src){isig} = result;
+
+    end
+  end % if params.pca.calculate
 end % for isig=
 
 toract = ensemble_tree2datastruct(toract);

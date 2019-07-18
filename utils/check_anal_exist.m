@@ -124,7 +124,7 @@ for iFile = nFiles:-1:1
       
       if(paramsAreEqual)
         if(params.allMatches)
-          foundFile = {foundFile{:} filename};
+          foundFile = [foundFile {filename}];
         else
           foundFile = {filename};
           return
@@ -153,7 +153,7 @@ for idx = 1:length(ignore)
   dotLoc = strfind(ignoreString,'.');
  
   
-  if ~isempty(dotLoc) & isfield(params,ignoreString(1:dotLoc-1))
+  if ~isempty(dotLoc) && isfield(params,ignoreString(1:dotLoc-1))
     if(isfield(params.(ignoreString(1:dotLoc-1)), ignoreString(dotLoc+1:end)))
       params.(ignoreString(1:dotLoc-1)) = rmfield(params.(ignoreString(1:dotLoc-1)), ...
 		       ignoreString(dotLoc+1:end));

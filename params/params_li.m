@@ -42,7 +42,7 @@ params = mkstruct(fields,varargin);
 % set defaults if not otherwise specified
 def.PeriodicityPitch = [];
 def.SnapShot = [];
-def.HalfDecayTimes = [0.1 2];
+def.HalfDecayTimes = [0.2 2];
 def.Enlargement = [];
 def.PlotFlag = [];
 def.prev_steps = {};

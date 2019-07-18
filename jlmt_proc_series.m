@@ -243,6 +243,7 @@ function outData = jlmt_proc_series(inData,params)
 %                step are read from disk instead of being maintained in memory.
 % 17Sep2014 PJ - Changed location of where stimulus_root and destroot are
 %                overridden
+% 30Dec2014 PJ - enabled filtering of Ensemble datastruct
 
 %%
 % Make sure IPEM setup has been run
@@ -356,7 +357,7 @@ nseries = length(params.glob.process);
 if ~iscell(params.glob.save_calc);
   params.glob.save_calc = {params.glob.save_calc};
 end
-if ~iscell(params.glob.save_calc{1}) && nseries > 1
+if ~iscell(params.glob.save_calc{1}) % && nseries > 1 - 29Dec2014 PJ -removed the nseries > 1 condition, because this was causing problems when nseries==1
   tmpcell = params.glob.save_calc;
   params.glob.save_calc = {};
   for k=1:nseries
@@ -425,6 +426,12 @@ elseif isstruct(inData) && all(isfield(inData,{'vars','type','data'}))
   
   % deal with ensemble data struct types here
   if(ismember('stimulus_id',inData.vars))
+    
+    % Perform any filtering if specified
+    if isfield(params,'filt')
+      fprintf('Filtering Ensemble datastruct\n');
+      inData = ensemble_filter(inData, params.filt);
+    end
     
     % ensemble structure with stimulus ids : must consult Ensemble database
     inDataType = 'stimulus_id';
@@ -582,7 +589,7 @@ for ifile = 1:nfiles
     filename = [fstub ext];
     paramsSig = params_aud('path',fpath,'filename',filename);
     sig_st = new_aud(paramsSig);
-    descript = sprintf(' Stimulus ID %d ',stimIDList(ifile));
+    descript = sprintf(' Stimulus ID %d (%s)',stimIDList(ifile), filename);
     
   end
   
