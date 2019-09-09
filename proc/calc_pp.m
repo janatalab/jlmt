@@ -12,6 +12,7 @@ function pp = calc_pp(inData,varargin)
 % 4/14/07 Stefan Tomic - data structures now conform to ensemble datastruct
 % 30Oct2012 PJ - added support for varargin and handling of default
 %                parameters
+% 29Jul2019 PJ - Fixed indexing of varargin in getDefaultParams
 
 if nargin > 1 && isstruct(varargin{1})
   par = varargin{1};
@@ -73,7 +74,7 @@ function params = getDefaultParams(varargin)
 for iarg = 1:2:nargin
   switch varargin{iarg}
     case 'params'
-      params = varargin{iarg}+1;
+      params = varargin{iarg+1};
   end
 end
 

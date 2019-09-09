@@ -41,8 +41,10 @@ function outdata = calc_mode_estimate(inData,varargin)
 %       pct_major - % of the timecourse estimated to lie in major mode
 %       timeseries - the timeseries of the mode estimate for the entire
 %           given toract timeseries
-% 
+
 % FB 2013.01.16
+% 29Jul2019 PJ - Fixed indexing of varargin in getDefaultParams
+
 
 if nargin > 1 && isstruct(varargin{1})
   params = varargin{1};
@@ -115,7 +117,7 @@ function params = getDefaultParams(varargin)
 for iarg = 1:2:nargin
   switch varargin{iarg}
     case 'params'
-      params = varargin{iarg}+1;
+      params = varargin{iarg+1};
   end
 end
 

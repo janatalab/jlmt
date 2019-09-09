@@ -32,6 +32,7 @@ function params = params_toract(varargin)
 % 2012.11.13 TC - Altered prev_steps to empty cell array, not double.
 % 2012.11.13 PJ - Fs is no longer part of the params struct
 % 2019.07.09 PJ - Added support for Principal Components analysis
+% 2019.07.29 PJ - Fixed handling of varargin 
 
 fields = {...
     'li_siglist',...
@@ -44,7 +45,14 @@ fields = {...
     'pca',...
     'inDataType', ...
     'prev_steps'};
-params = mkstruct(fields,varargin);
+
+% Convert params structure to argument list if necessary
+if strcmp(varargin{1},'params')
+  args = [fieldnames(varargin{2}) struct2cell(varargin{2})]';
+else
+  args = varargin;
+end
+params = mkstruct(fields,args(:));
 
 def.li_siglist = [];
 def.ci_siglist = [];
@@ -54,8 +62,10 @@ def.spher_harm = struct('nharm_theta',3,'nharm_phi',4,'min_rsqr',0.95);
 def.norm = 'x./repmat(sum(x),size(x,1),1)';
 def.som = [];
 
-def.pca.calculate = 1;
+def.pca.compute = 1;
 def.pca.sources = {'toroidal_surface','toroidal_harmonics'};
+def.pca.splines.compute = 0;
+def.pca.splines.minimumPercentVariance = 99.9;
 
 % Assign the default weight matrix based on context
 switch cell2str(params.prev_steps,'_')

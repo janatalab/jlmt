@@ -55,55 +55,13 @@ for istim = 1:nstim
       numPCs = find(cumPctVarExplained >= params.crit.pctVarExplained, 1, 'first');
       
       % Store the result in an output structure
-      results.(currSrc).(currTCLabel)(istim,1) = numPCs;
+      results.(currSrc).(currTCLabel).numPCs(istim,1) = numPCs;
       
+      % Calculate the mean score for each of the PCs
+      results.(currSrc).(currTCLabel).mean_scores{istim} = mean(currdata.score(:,1:numPCs));
+          
     end % for itc = 1:numTimeConstants
   end % for isrc = 1:length(sources)
 end % for istim=
-
-% Generate summary statistics and plots
-figure(1), clf
-for isrc = 1:numSources
-  currSrc = sources{isrc};
-  
-  for itc = 1:numTimeConstants
-    currTCLabel = toract.labels{itc};
-    if ~isfield(results.(currSrc),currTCLabel)
-      continue
-    end
-    currdata = results.(currSrc).(currTCLabel);
-    
-    subplot(numSources, numTimeConstants,(isrc-1)*numTimeConstants + itc)
-    bins = 1:18;
-    hist(currdata,bins)
-    set(gca,'xlim',[0 max(bins)])
-    title(strrep(sprintf('%s: %s', currSrc,currTCLabel),'_','\_'),'fontsize',18)
-    xlabel('#PCs')
-    ylabel('#songs')
-    
-    xoffset = 0.05;
-    align = 'left';
-    text(xoffset, 0.95, sprintf('Mean: %.1f', mean(currdata)), ...
-      'horizontalalign',align, ...
-      'units','normalized');
-    text(xoffset, 0.90, sprintf('Min: %.1f', min(currdata)), ...
-      'horizontalalign',align, ...
-      'units','normalized');  
-    text(xoffset, 0.85, sprintf('Max: %.1f', max(currdata)), ...
-      'horizontalalign',align, ...
-      'units','normalized');
-  end
-end
-
-% Save the figure if desired
-if isfield(params,'output') && isfield(params.output, 'savefig') && params.output.savefig
-  if ~isfield(params.output,'figstub')
-    error('Name of file to which to save the figure was not provided!')
-  end
-  
-  figname = fullfile(params.paths.figures, params.output.figstub);
-  fprintf('Saving figure to %s\n', figname);
-  print(figname, '-depsc')
-end
 
 end

@@ -19,7 +19,7 @@ function params = params_pp(varargin)
 %       prev_steps: specify the analysis steps previous to calc_pp that
 %                   should be encountered when using the given
 %                   parameters (optional)
-%
+
 % Copyright (c) 2006-2013 The Regents of the University of California
 % All Rights Reserved.
 %
@@ -28,6 +28,7 @@ function params = params_pp(varargin)
 % 12/4/06 Petr Janata
 % Changes.
 %  2012.11.13 TC. Altered prev_steps to empty cell array, not double.
+% 2019.07.29 PJ - Fixed handling of varargin 
 
 fields = {...
     'LowFrequency', ...
@@ -38,7 +39,13 @@ fields = {...
     'prev_steps', ...
     'inDataType'};
 
-params = mkstruct(fields,varargin);
+% Convert params structure to argument list if necessary
+if strcmp(varargin{1},'params')
+  args = [fieldnames(varargin{2}) struct2cell(varargin{2})]';
+else
+  args = varargin;
+end
+params = mkstruct(fields,args(:));
 
 def.LowFrequency = [];
 def.FrameWidth = 0.0381;

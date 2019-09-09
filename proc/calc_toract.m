@@ -17,11 +17,23 @@ function toract = calc_toract(inData,varargin)
 %       .nharm_theta
 %       .nharm_phi
 %       .min_rsqr
+%
+% OPTIONAL
+%   params.pca.compute - performs Principal Components Analysis on the
+%                        toroidal activation patterns (default=true)
+%   params.pca.sources - representation(s) on which to run PCA
+%                        (default={'toroidal_surface','toroidal_harmonics'}
+%   params.pca.splines.compute - calculate piecewise cubic splines for use
+%                        in subsequent interpolation (default=false)
+%   params.pca.splines.minimumPercentVariance - determines the number of PCs 
+%                        required to explain this percentage of variance
+%                        (default=99.9)
+%   
 % 
 % RETURNS
 %   toract - an ensemble data struct with the following variables:
 %       
-%
+
 % Copyright (c) 2007-2013 The Regents of the University of California
 % All Rights Reserved.
 %
@@ -40,6 +52,9 @@ function toract = calc_toract(inData,varargin)
 %                 rather as a variable
 % 2019.07.17 PJ - Added support for Principal Components analysis of both
 %                 the toroidal activations and the spherical harmonics
+% 2019.07.29 PJ - Made absence of an SOM file a fatal error rather than
+%                 soft return. Fixed handling of varargin in default params
+
 
 if nargin > 1 && isstruct(varargin{1})
   params = varargin{1};
@@ -68,9 +83,8 @@ if ~isfield(params.som,'fname')
 else
   som_fname = params.som.fname;
 end
-if ~exist(som_fname)
-  fprintf('SOM file (%s) does not exist\n', som_fname);
-  return
+if ~exist(som_fname,'file')
+  error('SOM file (%s) does not exist\n', som_fname);
 end
 
 load(som_fname,'sM')
@@ -136,7 +150,7 @@ for isig = 1:nsig
   end % if params.calc_spher_harm
   
   % Perform PCA if desired
-  if params.pca.calculate
+  if params.pca.compute
     for isrc = 1:length(params.pca.sources)
       curr_src = params.pca.sources{isrc};
       
@@ -164,6 +178,20 @@ for isig = 1:nsig
         result.explained, ...
         result.mu] = pca(pcadata);
       
+      % Calculate splines if requested
+      if params.pca.splines.compute
+        % Determine cumulative percentage of variance explained
+        cumPctVar = cumsum(result.explained);
+        
+        % Find the number of PCs required to explain the criterion amount
+        % of variance
+        numPCs = find(cumPctVar >= params.pca.splines.minimumPercentVariance, 1, 'first');
+        
+        % Calculate splines on the scores
+        timevect = (1:size(result.score,1))/toract.Fs;
+        result.splines = spline(timevect,result.score(:,1:numPCs)'); % spline operates row-wise
+      end
+      
       % Store the results in the output structure
       toract.pca.(curr_src){isig} = result;
 
@@ -187,19 +215,22 @@ function params = getDefaultParams(varargin)
 for iarg = 1:2:nargin
   switch varargin{iarg}
     case 'params'
-      params = varargin{iarg}+1;
+      params = varargin{iarg+1};
   end
 end
 
+% Get the default parameters
 def = params_toract(varargin{:});
 
 fnames = fieldnames(def);
 
+% Return default parameters if we have no overriding parameters
 if ~exist('params','var') || ~isstruct(params)
   params = def;
   return
 else
-
+  % Overwrite defaults with parameters we passed in. This shouldn't be
+  % necessary given how we are propagating parameters into params_toract
   for ifld = 1:length(fnames)
     if (~isfield(params,fnames{ifld}) || isempty(params.(fnames{ifld})))
       params.(fnames{ifld}) = def.(fnames{ifld});

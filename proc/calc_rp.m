@@ -477,6 +477,7 @@ function defParams = getDefaultParams(varargin)
 % 'getDefaultParams' to rhythm_profiler
 
 inDataType = '';
+prev_steps = {};
 for iarg = 1:2:nargin
   switch varargin{iarg}
       case 'inDataType'
@@ -491,6 +492,10 @@ end
 
 if isempty(inDataType) && exist('params','var') && isfield(params,'inDataType')
     inDataType = params.inDataType;
+end
+
+if isempty(prev_steps) && exist('params','var') && isfield(params,'prev_steps')
+  prev_steps = params.prev_steps;
 end
 
 if ~isempty(inDataType)

@@ -146,7 +146,7 @@ function outData = jlmt_proc_series(inData,params)
 %           params.toract(3).prev_steps = {'ani','pp','li'};
 % 
 %           In the above case, when running the 'ani' and the 'pc' steps,
-%           params.ani and params.pc, respectfully, will be used to conduct
+%           params.ani and params.pc, respectively, will be used to conduct
 %           those analyses. When 'pp' and 'li' are run in both analysis
 %           series, jlmt_proc_series will dynamically execute
 %           calc_pp('getDefaultParams') and calc_li('getDefaultParams'),
@@ -244,6 +244,8 @@ function outData = jlmt_proc_series(inData,params)
 % 17Sep2014 PJ - Changed location of where stimulus_root and destroot are
 %                overridden
 % 30Dec2014 PJ - enabled filtering of Ensemble datastruct
+% 07Sep2019 PJ - minor fix to move verbosity checking below initial
+%                handling of params
 
 %%
 % Make sure IPEM setup has been run
@@ -254,12 +256,6 @@ if isempty(getpref('IPEMToolbox'))
     otherwise
       IPEMSetupLinuxOSX;
   end
-end
-
-if isfield(params,'verbose')
-  verbose = params.verbose;
-else
-  verbose = 0;
 end
 
 % get a list of all current jlmt calc functions
@@ -288,6 +284,12 @@ end
 if ~exist('params','var')
   fprintf('No param structure specified. Using defaults ...\n')
   params = getDefaultParams;
+end
+
+if isfield(params,'verbose')
+  verbose = params.verbose;
+else
+  verbose = 0;
 end
 
 % This parameter sets the fieldnames to ignore when comparing the
@@ -766,13 +768,15 @@ end
 % Clear the defaults
 clear def
 
-if exist('calc_names','var')
-  if iscell(calc_names{1})
-    params.glob.process = calc_names;
-  else
-    params.glob.process = {calc_names};
-  end
-end
+% 29Jul2019 PJ - The following lines were commented out because they were
+% problematic in overwriting the specified lists of things to process
+% if exist('calc_names','var')
+%   if iscell(calc_names{1})
+%     params.glob.process = calc_names;
+%   else
+%     params.glob.process = {calc_names};
+%   end
+% end
 
 if ~iscell(params.glob.process{1})
   params.glob.process = {params.glob.process};
@@ -836,6 +840,11 @@ for iseries = 1:numSeries
           % tmpParams assignment that checks each param field for existing
           % settings and replaces with defaults where no fields exist?
           % 19Dec2013 BH
+          %
+          % Each of the calculation functions should accept overriding
+          % parameters. Discovered on 29Jul2019 that this was not working
+          % for calc_toract and may not be working for some of the other
+          % functions.
           
           % 17Sep2014 PJ - added conditional branching when getting default
           % params to accommodate both structs and cell arrays
@@ -865,7 +874,11 @@ for iseries = 1:numSeries
               end
           end
           
-          params.(currCalc)(ispec) = tmpParams;% 13Aug2013 PJ - changed from (end+1) to (ispec)
+          if ispec == 1
+            params.(currCalc) = tmpParams;
+          else
+            params.(currCalc)(ispec) = tmpParams;% 13Aug2013 PJ - changed from (end+1) to (ispec)
+          end
       end
       
     end % if ~isfield(params, currCalc)

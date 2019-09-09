@@ -47,6 +47,9 @@ function li = calc_li(inData, varargin)
 % 2012/07/03 FB - changed to 'calc_li' to reflect expansion beyound
 % contextuality images calculated from ani or pp space
 % 13Nov2012 PJ - Fs is no longer stored in the params structure.
+% 29Jul2019 PJ - dealt with some naming issues pertaining to .sig or
+%                .signals field. Fixed indexing of varargin in getDefaultParams
+
 
 li = [];
 
@@ -79,7 +82,16 @@ end
 li = init_li_struct;
 liCols = set_var_col_const(li.vars);
 dataCols = set_var_col_const(inData.vars);
-inSig = inData.data{dataCols.sig};
+
+if isfield(dataCols,'sig')
+  sigfld = 'sig';
+elseif isfield(dataCols,'signals')
+  sigfld = 'signals';
+else
+  error('Do not know where signals (data) are located')
+end
+
+inSig = inData.data{dataCols.(sigfld)};
 
 if(iscell(inSig)), inSig = inSig{1}; end
 
@@ -167,7 +179,7 @@ function params = getDefaultParams(varargin)
 for iarg = 1:2:nargin
   switch varargin{iarg}
     case 'params'
-      params = varargin{iarg}+1;
+      params = varargin{iarg+1};
   end
 end
 

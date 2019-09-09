@@ -53,6 +53,8 @@ function pc = calc_pc(indata,varargin)
 %                  reverts to former method of calculating the
 %                  multiplication of trained matrix and incoming pp
 %                  variable, consistent with the naming in older maps.
+% 29Jul2019 PJ - Fixed indexing of varargin in getDefaultParams
+
 
 if nargin > 1 && isstruct(varargin{1})
   params = varargin{1};
@@ -133,7 +135,7 @@ function params = getDefaultParams(varargin)
 for iarg = 1:2:nargin
   switch varargin{iarg}
     case 'params'
-      params = varargin{iarg}+1;
+      params = varargin{iarg+1};
   end
 end
 
